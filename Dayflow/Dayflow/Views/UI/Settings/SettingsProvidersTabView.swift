@@ -144,7 +144,7 @@ struct SettingsProvidersTabView: View {
       }
     case .dayflow:
       SettingsRow(label: "Status", showsDivider: false) {
-        SettingsMetadata(text: viewModel.statusText(for: .dayflow) ?? "Requires Dayflow Pro")
+        SettingsMetadata(text: viewModel.statusText(for: .dayflow) ?? "Requires TAKT Pro")
       }
     }
   }
@@ -202,7 +202,7 @@ struct SettingsProvidersTabView: View {
             }
           }
         case .dayflow:
-          Text("Hosted cards and transcription run through your Dayflow account.")
+          Text("Hosted cards and transcription run through your TAKT account.")
             .font(.custom("Figtree", size: 13))
             .foregroundColor(SettingsStyle.secondary)
         }
@@ -343,7 +343,7 @@ struct SettingsProvidersTabView: View {
   private var geminiModelSection: some View {
     SettingsSection(
       title: "Gemini model preference",
-      subtitle: "Choose which Gemini model Dayflow should prioritize."
+      subtitle: "Choose which Gemini model TAKT should prioritize."
     ) {
       VStack(alignment: .leading, spacing: 14) {
         Picker("Gemini model", selection: $viewModel.selectedGeminiModel) {
@@ -363,7 +363,7 @@ struct SettingsProvidersTabView: View {
           .foregroundColor(SettingsStyle.secondary)
 
         Text(
-          "Dayflow automatically downgrades if your chosen model is rate limited or unavailable."
+          "TAKT automatically downgrades if your chosen model is rate limited or unavailable."
         )
         .font(.custom("Figtree", size: 11))
         .foregroundColor(SettingsStyle.meta)
@@ -379,9 +379,9 @@ struct SettingsProvidersTabView: View {
     case .gemini:
       promptSection(
         title: "Gemini prompt customization",
-        subtitle: "Override Dayflow's defaults to tailor card generation.",
+        subtitle: "Override TAKT's defaults to tailor card generation.",
         intro:
-          "Overrides apply only when their toggle is on. Unchecked sections fall back to Dayflow's defaults.",
+          "Overrides apply only when their toggle is on. Unchecked sections fall back to TAKT's defaults.",
         sections: [
           promptEditorConfig(
             heading: "Card titles",
@@ -454,7 +454,7 @@ struct SettingsProvidersTabView: View {
       title: "ChatGPT and Claude prompt customization",
       subtitle: "Keep independent card-generation prompts for each CLI provider.",
       intro:
-        "Overrides apply only when their toggle is on. Unchecked sections fall back to Dayflow's defaults.",
+        "Overrides apply only when their toggle is on. Unchecked sections fall back to TAKT's defaults.",
       sections: [
         promptEditorConfig(
           heading: "Card titles",
@@ -535,7 +535,7 @@ struct SettingsProvidersTabView: View {
         HStack {
           Spacer()
           SettingsSecondaryButton(
-            title: "Reset to Dayflow defaults",
+            title: "Reset to TAKT defaults",
             systemImage: "arrow.counterclockwise",
             action: onReset
           )
@@ -737,7 +737,7 @@ struct LocalModelUpgradeSheet: View {
               .font(.custom("Figtree", size: 22))
               .fontWeight(.semibold)
             Text(
-              "Follow the steps below, run a quick test, and Dayflow will switch you over automatically."
+              "Follow the steps below, run a quick test, and TAKT will switch you over automatically."
             )
             .font(.custom("Figtree", size: 13))
             .foregroundColor(SettingsStyle.secondary)
@@ -799,7 +799,7 @@ struct LocalModelUpgradeSheet: View {
         )
 
         Text(
-          "Once the test succeeds, Dayflow updates your settings to \(preset.displayName) automatically."
+          "Once the test succeeds, TAKT updates your settings to \(preset.displayName) automatically."
         )
         .font(.custom("Figtree", size: 12))
         .foregroundColor(SettingsStyle.secondary)

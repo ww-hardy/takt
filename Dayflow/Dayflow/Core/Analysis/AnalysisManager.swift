@@ -161,7 +161,7 @@ final class AnalysisManager: AnalysisManaging {
                 progressHandler(
                   "✓ Batch \(index + 1) completed in \(self.formatDuration(batchDuration))")
               }
-            case "failed", "failed_empty", "skipped_short":
+            case "failed", "failed_empty", "skipped_short", "skipped_no_provider":
               // These are acceptable end states
               isCompleted = true
               processedCount += 1
@@ -297,7 +297,7 @@ final class AnalysisManager: AnalysisManaging {
                 progressHandler(
                   "✓ Batch \(index + 1) completed in \(self.formatDuration(batchDuration))")
               }
-            case "failed", "failed_empty", "skipped_short":
+            case "failed", "failed_empty", "skipped_short", "skipped_no_provider":
               // These are acceptable end states
               isCompleted = true
               processedCount += 1

@@ -20,7 +20,7 @@ struct LLMProviderSetupView: View {
     case .gemini:
       return "Gemini"
     case .dayflow:
-      return "Dayflow Pro"
+      return "TAKT Pro"
     }
   }
 
@@ -416,7 +416,7 @@ struct LLMProviderSetupView: View {
             .fontWeight(.semibold)
             .foregroundColor(.black.opacity(0.9))
 
-          Text("This model enables Dayflow to understand what's on your screen")
+          Text("This model enables TAKT to understand what's on your screen")
             .font(.custom("Figtree", size: 14))
             .foregroundColor(.black.opacity(0.6))
         }
@@ -610,7 +610,7 @@ struct LLMProviderSetupView: View {
             .foregroundColor(.black.opacity(0.9))
 
           Text(
-            "allows you to run Dayflow for free. All you need is a Google account - no credit card required."
+            "allows you to run TAKT for free. All you need is a Google account - no credit card required."
           )
           .font(.custom("Figtree", size: 14))
           .foregroundColor(.black.opacity(0.6))
@@ -734,7 +734,7 @@ struct LLMProviderSetupView: View {
     if providerType == .openAICompatible {
       guard persistOpenAICompatibleSettings() else {
         setupState.saveErrorMessage =
-          "Dayflow couldn't save this endpoint configuration. Your previous configuration is still active."
+          "TAKT couldn't save this endpoint configuration. Your previous configuration is still active."
         return false
       }
     }
@@ -744,7 +744,7 @@ struct LLMProviderSetupView: View {
       return true
     } catch {
       setupState.saveErrorMessage =
-        "Dayflow couldn't finish saving this provider. Please try again."
+        "TAKT couldn't finish saving this provider. Please try again."
       return false
     }
   }
@@ -753,7 +753,7 @@ struct LLMProviderSetupView: View {
     guard saveConfiguration() else { return }
     guard onComplete() else {
       setupState.saveErrorMessage =
-        "The provider is configured, but Dayflow couldn't update your routing. Your previous selection is still active."
+        "The provider is configured, but TAKT couldn't update your routing. Your previous selection is still active."
       return
     }
   }

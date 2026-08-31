@@ -34,6 +34,7 @@ struct MainView: View {
   @State var scrollToNowTick: Int = 0
   @State var hasAnyActivities: Bool = true
   @State var refreshActivitiesTrigger: Int = 0
+  @State var clientFilter: Set<Int64> = []
   @ObservedObject var inactivity = InactivityMonitor.shared
   @ObservedObject var pauseManager = PauseManager.shared
 

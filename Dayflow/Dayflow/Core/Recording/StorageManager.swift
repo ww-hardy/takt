@@ -717,6 +717,47 @@ final class StorageManager: StorageManaging, @unchecked Sendable {
             """)
         print("✅ Added is_skipped column to day_goals")
       }
+
+      // TAKT: Multi-client recognition — clients and projects tables
+      try db.execute(
+        sql: """
+              CREATE TABLE IF NOT EXISTS clients (
+                  id INTEGER PRIMARY KEY AUTOINCREMENT,
+                  name TEXT NOT NULL,
+                  detail TEXT,
+                  color TEXT,
+                  default_billable INTEGER NOT NULL DEFAULT 0,
+                  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+              );
+              CREATE TABLE IF NOT EXISTS projects (
+                  id INTEGER PRIMARY KEY AUTOINCREMENT,
+                  client_id INTEGER REFERENCES clients(id) ON DELETE CASCADE,
+                  name TEXT NOT NULL,
+                  detail TEXT,
+                  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+              );
+              CREATE INDEX IF NOT EXISTS idx_projects_client ON projects(client_id);
+          """)
+
+      // TAKT: Tag columns on timeline_cards (idempotent guard, mirrors is_deleted pattern)
+      let cardTagColumns = try db.columns(in: "timeline_cards").map { $0.name }
+      if !cardTagColumns.contains("client_id") {
+        try db.execute(
+          sql: """
+                ALTER TABLE timeline_cards ADD COLUMN client_id INTEGER;
+                ALTER TABLE timeline_cards ADD COLUMN project_id INTEGER;
+                ALTER TABLE timeline_cards ADD COLUMN task TEXT;
+                ALTER TABLE timeline_cards ADD COLUMN billable INTEGER;
+                ALTER TABLE timeline_cards ADD COLUMN tag_source TEXT;
+                ALTER TABLE timeline_cards ADD COLUMN tag_confidence REAL;
+            """)
+        try db.execute(
+          sql: """
+                CREATE INDEX IF NOT EXISTS idx_timeline_cards_client ON timeline_cards(client_id);
+                CREATE INDEX IF NOT EXISTS idx_timeline_cards_project ON timeline_cards(project_id);
+            """)
+        print("✅ Added TAKT tag columns (client_id, project_id, task, billable, tag_source, tag_confidence) to timeline_cards")
+      }
     }
   }
 

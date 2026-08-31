@@ -99,6 +99,16 @@ enum TimelineActivityLoader {
     var idCounts: [String: Int] = [:]
     results.reserveCapacity(cards.count)
 
+    // TAKT: Resolve client/project names once for the whole batch.
+    let clientNames = Dictionary(
+      uniqueKeysWithValues: StorageManager.shared.fetchClients()
+        .compactMap { client in client.id.map { ($0, client.name) } }
+    )
+    let projectNames = Dictionary(
+      uniqueKeysWithValues: StorageManager.shared.fetchProjects()
+        .compactMap { project in project.id.map { ($0, project.name) } }
+    )
+
     for card in cards {
       guard
         let baseDay = DateFormatter.yyyyMMdd.date(from: card.day),
@@ -175,7 +185,14 @@ enum TimelineActivityLoader {
           videoSummaryURL: card.videoSummaryURL,
           screenshot: nil,
           appSites: card.appSites,
-          isBackupGenerated: card.isBackupGenerated
+          isBackupGenerated: card.isBackupGenerated,
+          clientId: card.clientId,
+          projectId: card.projectId,
+          clientName: card.clientId.flatMap { clientNames[$0] },
+          projectName: card.projectId.flatMap { projectNames[$0] },
+          task: card.task,
+          billable: card.billable,
+          tagSource: card.tagSource
         )
       )
     }

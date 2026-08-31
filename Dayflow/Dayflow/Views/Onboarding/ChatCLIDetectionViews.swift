@@ -85,7 +85,7 @@ struct ChatCLIDetectionStepView<NextButton: View>: View {
   var body: some View {
     VStack(alignment: .leading, spacing: 24) {
       Text(
-        "Dayflow can talk to ChatGPT (via the Codex CLI) or Claude Code. You only need one installed and signed in on this Mac. After installing, run `codex auth` or `claude login` in Terminal to connect it to your account."
+        "TAKT can talk to ChatGPT (via the Codex CLI) or Claude Code. You only need one installed and signed in on this Mac. After installing, run `codex auth` or `claude login` in Terminal to connect it to your account."
       )
       .font(.custom("Figtree", size: 14))
       .foregroundColor(.black.opacity(0.6))
@@ -104,13 +104,13 @@ struct ChatCLIDetectionStepView<NextButton: View>: View {
       }
 
       Text(
-        "Tip: Once both are installed, you can choose which provider Dayflow uses from Settings → AI Provider."
+        "Tip: Once both are installed, you can choose which provider TAKT uses from Settings → AI Provider."
       )
       .font(.custom("Figtree", size: 12))
       .foregroundColor(.black.opacity(0.5))
 
       VStack(alignment: .leading, spacing: 10) {
-        Text("Choose which provider Dayflow should use")
+        Text("Choose which provider TAKT should use")
           .font(.custom("Figtree", size: 13))
           .fontWeight(.semibold)
           .foregroundColor(.black.opacity(0.65))

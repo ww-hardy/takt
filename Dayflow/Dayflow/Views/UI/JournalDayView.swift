@@ -350,7 +350,7 @@ private struct ReflectionPromptCard: View {
         .foregroundStyle(JournalDayTokens.sectionHeader.opacity(0.4))
 
       Text(
-        "Return near the end of your day to reflect on your intentions. Let Dayflow generate a narrative summary based on the activities on your Timeline."
+        "Return near the end of your day to reflect on your intentions. Let TAKT generate a narrative summary based on the activities on your Timeline."
       )
       .font(.custom("Figtree-Regular", size: 15))
       .foregroundStyle(JournalDayTokens.bodyText.opacity(0.65))
@@ -467,7 +467,7 @@ private struct ReflectionSavedCard: View {
             }
           }
         } else if canSummarize {
-          Button("Summarize with Dayflow", action: onSummarize)
+          Button("Summarize with TAKT", action: onSummarize)
             .buttonStyle(JournalPillButtonStyle(horizontalPadding: 24, verticalPadding: 11))
         } else {
           Text("Need at least 1 hour of timeline activity to summarize")
@@ -487,7 +487,7 @@ private struct SummaryCard: View {
   var body: some View {
     VStack(alignment: .leading, spacing: 22) {
       VStack(alignment: .leading, spacing: 8) {
-        Text("Dayflow summary")
+        Text("TAKT summary")
           .font(.custom("InstrumentSerif-Regular", size: 22))
           .foregroundStyle(JournalDayTokens.sectionHeader)
 
@@ -546,7 +546,7 @@ private struct IntroView: View {
         .foregroundStyle(JournalDayTokens.sectionHeader)
         .multilineTextAlignment(.center)
       Text(
-        "Dayflow helps you track your daily and longer term pursuits, gives you the space to reflect, and generates a summary of each day."
+        "TAKT helps you track your daily and longer term pursuits, gives you the space to reflect, and generates a summary of each day."
       )
       .font(.custom("Figtree-Regular", size: 16))
       .foregroundStyle(JournalDayTokens.bodyText)

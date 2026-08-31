@@ -379,7 +379,13 @@ extension StorageManager {
             videoSummaryURL: row["video_summary_url"],
             otherVideoSummaryURLs: nil,
             appSites: appSites,
-            isBackupGenerated: isBackupGenerated
+            isBackupGenerated: isBackupGenerated,
+            clientId: row["client_id"],
+            projectId: row["project_id"],
+            task: row["task"] ?? "",
+            billable: (row["billable"] as? Int).map { $0 != 0 },
+            tagSource: row["tag_source"] ?? "",
+            tagConfidence: row["tag_confidence"] as? Double
           )
         }
       }) ?? []
@@ -496,7 +502,13 @@ extension StorageManager {
           videoSummaryURL: row["video_summary_url"],
           otherVideoSummaryURLs: nil,
           appSites: appSites,
-          isBackupGenerated: isBackupGenerated
+          isBackupGenerated: isBackupGenerated,
+          clientId: row["client_id"],
+          projectId: row["project_id"],
+          task: row["task"] ?? "",
+          billable: (row["billable"] as? Int).map { $0 != 0 },
+          tagSource: row["tag_source"] ?? "",
+          tagConfidence: row["tag_confidence"] as? Double
         )
       }
     }
@@ -559,7 +571,13 @@ extension StorageManager {
           videoSummaryURL: row["video_summary_url"],
           otherVideoSummaryURLs: nil,
           appSites: appSites,
-          isBackupGenerated: isBackupGenerated
+          isBackupGenerated: isBackupGenerated,
+          clientId: row["client_id"],
+          projectId: row["project_id"],
+          task: row["task"] ?? "",
+          billable: (row["billable"] as? Int).map { $0 != 0 },
+          tagSource: row["tag_source"] ?? "",
+          tagConfidence: row["tag_confidence"] as? Double
         )
       }
     }

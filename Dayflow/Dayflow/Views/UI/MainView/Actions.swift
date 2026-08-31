@@ -38,6 +38,49 @@ extension MainView {
     }
   }
 
+  /// TAKT: Apply client/project/task/billable tagging to a card.
+  func handleTagChange(
+    clientId: Int64?,
+    projectId: Int64?,
+    task: String?,
+    billable: Bool?,
+    for activity: TimelineActivity
+  ) {
+    let clients = StorageManager.shared.fetchClients()
+    let projects = StorageManager.shared.fetchProjects()
+    let clientName = clientId.flatMap { id in clients.first { $0.id == id }?.name }
+    let projectName = projectId.flatMap { id in projects.first { $0.id == id }?.name }
+    let trimmedTask = task?.trimmingCharacters(in: .whitespacesAndNewlines)
+    let source: String? = activity.tagSource == nil || activity.tagSource == "ai" ? "corrected" : "manual"
+
+    // Optimistically update the selected activity so the UI reflects the change immediately.
+    selectedActivity = activity.withTagging(
+      clientId: clientId,
+      projectId: projectId,
+      clientName: clientName,
+      projectName: projectName,
+      task: trimmedTask,
+      billable: billable,
+      tagSource: source
+    )
+
+    // Ask the timeline list to refresh so other cards stay in sync.
+    refreshActivitiesTrigger &+= 1
+
+    guard let recordId = activity.recordId else { return }
+
+    Task.detached(priority: .userInitiated) {
+      StorageManager.shared.updateTimelineCardTagging(
+        cardId: recordId,
+        clientId: clientId,
+        projectId: projectId,
+        task: trimmedTask,
+        billable: billable,
+        tagSource: source
+      )
+    }
+  }
+
   func handleTimelineRating(_ direction: TimelineRatingDirection) {
     guard let activity = selectedActivity else { return }
 

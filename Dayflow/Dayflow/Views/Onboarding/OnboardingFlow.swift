@@ -144,55 +144,63 @@ struct OnboardingFlow: View {
         }
 
       case .llmSelection:
-        OnboardingPrototypeChooseProviderStep(
-          hasPaidAI: userHasPaidAI ?? false,
-          flowID: flowID,
-          flowVariant: "production_onboarding",
-          onSelect: { providerID in
-            if providerID == .dayflow, !saveRouting(primary: providerID) {
-              return
-            }
-            selectedProviderIDRawValue = providerID.rawValue
+        VStack(spacing: 0) {
+          OnboardingPrototypeChooseProviderStep(
+            hasPaidAI: userHasPaidAI ?? false,
+            flowID: flowID,
+            flowVariant: "production_onboarding",
+            onSelect: { providerID in
+              if providerID == .dayflow, !saveRouting(primary: providerID) {
+                return
+              }
+              selectedProviderIDRawValue = providerID.rawValue
 
-            var props: [String: Any] = [
-              "provider": providerID.analyticsName,
-              "provider_id": providerID.rawValue,
-            ]
-            if providerID == .local {
-              let localEngine = UserDefaults.standard.string(forKey: "llmLocalEngine") ?? "ollama"
-              props["local_engine"] = localEngine
+              var props: [String: Any] = [
+                "provider": providerID.analyticsName,
+                "provider_id": providerID.rawValue,
+              ]
+              if providerID == .local {
+                let localEngine = UserDefaults.standard.string(forKey: "llmLocalEngine") ?? "ollama"
+                props["local_engine"] = localEngine
+              }
+              AnalyticsService.shared.capture("llm_provider_selected", props)
+              if providerID == .dayflow {
+                recordCurrentProvider(providerID)
+              }
+              advance(extraProps: props)
             }
-            AnalyticsService.shared.capture("llm_provider_selected", props)
-            if providerID == .dayflow {
-              recordCurrentProvider(providerID)
-            }
-            advance(extraProps: props)
+          )
+          .frame(maxWidth: .infinity, maxHeight: .infinity)
+          .onAppear {
+            AnalyticsService.shared.screen("onboarding_llm_selection")
           }
-        )
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .onAppear {
-          AnalyticsService.shared.screen("onboarding_llm_selection")
+          skipAISetupButton
+            .padding(.bottom, 20)
         }
 
       case .llmSetup:
-        // COMPLETELY STANDALONE - no parent constraints!
-        LLMProviderSetupView(
-          providerType: selectedProviderID,
-          onBack: {
-            setStep(.llmSelection)
-          },
-          onComplete: {
-            guard saveRouting(primary: selectedProviderID, presentsError: false) else {
-              return false
+        VStack(spacing: 0) {
+          // COMPLETELY STANDALONE - no parent constraints!
+          LLMProviderSetupView(
+            providerType: selectedProviderID,
+            onBack: {
+              setStep(.llmSelection)
+            },
+            onComplete: {
+              guard saveRouting(primary: selectedProviderID, presentsError: false) else {
+                return false
+              }
+              recordCurrentProvider(selectedProviderID)
+              advance()
+              return true
             }
-            recordCurrentProvider(selectedProviderID)
-            advance()
-            return true
+          )
+          .frame(maxWidth: .infinity, maxHeight: .infinity)
+          .onAppear {
+            AnalyticsService.shared.screen("onboarding_llm_setup")
           }
-        )
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .onAppear {
-          AnalyticsService.shared.screen("onboarding_llm_setup")
+          skipAISetupButton
+            .padding(.bottom, 20)
         }
 
       case .categories:
@@ -306,7 +314,7 @@ struct OnboardingFlow: View {
       return true
     } catch {
       if presentsError {
-        routingSaveErrorMessage = "Dayflow couldn't save this provider. Please try again."
+        routingSaveErrorMessage = "TAKT couldn't save this provider. Please try again."
       }
       AnalyticsService.shared.capture(
         "llm_provider_routing_save_failed",
@@ -324,6 +332,34 @@ struct OnboardingFlow: View {
       "current_llm_provider": providerID.analyticsName,
       "current_llm_provider_id": providerID.rawValue,
     ])
+  }
+
+  // MARK: - TAKT: skip AI setup
+
+  /// Finishes onboarding without saving a provider. The app opens straight
+  /// into the timeline; batches are skipped (not failed) until the user
+  /// configures an AI provider in Settings.
+  private func skipAIAndFinishOnboarding() {
+    markStepCompleted(.llmSelection, extraProps: ["skipped_ai": true])
+    didOnboard = true
+    savedStepRawValue = 0
+    savedHasPaidAISelection = ""
+    AnalyticsService.shared.capture("onboarding_ai_skipped")
+    AnalyticsService.shared.setPersonProperties(["onboarding_status": "completed"])
+  }
+
+  private var skipAISetupButton: some View {
+    Button(action: skipAIAndFinishOnboarding) {
+      Text("Später einrichten")
+        .font(.custom("Figtree", size: 14))
+        .foregroundColor(Color(hex: "786A61"))
+        .underline()
+        .padding(.vertical, 8)
+        .padding(.horizontal, 16)
+    }
+    .buttonStyle(.plain)
+    .help(
+      "Überspringt die KI-Einrichtung. Du kannst jederzeit unter Einstellungen einen Anbieter konfigurieren.")
   }
 
   private func restoreSavedStep() {
@@ -741,7 +777,7 @@ struct OnboardingPrototypeDownloadReasonStep: View {
 
       VStack(spacing: 22) {
         VStack(spacing: 4) {
-          Text("What are you hoping to get out of Dayflow?")
+          Text("What are you hoping to get out of TAKT?")
             .font(.custom("Figtree", size: 20))
             .foregroundColor(Color(hex: "89380E"))
 
@@ -958,7 +994,7 @@ struct OnboardingPrototypeReferralStep: View {
 
       VStack(spacing: 20) {
         ReferralSurveyView(
-          prompt: "Where did you first hear about Dayflow?",
+          prompt: "Where did you first hear about TAKT?",
           showSubmitButton: false,
           selectedReferral: $selectedReferral,
           customReferral: $referralDetail
@@ -1018,7 +1054,7 @@ struct CompletionView: View {
           .foregroundColor(.black.opacity(0.9))
 
         Text(
-          "To get useful insights, let Dayflow run in the background for an hour or two to gather enough context, then check back in."
+          "To get useful insights, let TAKT run in the background for an hour or two to gather enough context, then check back in."
         )
         .font(.custom("Figtree", size: 15))
         .foregroundColor(.black.opacity(0.6))
@@ -1031,7 +1067,7 @@ struct CompletionView: View {
           onFinish()
         },
         content: {
-          Text("Launch Dayflow")
+          Text("Launch TAKT")
             .font(.custom("Figtree", size: 16))
             .fontWeight(.semibold)
         },

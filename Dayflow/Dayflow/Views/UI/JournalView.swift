@@ -62,9 +62,9 @@ struct JournalView: View {
     VStack(spacing: 24) {
       Spacer()
 
-      // Header: "Dayflow Journal" with BETA badge
+      // Header: "TAKT Journal" with BETA badge
       HStack(alignment: .top, spacing: 4) {
-        Text("Dayflow Journal")
+        Text("TAKT Journal")
           .font(.custom("InstrumentSerif-Italic", size: 38))
           .foregroundColor(Color(red: 0.35, green: 0.22, blue: 0.12))
 
@@ -236,7 +236,7 @@ private struct JournalOnboardingView: View {
 
       // Description
       Text(
-        "Dayflow helps you track your daily and longer term goals, gives you the space to reflect, and generates a summary of each day."
+        "TAKT helps you track your daily and longer term goals, gives you the space to reflect, and generates a summary of each day."
       )
       .font(.custom("Figtree-Regular", size: 16))
       .foregroundColor(Color(red: 0.25, green: 0.15, blue: 0.10).opacity(0.8))

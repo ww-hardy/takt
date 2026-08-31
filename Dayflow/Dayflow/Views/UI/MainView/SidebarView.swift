@@ -22,6 +22,7 @@ enum SidebarIcon: CaseIterable {
   case chat
   case flow
   case agents
+  case clients
   case journal
   case bug
   case settings
@@ -34,6 +35,7 @@ enum SidebarIcon: CaseIterable {
     case .chat: return "ChatIcon"
     case .flow: return nil
     case .agents: return nil
+    case .clients: return nil
     case .journal: return "JournalIcon"
     case .bug: return nil
     case .settings: return nil
@@ -44,6 +46,7 @@ enum SidebarIcon: CaseIterable {
     switch self {
     case .flow: return "water.waves"
     case .agents: return "sparkles"
+    case .clients: return "briefcase.fill"
     case .bug: return "exclamationmark.bubble.fill"
     case .settings: return "gearshape.fill"
     default: return nil
@@ -58,6 +61,7 @@ enum SidebarIcon: CaseIterable {
     case .chat: return "Chat"
     case .flow: return "Flow"
     case .agents: return "Agents"
+    case .clients: return "Kunden"
     case .journal: return "Journal"
     case .bug: return "Report"
     case .settings: return "Settings"
@@ -72,6 +76,7 @@ enum SidebarIcon: CaseIterable {
     case .chat: return "dashboard"
     case .flow: return "flow"
     case .agents: return "agents"
+    case .clients: return "clients"
     case .journal: return "journal"
     case .bug: return "bug_report"
     case .settings: return "settings"

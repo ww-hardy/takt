@@ -11,7 +11,7 @@ struct ReferralPassCard: View {
 
   private let cardSize = CGSize(width: 283, height: 161)
 
-  init(message: String = "Enjoy a free month of Dayflow Pro on us.") {
+  init(message: String = "Enjoy a free month of TAKT Pro on us.") {
     self.message = message
   }
 
@@ -32,7 +32,7 @@ struct ReferralPassCard: View {
             .scaledToFit()
             .frame(width: 24, height: 24)
 
-          Text("Dayflow")
+          Text("TAKT")
             .font(.custom("InstrumentSerif-Regular", size: 28))
             .foregroundColor(.white)
             .lineLimit(1)

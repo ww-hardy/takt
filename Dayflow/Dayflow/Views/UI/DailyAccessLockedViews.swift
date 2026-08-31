@@ -242,7 +242,7 @@ struct DailyProviderOnboardingView: View {
 private struct DailyAccessHeaderView: View {
   var body: some View {
     HStack(alignment: .top, spacing: 4) {
-      Text("Dayflow Daily")
+      Text("TAKT Daily")
         .font(.custom("InstrumentSerif-Italic", size: 38))
         .foregroundColor(Color(red: 0.35, green: 0.22, blue: 0.12))
 
@@ -357,7 +357,7 @@ private struct DailyNotificationPermissionPanelView: View {
         .foregroundColor(Color(red: 0.85, green: 0.45, blue: 0.25))
         .multilineTextAlignment(.center)
 
-      Text("Dayflow uses notifications to tell you when your recap is ready.")
+      Text("TAKT uses notifications to tell you when your recap is ready.")
         .font(.custom("Figtree-SemiBold", size: 16))
         .foregroundColor(Color(red: 0.25, green: 0.15, blue: 0.10))
         .multilineTextAlignment(.center)

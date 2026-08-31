@@ -54,6 +54,7 @@ struct CanvasTimelineDataView: View {
   @Binding var scrollToNowTick: Int
   @Binding var hasAnyActivities: Bool
   @Binding var refreshTrigger: Int
+  @Binding var clientFilter: Set<Int64>
   let weeklyHoursFrame: CGRect
   @Binding var weeklyHoursIntersectsCard: Bool
   let contentLeadingInset: CGFloat
@@ -140,6 +141,7 @@ struct CanvasTimelineDataView: View {
       .onDisappear(perform: performDayTimelineOnDisappear)
       .onChange(of: selectedDate) { loadActivities() }
       .onChange(of: refreshTrigger) { loadActivities() }
+      .onChange(of: clientFilter) { loadActivities() }
       .onChange(of: appState.isRecording) { loadActivities(animate: false) }
       .onChange(of: hourHeight) { loadActivities(animate: false) }
       .onReceive(
@@ -551,14 +553,14 @@ struct CanvasTimelineDataView: View {
   private var pausedStatusText: some View {
     statusText(
       iconName: "pause.fill",
-      message: "Dayflow is paused. Click 'Resume' to generate new activity cards."
+      message: "TAKT is paused. Click 'Resume' to generate new activity cards."
     )
   }
 
   private var stoppedStatusText: some View {
     statusText(
       iconName: "play.fill",
-      message: "Dayflow isn't recording. Click 'Resume' to generate new activity cards."
+      message: "TAKT isn't recording. Click 'Resume' to generate new activity cards."
     )
   }
 
@@ -641,10 +643,21 @@ struct CanvasTimelineDataView: View {
       // Check for cancellation before expensive processing
       guard !Task.isCancelled else { return }
 
+      // TAKT: client filter — empty set = show all; otherwise only cards
+      // tagged with a selected client (untagged cards are hidden while filtering).
+      let filter = await MainActor.run { self.clientFilter }
+      let filteredActivities =
+        filter.isEmpty
+        ? payload.activities
+        : payload.activities.filter { activity in
+          guard let clientId = activity.clientId else { return false }
+          return filter.contains(clientId)
+        }
+
       // Mitigation transform: resolve visual overlaps by trimming larger cards
       // so that smaller cards "win". This is a display-only fix to handle
       // upstream card-generation overlap bugs without touching stored data.
-      let segments = TimelineActivityLoader.resolveDisplaySegments(from: payload.activities)
+      let segments = TimelineActivityLoader.resolveDisplaySegments(from: filteredActivities)
       let recordingProjection = TimelineActivityLoader.recordingProjectionWindow(
         for: payload.timelineDate,
         displaySegments: segments,
@@ -884,6 +897,7 @@ extension CanvasTimelineDataView {
     @State private var selected: TimelineActivity? = nil
     @State private var tick: Int = 0
     @State private var refresh: Int = 0
+    @State private var clientFilter: Set<Int64> = []
     @State private var weeklyHoursIntersectsCard = false
     var body: some View {
       CanvasTimelineDataView(
@@ -892,6 +906,7 @@ extension CanvasTimelineDataView {
         scrollToNowTick: $tick,
         hasAnyActivities: .constant(true),
         refreshTrigger: $refresh,
+        clientFilter: $clientFilter,
         weeklyHoursFrame: .zero,
         weeklyHoursIntersectsCard: $weeklyHoursIntersectsCard,
         contentLeadingInset: 0,

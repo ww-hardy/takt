@@ -981,7 +981,7 @@ private struct WeeklyGeneratedWithDayflowText: View {
         .font(.custom("Figtree-SemiBold", size: 10))
         .foregroundStyle(Color(hex: "786A61"))
 
-      Text("Dayflow")
+      Text("TAKT")
         .font(.custom("Figtree-Bold", size: 10))
         .foregroundStyle(Color(hex: "B46531"))
     }

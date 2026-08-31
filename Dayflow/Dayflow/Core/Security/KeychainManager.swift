@@ -11,8 +11,11 @@ final class KeychainManager {
 
   static let shared = KeychainManager()
 
-  private let servicePrefix = "com.teleportlabs.dayflow.apikeys"
-  private let queue = DispatchQueue(label: "com.teleportlabs.dayflow.keychain", qos: .userInitiated)
+  // TAKT deliberately uses its own Keychain namespace. Do not read the
+  // legacy Dayflow item: macOS repeatedly asks for permission because the
+  // renamed app is a different code-signing identity.
+  private let servicePrefix = "ch.wertwandler.takt.apikeys"
+  private let queue = DispatchQueue(label: "ch.wertwandler.takt.keychain", qos: .userInitiated)
 
   private init() {}
 

@@ -1005,6 +1005,18 @@ final class LLMService: LLMServicing {
 
         let failureClassification = TimelineFailureClassifier.classify(error)
 
+        // TAKT: If no AI provider is configured at all, there is nothing to
+        // retry — do not mark the batch as failed and do not create a
+        // "Processing failed" card. Skip silently and keep the batch out of
+        // the retry queue until the user configures a provider.
+        if failureClassification.kind == .notConfigured {
+          print("⏭️ [LLMService] No AI provider configured — skipping batch \(batchId)")
+          StorageManager.shared.updateBatch(
+            batchId, status: "skipped_no_provider", reason: "No LLM provider configured")
+          completion(.failure(error))
+          return
+        }
+
         // Track analysis batch failed
         AnalyticsService.shared.capture(
           "analysis_batch_failed",

@@ -189,7 +189,7 @@ final class OtherSettingsViewModel: ObservableObject {
     savePanel.title = "Export timeline"
     savePanel.prompt = "Export"
     savePanel.nameFieldStringValue =
-      "Dayflow timeline \(dayFormatter.string(from: startDate)) to \(dayFormatter.string(from: endDate)).md"
+      "TAKT timeline \(dayFormatter.string(from: startDate)) to \(dayFormatter.string(from: endDate)).md"
     savePanel.allowedContentTypes = [.text, .plainText]
     savePanel.canCreateDirectories = true
 

@@ -60,7 +60,7 @@ struct HowItWorksCard_Previews: PreviewProvider {
         iconImage: "OnboardingHow",
         title: "Install and Forget",
         description:
-          "Dayflow takes periodic screen captures to understand what you're working on - all stored privately on your device."
+          "TAKT takes periodic screen captures to understand what you're working on - all stored privately on your device."
       )
 
       HowItWorksCard(

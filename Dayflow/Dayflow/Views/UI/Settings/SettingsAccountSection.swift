@@ -49,11 +49,11 @@ struct SettingsAccountSection: View {
   private var accountSection: some View {
     SettingsSection(
       title: "Account",
-      subtitle: "Sign in once to keep Dayflow Pro and cloud features attached to this Mac."
+      subtitle: "Sign in once to keep TAKT Pro and cloud features attached to this Mac."
     ) {
       VStack(alignment: .leading, spacing: 0) {
         SettingsRow(
-          label: "Dayflow account",
+          label: "TAKT account",
           subtitle: authManager.isSignedIn
             ? authManager.displayIdentity
             : nil,
@@ -89,7 +89,7 @@ struct SettingsAccountSection: View {
   private var currentPlanSection: some View {
     SettingsSection(
       title: "Account",
-      subtitle: "Manage your Dayflow account and subscription."
+      subtitle: "Manage your TAKT account and subscription."
     ) {
       ActiveProCard(
         entitlement: authManager.entitlements,
@@ -103,7 +103,7 @@ struct SettingsAccountSection: View {
 
   private var upgradeSection: some View {
     SettingsSection(
-      title: "Upgrade to Dayflow Pro",
+      title: "Upgrade to TAKT Pro",
       subtitle: "Pick a plan, then finish securely in Stripe Checkout."
     ) {
       VStack(alignment: .leading, spacing: 16) {
@@ -280,7 +280,7 @@ private struct ActiveProCard: View {
   }
 
   private var title: String {
-    isGifted ? "Gifted Pro" : "Dayflow Pro"
+    isGifted ? "Gifted Pro" : "TAKT Pro"
   }
 
   private var badge: String {
@@ -290,10 +290,10 @@ private struct ActiveProCard: View {
   private var description: String {
     if isGifted {
       return
-        "You have complimentary Dayflow Pro access. There is no billing to manage for this account."
+        "You have complimentary TAKT Pro access. There is no billing to manage for this account."
     }
 
-    return "Your Pro access is active on this Mac and attached to your Dayflow account."
+    return "Your Pro access is active on this Mac and attached to your TAKT account."
   }
 
   private var dateLabel: String {
@@ -480,7 +480,7 @@ private struct ReferralProgramCard: View {
         .fontWeight(.bold)
         .foregroundColor(Color(hex: "333333"))
 
-      Text("Give a month of Dayflow Pro and earn $20 in credits for each person you refer!")
+      Text("Give a month of TAKT Pro and earn $20 in credits for each person you refer!")
         .font(.custom("Figtree", size: 12))
         .foregroundColor(Color(hex: "333333"))
     }
@@ -567,7 +567,7 @@ private struct ReferralProgramCard: View {
           .foregroundColor(Color(hex: "333333"))
 
         Text(
-          "Referral credits are tied to your Dayflow account so we can credit you when friends join."
+          "Referral credits are tied to your TAKT account so we can credit you when friends join."
         )
         .font(.custom("Figtree", size: 11))
         .foregroundColor(Color(hex: "72706D"))
@@ -641,12 +641,12 @@ private struct ReferralProgramCard: View {
         )
         ReferralStepRow(
           icon: .menuBarMark,
-          content: Text("They sign up and get a ") + Text("free month of Dayflow Pro!").bold()
+          content: Text("They sign up and get a ") + Text("free month of TAKT Pro!").bold()
         )
         ReferralStepRow(
           icon: .system("sparkles"),
-          content: Text("You earn ") + Text("1 month of Dayflow Pro (stackable!)").bold()
-            + Text(", when they use Dayflow for a week.")
+          content: Text("You earn ") + Text("1 month of TAKT Pro (stackable!)").bold()
+            + Text(", when they use TAKT for a week.")
         )
       }
     }

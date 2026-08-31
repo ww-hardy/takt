@@ -505,7 +505,7 @@ private struct ScreenRecordingPermissionNoticeView: View {
             .fontWeight(.semibold)
             .foregroundColor(.black.opacity(0.86))
 
-          Text("Dayflow cannot update your timeline until access is restored.")
+          Text("TAKT cannot update your timeline until access is restored.")
             .font(.custom("Figtree", size: 12))
             .foregroundColor(.black.opacity(0.62))
             .fixedSize(horizontal: false, vertical: true)

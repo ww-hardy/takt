@@ -13,7 +13,7 @@ struct HowItWorksView: View {
   @State private var cardOpacities: [Double] = [0, 0, 0]
   @State private var buttonsOpacity: Double = 0
 
-  private let fullText = "How Dayflow Works"
+  private let fullText = "How TAKT Works"
 
   // Navigation callbacks
   var onBack: () -> Void
@@ -23,17 +23,17 @@ struct HowItWorksView: View {
     (
       "OnboardingHow",
       "Install and Forget",
-      "Dayflow takes periodic screen captures to understand what you're working on, all stored privately on your device. You can toggle this whenever you like."
+      "TAKT takes periodic screen captures to understand what you're working on, all stored privately on your device. You can toggle this whenever you like."
     ),
     (
       "OnboardingSecurity",
       "Privacy by Default",
-      "Dayflow can run entirely on local AI models, which means your data never leaves your computer. You can also find the source code below - please consider giving it a star on Github!"
+      "TAKT can run entirely on local AI models, which means your data never leaves your computer. You can also find the source code below - please consider giving it a star on Github!"
     ),
     (
       "OnboardingUnderstanding",
       "Understand your Day",
-      "Knows the difference between YouTube tutorials and YouTube rabbit holes. Dayflow actually gets what you're working on."
+      "Knows the difference between YouTube tutorials and YouTube rabbit holes. TAKT actually gets what you're working on."
     ),
   ]
 
@@ -97,7 +97,7 @@ struct HowItWorksView: View {
               Image("GithubIcon").resizable().aspectRatio(contentMode: .fit).frame(
                 width: 20, height: 20
               ).colorInvert()
-              Text("Star Dayflow on GitHub").font(.custom("Figtree", size: 14)).fontWeight(.medium)
+              Text("Star TAKT on GitHub").font(.custom("Figtree", size: 14)).fontWeight(.medium)
             }
           },
           background: Color(red: 0.25, green: 0.17, blue: 0),

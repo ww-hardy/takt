@@ -82,19 +82,19 @@ struct OnboardingCategoryStepView: View {
 
   private var instructionsColumn: some View {
     VStack(alignment: .leading, spacing: 16) {
-      Text("Help Dayflow understand your workflow")
+      Text("Help TAKT understand your workflow")
         .font(.custom("InstrumentSerif-Regular", size: 28))
         .foregroundColor(.black)
         .fixedSize(horizontal: false, vertical: true)
         .padding(.bottom, 24)
 
-      Text("Dayflow will organize your activities based on the categories you provide.")
+      Text("TAKT will organize your activities based on the categories you provide.")
         .font(.custom("Figtree", size: 14).weight(.medium))
         .foregroundColor(Color(hex: "5B5B5B"))
         .fixedSize(horizontal: false, vertical: true)
 
       Text(
-        "Here are options tailored to your work to help you get started. Provide more personalized descriptions to help Dayflow better understand your actions."
+        "Here are options tailored to your work to help you get started. Provide more personalized descriptions to help TAKT better understand your actions."
       )
       .font(.custom("Figtree", size: 14).weight(.medium))
       .foregroundColor(Color(hex: "5B5B5B"))

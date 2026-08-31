@@ -109,7 +109,7 @@ class ProviderSetupState: ObservableObject {
           title: "Before you begin",
           contentType: .information(
             "For experienced users",
-            "This path is recommended only if you're comfortable running LLMs locally and debugging technical issues. If terms like vLLM or API endpoint don't ring a bell, we recommend going back and picking ChatGPT, Claude, or Gemini. It's non-technical and takes about 30 seconds.\n\nFor local mode, Dayflow recommends Qwen3-VL 4B as the core vision-language model (Qwen2.5-VL 3B remains available if you need a smaller download)."
+            "This path is recommended only if you're comfortable running LLMs locally and debugging technical issues. If terms like vLLM or API endpoint don't ring a bell, we recommend going back and picking ChatGPT, Claude, or Gemini. It's non-technical and takes about 30 seconds.\n\nFor local mode, TAKT recommends Qwen3-VL 4B as the core vision-language model (Qwen2.5-VL 3B remains available if you need a smaller download)."
           )
         ),
         SetupStep(id: "choose", title: "Choose engine", contentType: .localChoice),
@@ -123,7 +123,7 @@ class ProviderSetupState: ObservableObject {
         SetupStep(
           id: "complete", title: "Complete",
           contentType: .information(
-            "All set!", "Local AI is configured and ready to use with Dayflow.")),
+            "All set!", "Local AI is configured and ready to use with TAKT.")),
       ]
     case .chatGPT, .claude:
       let isClaude = provider == .claude
@@ -136,7 +136,7 @@ class ProviderSetupState: ObservableObject {
           title: "Before you begin",
           contentType: .information(
             "Install \(cliName)",
-            "Dayflow uses \(cliName) through your existing \(providerName) subscription. Install it and sign in on this Mac, then we'll verify the connection."
+            "TAKT uses \(cliName) through your existing \(providerName) subscription. Install it and sign in on this Mac, then we'll verify the connection."
           )
         ),
         SetupStep(
@@ -157,7 +157,7 @@ class ProviderSetupState: ObservableObject {
           title: "Complete",
           contentType: .information(
             "All set!",
-            "\(providerName) is configured and ready to use with Dayflow."
+            "\(providerName) is configured and ready to use with TAKT."
           )
         ),
       ]
@@ -189,7 +189,7 @@ class ProviderSetupState: ObservableObject {
           id: "complete",
           title: "Complete",
           contentType: .information(
-            "All set!", "Your OpenAI-compatible provider is ready to use with Dayflow."
+            "All set!", "Your OpenAI-compatible provider is ready to use with TAKT."
           )
         ),
       ]
@@ -212,7 +212,7 @@ class ProviderSetupState: ObservableObject {
         SetupStep(
           id: "complete", title: "Complete",
           contentType: .information(
-            "All set!", "Gemini is now configured and ready to use with Dayflow.")),
+            "All set!", "Gemini is now configured and ready to use with TAKT.")),
       ]
     }
   }

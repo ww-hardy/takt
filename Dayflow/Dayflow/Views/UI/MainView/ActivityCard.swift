@@ -11,6 +11,7 @@ struct ActivityCard: View {
   var hasAnyActivities: Bool = true
   var onCategoryChange: ((TimelineCategory, TimelineActivity) -> Void)? = nil
   var onTitleChange: ((String, TimelineActivity) -> Void)? = nil
+  var onTagChange: ((CardTagSelection, TimelineActivity) -> Void)? = nil
   var onNavigateToCategoryEditor: (() -> Void)? = nil
   var onRetryBatchCompleted: ((Int64) -> Void)? = nil
   @EnvironmentObject private var appState: AppState
@@ -23,6 +24,7 @@ struct ActivityCard: View {
   @State private var isEditingTitle = false
   @State private var draftTitle = ""
   @State private var isHoveringTitle = false
+  @State private var showTagEditor = false
   @FocusState private var titleFieldFocused: Bool
   @State private var isPreparingSlideshow = false
   @State private var slideshowError: String?
@@ -124,7 +126,7 @@ struct ActivityCard: View {
                 .font(.system(size: 14, weight: .semibold))
                 .foregroundColor(.gray.opacity(0.7))
               Text(
-                "Cards are generated about every 15 minutes. If Dayflow is on and no cards show up within 30 minutes, please report a bug."
+                "Cards are generated about every 15 minutes. If TAKT is on and no cards show up within 30 minutes, please report a bug."
               )
               .font(.custom("Figtree", size: 13))
               .foregroundColor(.gray.opacity(0.6))
@@ -136,7 +138,7 @@ struct ActivityCard: View {
               Text("Recording is off")
                 .font(.system(size: 14, weight: .semibold))
                 .foregroundColor(.gray.opacity(0.7))
-              Text("Dayflow recording is currently turned off, so cards aren’t being produced.")
+              Text("TAKT recording is currently turned off, so cards aren’t being produced.")
                 .font(.custom("Figtree", size: 13))
                 .foregroundColor(.gray.opacity(0.6))
                 .multilineTextAlignment(.center)
@@ -234,6 +236,11 @@ struct ActivityCard: View {
         }
       }
 
+      // TAKT: client/project tag row
+      if !isFailedCard(activity) {
+        tagRow(for: activity)
+      }
+
       // Error message (if retry failed)
       if isFailedCard(activity), let statusLine = retryCoordinator.statusLine(for: activity.batchId)
       {
@@ -282,6 +289,72 @@ struct ActivityCard: View {
         }
       }
     }
+  }
+
+  @ViewBuilder
+  private func tagRow(for activity: TimelineActivity) -> some View {
+    HStack(spacing: 6) {
+      Button {
+        showTagEditor = true
+      } label: {
+        HStack(spacing: 6) {
+          if let clientName = activity.clientName {
+            Circle()
+              .fill(clientColor(for: activity.clientId))
+              .frame(width: 8, height: 8)
+            Text(clientName)
+            if let projectName = activity.projectName {
+              Text("· \(projectName)")
+                .opacity(0.8)
+            }
+          } else {
+            Image(systemName: "tag")
+            Text("Kunde zuordnen")
+          }
+          if let billable = activity.billable {
+            Text(billable ? "abrechenbar" : "nicht abrechenbar")
+              .font(.caption)
+              .padding(.horizontal, 5)
+              .padding(.vertical, 1)
+              .background(billable ? Color.orange.opacity(0.15) : Color.secondary.opacity(0.12))
+              .cornerRadius(4)
+          }
+        }
+        .font(Font.custom("Figtree", size: 12))
+        .foregroundColor(.primary)
+        .padding(.horizontal, 8)
+        .padding(.vertical, 4)
+        .background(Color.secondary.opacity(0.08))
+        .cornerRadius(6)
+      }
+      .buttonStyle(PlainButtonStyle())
+      .popover(isPresented: $showTagEditor, arrowEdge: .bottom) {
+        CardTagEditorPopover(
+          activity: activity,
+          onSave: { selection in
+            showTagEditor = false
+            onTagChange?(selection, activity)
+          }
+        )
+      }
+
+      if let task = activity.task, !task.isEmpty {
+        Text(task)
+          .font(Font.custom("Figtree", size: 12))
+          .foregroundStyle(.secondary)
+          .lineLimit(1)
+      }
+    }
+  }
+
+  private func clientColor(for clientId: Int64?) -> Color {
+    guard let clientId,
+      let client = StorageManager.shared.fetchClient(id: clientId),
+      let hex = client.color, hex.count == 7
+    else {
+      return .secondary
+    }
+    return Color(hex: hex)
   }
 
   @ViewBuilder

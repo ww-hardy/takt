@@ -86,6 +86,9 @@ extension MainView {
         FlowView()
       case .agents:
         AgentsView()
+      case .clients:
+        ClientsView()
+          .padding(15)
       case .daily:
         DailyView(selectedDate: $selectedDate)
       case .weekly:
@@ -172,6 +175,10 @@ extension MainView {
 
   private var timelineContent: some View {
     VStack(alignment: .leading, spacing: 12) {
+      ClientFilterBar(selectedClientIds: $clientFilter)
+        .padding(.leading, 10 + TimelineAlignment.categoryRowInset)
+        .opacity(contentOpacity)
+
       TabFilterBar(
         categories: categoryStore.editableCategories,
         idleCategory: categoryStore.idleCategory,
@@ -189,6 +196,7 @@ extension MainView {
             scrollToNowTick: $scrollToNowTick,
             hasAnyActivities: $hasAnyActivities,
             refreshTrigger: $refreshActivitiesTrigger,
+            clientFilter: $clientFilter,
             weeklyHoursFrame: weeklyHoursFrame,
             weeklyHoursIntersectsCard: $weeklyHoursIntersectsCard,
             contentLeadingInset: 0,
@@ -380,6 +388,15 @@ extension MainView {
         },
         onTitleChange: { newTitle, activity in
           handleTitleChange(to: newTitle, for: activity)
+        },
+        onTagChange: { selection, activity in
+          handleTagChange(
+            clientId: selection.clientId,
+            projectId: selection.projectId,
+            task: selection.task,
+            billable: selection.billable,
+            for: activity
+          )
         },
         onNavigateToCategoryEditor: {
           showCategoryEditor = true

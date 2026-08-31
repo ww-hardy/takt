@@ -191,20 +191,20 @@ struct ColorOrganizerRoot: View {
         instructionRow(
           icon: "CategoriesOrganize",
           text:
-            "Dayflow organizes your activities by the category titles and descriptions you provide."
+            "TAKT organizes your activities by the category titles and descriptions you provide."
         )
         .frame(maxWidth: isCompact ? .infinity : 280, alignment: .leading)
 
         instructionRow(
           icon: "CategoriesTextSelect",
           text:
-            "Try to provide as much details in the descriptions as you can to help Dayflow understand your workflow and habits."
+            "Try to provide as much details in the descriptions as you can to help TAKT understand your workflow and habits."
         )
         .frame(maxWidth: isCompact ? .infinity : 280, alignment: .leading)
       }
 
       Text(
-        "This step is optional. You can customize the categories or create new ones anytime while using Dayflow."
+        "This step is optional. You can customize the categories or create new ones anytime while using TAKT."
       )
       .font(Font.custom("Figtree", size: 12).weight(.medium))
       .foregroundColor(Color(red: 0.48, green: 0.48, blue: 0.48))
@@ -389,7 +389,7 @@ struct ColorOrganizerRoot: View {
       .frame(maxWidth: isCompact ? .infinity : 708)
       .frame(height: containerHeight, alignment: .topLeading)
 
-      Text("This step is optional. You can change the colors anytime while using Dayflow.")
+      Text("This step is optional. You can change the colors anytime while using TAKT.")
         .font(Font.custom("Figtree", size: 12).weight(.medium))
         .foregroundColor(Color(red: 0.48, green: 0.48, blue: 0.48))
         .frame(maxWidth: .infinity, alignment: .leading)

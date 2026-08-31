@@ -14,12 +14,12 @@ struct BugReportView: View {
   var body: some View {
     VStack(spacing: 36) {
       VStack(spacing: 16) {
-        Text("Thanks for using Dayflow")
+        Text("Thanks for using TAKT")
           .font(.custom("InstrumentSerif-Regular", size: 40))
           .foregroundColor(.black.opacity(0.9))
 
         Text(
-          "Email works great if you want to drop a quick note, Discord if you want to join the community, and if you’d prefer to chat, find some time on my calendar - I’d love to dig into why Dayflow is or isn’t working well for you."
+          "Email works great if you want to drop a quick note, Discord if you want to join the community, and if you’d prefer to chat, find some time on my calendar - I’d love to dig into why TAKT is or isn’t working well for you."
         )
         .font(.custom("Figtree", size: 16))
         .foregroundColor(.black.opacity(0.65))
@@ -165,7 +165,7 @@ struct BugReportView: View {
     components.scheme = "mailto"
     components.path = emailAddress
     components.queryItems = [
-      URLQueryItem(name: "subject", value: "Dayflow feedback")
+      URLQueryItem(name: "subject", value: "TAKT feedback")
     ]
 
     guard let url = components.url else { return }

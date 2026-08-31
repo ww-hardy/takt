@@ -116,6 +116,14 @@ struct TimelineCard: Codable, Sendable, Identifiable {
   let appSites: AppSites?
   let isBackupGenerated: Bool?
 
+  // TAKT: client/project tagging (multi-client recognition)
+  let clientId: Int64?
+  let projectId: Int64?
+  let task: String?
+  let billable: Bool?
+  let tagSource: String?  // 'ai' | 'manual' | 'corrected' | 'pending'
+  let tagConfidence: Double?
+
   init(
     id: UUID = UUID(),
     recordId: Int64?,
@@ -132,7 +140,13 @@ struct TimelineCard: Codable, Sendable, Identifiable {
     videoSummaryURL: String?,
     otherVideoSummaryURLs: [String]?,
     appSites: AppSites?,
-    isBackupGenerated: Bool? = nil
+    isBackupGenerated: Bool? = nil,
+    clientId: Int64? = nil,
+    projectId: Int64? = nil,
+    task: String? = nil,
+    billable: Bool? = nil,
+    tagSource: String? = nil,
+    tagConfidence: Double? = nil
   ) {
     self.id = id
     self.recordId = recordId
@@ -150,6 +164,12 @@ struct TimelineCard: Codable, Sendable, Identifiable {
     self.otherVideoSummaryURLs = otherVideoSummaryURLs
     self.appSites = appSites
     self.isBackupGenerated = isBackupGenerated
+    self.clientId = clientId
+    self.projectId = projectId
+    self.task = task
+    self.billable = billable
+    self.tagSource = tagSource
+    self.tagConfidence = tagConfidence
   }
 }
 
@@ -297,6 +317,44 @@ struct AnalysisBatchDebugEntry: Sendable {
 }
 
 // Extended TimelineCard with timestamp fields for internal use
+/// TAKT: A billable client (customer) the consultant works for.
+struct Client: Codable, Sendable, Identifiable, Equatable {
+  let id: Int64?
+  var name: String
+  var detail: String?  // Short description to help AI/manual recognition
+  var color: String?  // Hex color for UI chips
+  var defaultBillable: Bool
+
+  init(
+    id: Int64? = nil,
+    name: String,
+    detail: String? = nil,
+    color: String? = nil,
+    defaultBillable: Bool = false
+  ) {
+    self.id = id
+    self.name = name
+    self.detail = detail
+    self.color = color
+    self.defaultBillable = defaultBillable
+  }
+}
+
+/// TAKT: A project belonging to a client.
+struct Project: Codable, Sendable, Identifiable, Equatable {
+  let id: Int64?
+  let clientId: Int64?
+  var name: String
+  var detail: String?  // Short description to help recognition
+
+  init(id: Int64? = nil, clientId: Int64? = nil, name: String, detail: String? = nil) {
+    self.id = id
+    self.clientId = clientId
+    self.name = name
+    self.detail = detail
+  }
+}
+
 struct TimelineCardWithTimestamps {
   let id: Int64
   let startTimestamp: String
