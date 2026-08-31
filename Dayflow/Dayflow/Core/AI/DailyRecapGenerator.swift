@@ -150,6 +150,11 @@ final class DailyRecapGenerator {
   }
 
   func availabilitySnapshot() -> [DailyRecapProvider: DailyRecapProviderAvailability] {
+    let geminiKey =
+      KeychainManager.shared.retrieve(for: "gemini")?
+      .trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+    let codexInstalled = LoginShellRunner.isInstalled("codex")
+    let claudeInstalled = LoginShellRunner.isInstalled("claude")
     let isLocalConfigured = localProviderIsConfigured()
     let localModel = DailyRecapProvider.local.modelOrTool
     let isOpenAICompatibleConfigured = openAICompatibleIsConfigured()
@@ -162,11 +167,29 @@ final class DailyRecapGenerator {
             ?? DailyRecapProvider.openAICompatible.pickerSubtitle)
           : "OpenAI-kompatiblen Anbieter in den Einstellungen einrichten"
       ),
+      .gemini: DailyRecapProviderAvailability(
+        isAvailable: !geminiKey.isEmpty,
+        detail: geminiKey.isEmpty
+          ? "Gemini-API-Schlüssel in den Einstellungen hinzufügen"
+          : DailyRecapProvider.gemini.pickerSubtitle
+      ),
+      .chatgpt: DailyRecapProviderAvailability(
+        isAvailable: codexInstalled,
+        detail: codexInstalled
+          ? DailyRecapProvider.chatgpt.pickerSubtitle
+          : "Codex CLI installieren, bevor du diesen Anbieter nutzt"
+      ),
+      .claude: DailyRecapProviderAvailability(
+        isAvailable: claudeInstalled,
+        detail: claudeInstalled
+          ? DailyRecapProvider.claude.pickerSubtitle
+          : "Claude Code installieren, bevor du diesen Anbieter nutzt"
+      ),
       .local: DailyRecapProviderAvailability(
         isAvailable: isLocalConfigured,
         detail: isLocalConfigured
           ? (localModel ?? DailyRecapProvider.local.pickerSubtitle)
-          : "Configure Ollama or LM Studio before using this provider"
+          : "Ollama oder LM Studio einrichten, bevor du diesen Anbieter nutzt"
       ),
       .none: DailyRecapProviderAvailability(
         isAvailable: true,
@@ -191,9 +214,12 @@ final class DailyRecapGenerator {
       return try await generateWithOpenAICompatible(context: context, metadata: metadata)
     case .local:
       return try await generateWithLocal(context: context, metadata: metadata)
-    case .dayflow, .gemini, .chatgpt, .claude:
-      // These providers are not offered in TAKT; treat as no provider.
-      throw DailyRecapGeneratorError.noProviderSelected
+    case .gemini:
+      return try await generateWithGemini(context: context, metadata: metadata)
+    case .chatgpt:
+      return try await generateWithChatGPT(context: context, metadata: metadata)
+    case .claude:
+      return try await generateWithClaude(context: context, metadata: metadata)
     case .none:
       throw DailyRecapGeneratorError.noProviderSelected
     }

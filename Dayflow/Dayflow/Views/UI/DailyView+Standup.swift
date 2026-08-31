@@ -265,7 +265,6 @@ extension DailyView {
     let targetDay = workflowDayInfo(for: selectedDate)
     let storageDayString = targetDay.dayString
     let selectedProvider = dailyRecapProvider
-    let usesDayflowInputs = selectedProvider.usesDayflowInputs
 
     guard selectedProvider.canGenerate else {
       standupDraft = .noProviderSelected
@@ -349,23 +348,23 @@ extension DailyView {
       }
 
       let observations =
-        usesDayflowInputs
+        false
         ? StorageManager.shared.fetchObservations(startTs: dayStartTs, endTs: dayEndTs) : []
       let priorEntries =
-        usesDayflowInputs
+        false
         ? StorageManager.shared.fetchRecentDailyStandups(
           limit: priorStandupHistoryLimit,
           excludingDay: dayString
         ) : []
       let cardsText = DailyRecapGenerator.makeCardsText(day: dayString, cards: cards)
       let observationsText =
-        usesDayflowInputs
+        false
         ? DailyRecapGenerator.makeObservationsText(day: dayString, observations: observations)
         : ""
       let priorDailyText =
-        usesDayflowInputs ? DailyRecapGenerator.makePriorDailyText(entries: priorEntries) : ""
+        false ? DailyRecapGenerator.makePriorDailyText(entries: priorEntries) : ""
       let preferencesText =
-        usesDayflowInputs
+        false
         ? DailyRecapGenerator.makePreferencesText(
           highlightsTitle: currentHighlightsTitle,
           tasksTitle: currentTasksTitle,
@@ -378,7 +377,7 @@ extension DailyView {
           [
             "timeline_day": dayString,
             "source": "regenerate_button",
-            "input_mode": usesDayflowInputs ? "cards_observations_prior" : "cards_only",
+            "input_mode": false ? "cards_observations_prior" : "cards_only",
             "cards_count": cards.count,
             "observations_count": observations.count,
             "prior_daily_count": priorEntries.count,
@@ -391,7 +390,7 @@ extension DailyView {
         ))
       print(
         "[Daily] Regenerate payload run_id=\(regenerateRunId) day=\(dayString) "
-          + "cards=\(cards.count) observations=\(observations.count) prior_daily=\(priorEntries.count) input_mode=\(usesDayflowInputs ? "cards_observations_prior" : "cards_only")"
+          + "cards=\(cards.count) observations=\(observations.count) prior_daily=\(priorEntries.count) input_mode=\(false ? "cards_observations_prior" : "cards_only")"
       )
 
       do {
@@ -631,7 +630,8 @@ extension DailyView {
     }
 
     if decoded.generation == nil {
-      decoded.generation = .legacyDayflow
+      // TAKT: kein Dayflow-Backend mehr; Legacy-Einträge als unbekannt markieren.
+      decoded.generation = DailyStandupGenerationMetadata(provider: .none, generatedAt: nil)
     }
     standupDraft = decoded
   }

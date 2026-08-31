@@ -99,8 +99,6 @@ final class DailyRecapScheduler: @unchecked Sendable {
     }
 
     let sourceDayString = sourceDay.dayString
-    let sourceStart = sourceDay.startOfDay
-    let sourceEnd = sourceDay.endOfDay
     let selectedProvider = DailyRecapGenerator.shared.selectedProvider()
     let providerAvailability =
       DailyRecapGenerator.shared.availabilitySnapshot()[selectedProvider]
@@ -146,36 +144,15 @@ final class DailyRecapScheduler: @unchecked Sendable {
       return
     }
 
-    let usesDayflowInputs = selectedProvider.usesDayflowInputs
-
+    // TAKT: kein Dayflow-Backend mehr — Observations/Prior werden nicht genutzt.
     let cards = StorageManager.shared.fetchTimelineCards(forDay: sourceDayString)
-    let observations =
-      usesDayflowInputs
-      ? StorageManager.shared.fetchObservations(
-        startTs: Int(sourceStart.timeIntervalSince1970),
-        endTs: Int(sourceEnd.timeIntervalSince1970)
-      ) : []
-    let priorEntries =
-      usesDayflowInputs
-      ? StorageManager.shared.fetchRecentDailyStandups(
-        limit: priorStandupHistoryLimit,
-        excludingDay: sourceDayString
-      ) : []
+    let observations: [Observation] = []
+    let priorEntries: [DailyStandupEntry] = []
 
     let cardsText = DailyRecapGenerator.makeCardsText(day: sourceDayString, cards: cards)
-    let observationsText =
-      usesDayflowInputs
-      ? DailyRecapGenerator.makeObservationsText(day: sourceDayString, observations: observations)
-      : ""
-    let priorDailyText =
-      usesDayflowInputs ? DailyRecapGenerator.makePriorDailyText(entries: priorEntries) : ""
-    let preferencesText =
-      usesDayflowInputs
-      ? DailyRecapGenerator.makePreferencesText(
-        highlightsTitle: "Yesterday's highlights",
-        tasksTitle: "Today's tasks",
-        blockersTitle: "Blockers"
-      ) : ""
+    let observationsText = ""
+    let priorDailyText = ""
+    let preferencesText = ""
     AnalyticsService.shared.capture(
       "daily_auto_generation_check_started",
       providerProps.merging(
@@ -194,7 +171,7 @@ final class DailyRecapScheduler: @unchecked Sendable {
           "trigger": reason,
           "target_day": targetDay,
           "source_day": sourceDayString,
-          "input_mode": usesDayflowInputs ? "cards_observations_prior" : "cards_only",
+          "input_mode": "cards_only",
           "cards_count": cards.count,
           "observations_count": observations.count,
           "prior_daily_count": priorEntries.count,

@@ -10,7 +10,6 @@ import SwiftUI
 
 struct SettingsView: View {
   private enum SettingsTab: String, CaseIterable, Identifiable {
-    case account
     case storage
     case privacy
     case providers
@@ -22,7 +21,6 @@ struct SettingsView: View {
 
     var title: String {
       switch self {
-      case .account: return "Account"
       case .storage: return "Storage"
       case .privacy: return "Privacy"
       case .providers: return "Providers"
@@ -33,7 +31,7 @@ struct SettingsView: View {
     }
   }
 
-  @State private var selectedTab: SettingsTab = .account
+  @State private var selectedTab: SettingsTab = .storage
 
   @Namespace private var sidebarSelectionNamespace
 
@@ -126,10 +124,7 @@ struct SettingsView: View {
       }
     }
     .onReceive(NotificationCenter.default.publisher(for: .openAccountSettings)) { _ in
-      guard selectedTab != .account else { return }
-      withAnimation(.easeOut(duration: 0.18)) {
-        selectedTab = .account
-      }
+      // TAKT: Account-Bereich entfernt (kein Dayflow-Backend) — ignoriert.
     }
   }
 
@@ -254,8 +249,6 @@ struct SettingsView: View {
     // actually exist (the sidebar is vertical, not left/right tabs).
     Group {
       switch selectedTab {
-      case .account:
-        SettingsAccountSection()
       case .storage:
         SettingsStorageTabView(viewModel: storageViewModel)
       case .privacy:
