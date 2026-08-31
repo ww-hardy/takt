@@ -37,3 +37,6 @@ tools/dayflow-cli/.build/
 
 # TAKT: keep the deterministic logo generator (build-artifact ignores above stay)
 !tools/takt_logo_gen.swift
+
+# Kanban-Worker-Worktrees (eingebettete Repos, nicht committen)
+.worktrees/
