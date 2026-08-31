@@ -23,6 +23,38 @@ enum DashboardChatProvider: String, Codable, CaseIterable {
     return DashboardChatProvider(rawValue: value) ?? .gemini
   }
 
+  /// TAKT: Der Chat nutzt denselben Provider wie der Rest der App.
+  /// Der Standard-Provider aus dem LLMProviderRoutingStore wird auf den
+  /// Chat-Provider gemappt; eine separate Chat-Provider-Auswahl gibt es
+  /// nicht mehr (die Gemini/Codex/Claude-Pills wurden entfernt).
+  static func fromRoutingStore() -> DashboardChatProvider {
+    let primary = (try? LLMProviderRoutingStore.load())?.primary
+    switch primary {
+    case .gemini:
+      return .gemini
+    case .chatGPT:
+      return .codex
+    case .claude:
+      return .claude
+    case .openAICompatible, .local, .dayflow, nil:
+      // OpenAI-kompatibel (z. B. Nous Portal) und Lokal laufen ueber die
+      // OpenAI-kompatible Chat-Route; fuer den Chat-Provider ist Gemini
+      // der Fallback, wenn kein CLI-Provider aktiv ist.
+      return .gemini
+    }
+  }
+
+  var displayLabel: String {
+    switch self {
+    case .gemini:
+      return "Gemini"
+    case .codex:
+      return "ChatGPT (Codex)"
+    case .claude:
+      return "Claude"
+    }
+  }
+
   var analyticsProvider: String {
     rawValue
   }

@@ -73,9 +73,6 @@ struct ChatView: View {
           if showMemoryPanel {
             memoryPanel
           }
-          if chatService.showDebugPanel {
-            debugPanel
-          }
         }
         .allowsHitTesting(chatFeedbackTarget == nil)
         .transition(.opacity)
@@ -127,15 +124,15 @@ struct ChatView: View {
     .onChange(of: chatService.messages.count) { _, _ in
       syncMemoryFromStoreIfNeeded()
     }
-    .alert("Switch provider?", isPresented: $showToolSwitchConfirm) {
-      Button("Switch and Reset", role: .destructive) {
+    .alert("Provider wechseln?", isPresented: $showToolSwitchConfirm) {
+      Button("Wechseln und zurücksetzen", role: .destructive) {
         confirmProviderSwitch()
       }
-      Button("Cancel", role: .cancel) {
+      Button("Abbrechen", role: .cancel) {
         pendingProviderSelection = nil
       }
     } message: {
-      Text("Switching to \(pendingProviderLabel) will clear this chat's context.")
+      Text("Der Wechsel zu \\(pendingProviderLabel) löscht den Kontext dieses Chats.")
     }
     .environment(\.colorScheme, .light)
   }

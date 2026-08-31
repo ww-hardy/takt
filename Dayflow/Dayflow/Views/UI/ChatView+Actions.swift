@@ -16,7 +16,9 @@ extension ChatView {
 
   func sendMessage(_ text: String) {
     guard !chatService.isProcessing else { return }
-    guard selectedProviderAvailable else { return }
+    // TAKT: Chat nutzt den Standard-Provider aus den Einstellungen.
+    let provider = standardChatProvider
+    guard isProviderAvailable(provider) else { return }
     let messageText = text.trimmingCharacters(in: .whitespacesAndNewlines)
     guard !messageText.isEmpty else { return }
     inputText = ""
@@ -38,12 +40,12 @@ extension ChatView {
         "conversation_id": conversationId?.uuidString ?? "unknown",
         "is_new_conversation": isNewConversation,
         "message_index": messageIndex,
-        "provider": selectedProvider.analyticsProvider,
-        "chat_runtime": selectedProvider.runtimeLabel,
+        "provider": provider.analyticsProvider,
+        "chat_runtime": provider.runtimeLabel,
       ])
 
     Task {
-      await chatService.sendMessage(messageText, provider: selectedProvider)
+      await chatService.sendMessage(messageText, provider: provider)
     }
   }
 
@@ -378,16 +380,16 @@ extension ChatView {
     case .claude:
       return "Claude"
     case .codex:
-      return "Codex"
+      return "ChatGPT (Codex)"
     case .none:
-      return "selected provider"
+      return "Standard-Provider"
     }
   }
 
   var providerToggleHelpText: String {
     if selectedProviderAvailable {
-      return "Choose chat provider"
+      return "Chat nutzt den Standard-Provider aus den Einstellungen"
     }
-    return "Configure Gemini key or install Codex/Claude CLI"
+    return "Standard-Provider in den Einstellungen konfigurieren"
   }
 }

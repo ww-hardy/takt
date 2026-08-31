@@ -32,7 +32,7 @@ extension ChatView {
       // New chat button (only show if there are messages)
       if !chatService.messages.isEmpty {
         Button(action: { resetConversation() }) {
-          Text("New chat")
+          Text("Neuer Chat")
             .font(.custom("Figtree", size: 12).weight(.semibold))
             .foregroundColor(Color(hex: "F96E00"))
             .padding(.horizontal, 10)
@@ -65,18 +65,7 @@ extension ChatView {
           .foregroundColor(showHistoryPanel ? Color(hex: "F96E00") : Color(hex: "999999"))
       }
       .buttonStyle(.plain)
-      .help("Toggle chat history")
-      .pointingHandCursor()
-
-      // Debug toggle
-      Button(action: { chatService.showDebugPanel.toggle() }) {
-        Image(systemName: chatService.showDebugPanel ? "ladybug.fill" : "ladybug")
-          .font(.system(size: 14))
-          .foregroundColor(
-            chatService.showDebugPanel ? Color(hex: "F96E00") : Color(hex: "999999"))
-      }
-      .buttonStyle(.plain)
-      .help("Toggle debug panel")
+      .help("Chat-Verlauf anzeigen")
       .pointingHandCursor()
 
       Button(
@@ -93,7 +82,7 @@ extension ChatView {
           .foregroundColor(showMemoryPanel ? Color(hex: "F96E00") : Color(hex: "999999"))
       }
       .buttonStyle(.plain)
-      .help("Toggle memory panel")
+      .help("Notiz-Panel anzeigen")
       .pointingHandCursor()
     }
     .padding(.trailing, 12)
@@ -255,68 +244,12 @@ extension ChatView {
     }
   }
 
-  // MARK: - Debug Panel
-
-  var debugPanel: some View {
-    VStack(alignment: .leading, spacing: 0) {
-      // Header
-      HStack {
-        Text("Debug Log")
-          .font(.custom("Figtree", size: 12).weight(.bold))
-          .foregroundColor(Color(hex: "666666"))
-
-        Spacer()
-
-        Button(action: { copyDebugLog() }) {
-          Image(systemName: "doc.on.doc")
-            .font(.system(size: 11))
-            .foregroundColor(Color(hex: "999999"))
-        }
-        .buttonStyle(.plain)
-        .help("Copy all")
-        .pointingHandCursor()
-
-        Button(action: { chatService.clearDebugLog() }) {
-          Image(systemName: "trash")
-            .font(.system(size: 11))
-            .foregroundColor(Color(hex: "999999"))
-        }
-        .buttonStyle(.plain)
-        .help("Clear log")
-        .pointingHandCursor()
-      }
-      .padding(.horizontal, 12)
-      .padding(.vertical, 8)
-      .background(Color(hex: "F5F5F5"))
-
-      Divider()
-
-      // Log entries
-      ScrollView {
-        LazyVStack(alignment: .leading, spacing: 8) {
-          ForEach(chatService.debugLog) { entry in
-            DebugLogEntry(entry: entry)
-          }
-        }
-        .padding(12)
-      }
-    }
-    .frame(width: 350)
-    .background(Color.white)
-    .overlay(
-      Rectangle()
-        .fill(Color(hex: "E0E0E0"))
-        .frame(width: 1),
-      alignment: .leading
-    )
-  }
-
   // MARK: - Memory Panel
 
   var memoryPanel: some View {
     VStack(alignment: .leading, spacing: 0) {
       HStack {
-        Text("Memory")
+        Text("Notizen")
           .font(.custom("Figtree", size: 12).weight(.bold))
           .foregroundColor(Color(hex: "666666"))
         Spacer()
@@ -331,7 +264,7 @@ extension ChatView {
       Divider()
 
       VStack(alignment: .leading, spacing: 8) {
-        Text("Auto-updated from assistant replies. You can edit this manually.")
+        Text("Wird automatisch aus den Antworten des Assistenten aktualisiert. Du kannst es manuell bearbeiten.")
           .font(.custom("Figtree", size: 11))
           .foregroundColor(Color(hex: "8A8A8A"))
 
@@ -350,36 +283,36 @@ extension ChatView {
           }
 
         HStack {
-          Text("Last updated: \(memoryUpdatedLabel)")
-            .font(.custom("Figtree", size: 10))
-            .foregroundColor(Color(hex: "999999"))
-          Spacer()
-        }
+                  Text("Zuletzt aktualisiert: \\(memoryUpdatedLabel)")
+                    .font(.custom("Figtree", size: 10))
+                    .foregroundColor(Color(hex: "999999"))
+                  Spacer()
+                }
 
-        HStack(spacing: 8) {
-          Button("Save") { saveMemoryDraft() }
-            .buttonStyle(.plain)
-            .font(.custom("Figtree", size: 11).weight(.bold))
-            .foregroundColor(isMemoryDirty ? Color(hex: "F96E00") : Color(hex: "999999"))
-            .disabled(!isMemoryDirty)
-            .pointingHandCursor()
+                HStack(spacing: 8) {
+                  Button("Speichern") { saveMemoryDraft() }
+                    .buttonStyle(.plain)
+                    .font(.custom("Figtree", size: 11).weight(.bold))
+                    .foregroundColor(isMemoryDirty ? Color(hex: "F96E00") : Color(hex: "999999"))
+                    .disabled(!isMemoryDirty)
+                    .pointingHandCursor()
 
-          Button("Reload") { reloadMemoryDraft() }
-            .buttonStyle(.plain)
-            .font(.custom("Figtree", size: 11).weight(.bold))
-            .foregroundColor(isMemoryDirty ? Color(hex: "555555") : Color(hex: "AAAAAA"))
-            .disabled(!isMemoryDirty)
-            .pointingHandCursor()
+                  Button("Neu laden") { reloadMemoryDraft() }
+                    .buttonStyle(.plain)
+                    .font(.custom("Figtree", size: 11).weight(.bold))
+                    .foregroundColor(isMemoryDirty ? Color(hex: "555555") : Color(hex: "AAAAAA"))
+                    .disabled(!isMemoryDirty)
+                    .pointingHandCursor()
 
-          Spacer()
+                  Spacer()
 
-          Button("Clear") { clearMemoryDraft() }
-            .buttonStyle(.plain)
-            .font(.custom("Figtree", size: 11).weight(.bold))
-            .foregroundColor(storedMemoryBlob.isEmpty ? Color(hex: "AAAAAA") : Color(hex: "C85A4B"))
-            .disabled(storedMemoryBlob.isEmpty)
-            .pointingHandCursor()
-        }
+                  Button("Leeren") { clearMemoryDraft() }
+                    .buttonStyle(.plain)
+                    .font(.custom("Figtree", size: 11).weight(.bold))
+                    .foregroundColor(storedMemoryBlob.isEmpty ? Color(hex: "AAAAAA") : Color(hex: "C85A4B"))
+                    .disabled(storedMemoryBlob.isEmpty)
+                    .pointingHandCursor()
+                }
       }
       .padding(12)
     }
@@ -434,7 +367,7 @@ extension ChatView {
                 .font(.custom("InstrumentSerif-Regular", size: 30))
                 .foregroundColor(Color(hex: "2F2A24"))
 
-              Text("Ask questions, analyze your timeline, and generate charts/graphs.")
+              Text("Stelle Fragen, analysiere deine Timeline und erzeuge Diagramme.")
                 .font(.custom("Figtree", size: 13).weight(.semibold))
                 .foregroundColor(Color(hex: "7D6B5B"))
 
@@ -789,38 +722,34 @@ extension ChatView {
 
   var providerToggle: some View {
     HStack(spacing: 6) {
-      ProviderTogglePill(
-        title: "Gemini",
-        isSelected: selectedProvider == .gemini,
-        isEnabled: isProviderAvailable(.gemini)
-      ) {
-        handleProviderSelection(.gemini)
-      }
-      ProviderTogglePill(
-        title: "Codex",
-        isSelected: selectedProvider == .codex,
-        isEnabled: isProviderAvailable(.codex)
-      ) {
-        handleProviderSelection(.codex)
-      }
-      ProviderTogglePill(
-        title: "Claude",
-        isSelected: selectedProvider == .claude,
-        isEnabled: isProviderAvailable(.claude)
-      ) {
-        handleProviderSelection(.claude)
-      }
+      Image(systemName: "sparkles")
+        .font(.system(size: 11, weight: .semibold))
+        .foregroundColor(Color(hex: "999999"))
+
+      Text(standardChatProvider.displayLabel)
+        .font(.custom("Figtree", size: 11).weight(.semibold))
+        .foregroundColor(Color(hex: "666666"))
+
+      Text("· Standard")
+        .font(.custom("Figtree", size: 11))
+        .foregroundColor(Color(hex: "999999"))
     }
-    .padding(4)
+    .padding(.horizontal, 10)
+    .padding(.vertical, 5)
     .background(
-      RoundedRectangle(cornerRadius: 11, style: .continuous)
-        .fill(Color.white.opacity(0.84))
+      RoundedRectangle(cornerRadius: 6, style: .continuous)
+        .fill(Color(hex: "F5F5F5"))
     )
     .overlay(
-      RoundedRectangle(cornerRadius: 11, style: .continuous)
+      RoundedRectangle(cornerRadius: 6, style: .continuous)
         .stroke(Color(hex: "E4D6C8"), lineWidth: 1)
     )
     .help(providerToggleHelpText)
+  }
+
+  /// TAKT: Chat nutzt den Standard-Provider aus den Einstellungen.
+  var standardChatProvider: DashboardChatProvider {
+    DashboardChatProvider.fromRoutingStore()
   }
 
   var statusInsertionIndex: Int? {
@@ -833,7 +762,7 @@ extension ChatView {
 
   var followUpSuggestions: some View {
     VStack(alignment: .leading, spacing: 8) {
-      Text("Follow up")
+      Text("Vorschläge")
         .font(.custom("Figtree", size: 11).weight(.semibold))
         .foregroundColor(Color(hex: "999999"))
 

@@ -35,12 +35,12 @@ extension ChatView {
 
   var welcomePrompts: [WelcomePrompt] {
     [
-      WelcomePrompt(icon: "doc.text", text: "Generate standup notes for yesterday"),
-      WelcomePrompt(icon: "checkmark.seal", text: "What did I get done last week?"),
+      WelcomePrompt(icon: "doc.text", text: "Tagesbericht für gestern erstellen"),
+      WelcomePrompt(icon: "checkmark.seal", text: "Was habe ich letzte Woche erledigt?"),
       WelcomePrompt(
-        icon: "exclamationmark.bubble", text: "When was I most focused this week"),
+        icon: "exclamationmark.bubble", text: "Wann war ich diese Woche am fokussiertesten"),
       WelcomePrompt(
-        icon: "sparkles", text: "Compare this week to last week"),
+        icon: "sparkles", text: "Vergleiche diese Woche mit der letzten"),
     ]
   }
 
