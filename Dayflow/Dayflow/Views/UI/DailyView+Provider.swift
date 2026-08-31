@@ -62,8 +62,8 @@ extension DailyView {
       enabled: standupRegenerateState != .regenerating,
       reassertOnPressEnd: true
     )
-    .accessibilityLabel(Text("Choose daily recap provider"))
-    .help("Daily recap provider: \(dailyRecapProvider.selectionLabel)")
+    .accessibilityLabel(Text("Tagesbericht-Provider wählen"))
+    .help("Tagesbericht-Provider: \\(dailyRecapProvider.selectionLabel)")
     .popover(isPresented: $isShowingProviderPicker, arrowEdge: .bottom) {
       dailyProviderPicker(scale: scale)
         .padding(16)
@@ -76,11 +76,11 @@ extension DailyView {
     VStack(alignment: .leading, spacing: 12 * scale) {
       HStack(alignment: .firstTextBaseline) {
         VStack(alignment: .leading, spacing: 2 * scale) {
-          Text("Daily recap provider")
+          Text("Tagesbericht-Provider")
             .font(.custom("InstrumentSerif-Regular", size: 22 * scale))
             .foregroundStyle(Color(hex: "2E221B"))
 
-          Text("Choose how Daily generates this recap, or turn generation off.")
+          Text("Wähle, wie der Tagesbericht erstellt wird, oder deaktiviere die Generierung.")
             .font(.custom("Figtree-Regular", size: 12 * scale))
             .foregroundStyle(Color(hex: "8B6B59"))
         }

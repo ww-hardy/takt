@@ -30,7 +30,7 @@ struct DailyAccessIntroView: View {
         .frame(maxWidth: 480)
         .padding(.horizontal, 24)
 
-      Text("Daily unlocks after 5 hours of analyzed timeline data. \(progressText)")
+      Text("Der Tagesbericht wird nach 5 Stunden analysierter Timeline-Daten freigeschaltet. \\(progressText)")
         .font(.custom("Figtree-SemiBold", size: 13))
         .foregroundColor(Color(red: 0.35, green: 0.22, blue: 0.12).opacity(0.76))
         .multilineTextAlignment(.center)
@@ -118,13 +118,13 @@ struct DailyProviderOnboardingView: View {
 
       VStack(spacing: 12) {
         VStack(spacing: 6) {
-          Text("Pick your Daily provider")
+          Text("Wähle deinen Tagesbericht-Provider")
             .font(.custom("InstrumentSerif-Regular", size: 24))
             .foregroundColor(Color(red: 0.35, green: 0.22, blue: 0.12))
             .multilineTextAlignment(.center)
 
           Text(
-            "Choose how Daily generates your recap, or turn generation off. You can change this later."
+            "Wähle, wie der Tagesbericht erstellt wird, oder deaktiviere die Generierung. Du kannst das später ändern."
           )
           .font(.custom("Figtree-Regular", size: 13))
           .foregroundColor(Color(red: 0.35, green: 0.22, blue: 0.12).opacity(0.8))
@@ -319,7 +319,7 @@ private struct DailyAnimatedRequestAccessButton: View {
           HStack(spacing: 8) {
             Image(systemName: "checkmark.circle.fill")
               .font(.system(size: 14, weight: .semibold))
-            Text("Daily Unlocked")
+            Text("Tagesbericht freigeschaltet")
               .font(.custom("Figtree", size: 15))
               .fontWeight(.semibold)
           }

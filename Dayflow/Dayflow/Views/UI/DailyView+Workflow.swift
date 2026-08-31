@@ -123,7 +123,7 @@ extension DailyView {
       headingText = "Dein Workflow von gestern"
     } else {
       let displayDate = timelineDisplayDate(from: selectedDate)
-      headingText = "Your workflow on \(dailyStandupSectionDayFormatter.string(from: displayDate))"
+      headingText = "Dein Workflow für \\(dailyStandupSectionDayFormatter.string(from: displayDate))"
     }
 
     return VStack(alignment: .leading, spacing: 8 * scale) {
@@ -405,7 +405,7 @@ extension DailyView {
     }
 
     let displayDate = timelineDisplayDate(from: date)
-    return "Total for \(dailyStandupSectionDayFormatter.string(from: displayDate))"
+    return "Gesamtzeit für \\(dailyStandupSectionDayFormatter.string(from: displayDate))"
   }
   func formatDuration(minutes: Double) -> String {
     formatDurationValue(minutes)

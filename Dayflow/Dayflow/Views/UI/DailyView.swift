@@ -43,7 +43,7 @@ struct DailyView: View {
     [:]
 
   let betaNoticeCopy =
-    "Daily is a new way to visualize your day and turn it into a standup update fast."
+    "Der Tagesbericht zeigt deinen Tag auf neue Weise und macht daraus in Sekunden ein Update für dein Team."
   let priorStandupHistoryLimit = 3
   static let maxDateTitleWidth: CGFloat = {
     let referenceText = "Wednesday, September 30"

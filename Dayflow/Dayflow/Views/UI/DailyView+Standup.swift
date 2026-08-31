@@ -6,12 +6,25 @@ import UserNotifications
 extension DailyView {
   @ViewBuilder
   func actionRow(scale: CGFloat) -> some View {
-    let actionButtons = HStack(spacing: 10 * scale) {
-      if hasPersistedStandupEntry {
-        standupCopyButton(scale: scale)
+    // ViewThatFits: one line when the window is wide enough, wrapped
+    // stack when narrow — the rightmost button used to get clipped.
+    let actionButtons = ViewThatFits(in: .horizontal) {
+      HStack(spacing: 10 * scale) {
+        if hasPersistedStandupEntry {
+          standupCopyButton(scale: scale)
+        }
+        standupRegenerateButton(scale: scale)
+        dailyProviderButton(scale: scale)
       }
-      standupRegenerateButton(scale: scale)
-      dailyProviderButton(scale: scale)
+      VStack(alignment: .trailing, spacing: 10 * scale) {
+        if hasPersistedStandupEntry {
+          standupCopyButton(scale: scale)
+        }
+        HStack(spacing: 10 * scale) {
+          standupRegenerateButton(scale: scale)
+          dailyProviderButton(scale: scale)
+        }
+      }
     }
 
     HStack {
@@ -42,7 +55,7 @@ extension DailyView {
         .frame(width: 16 * scale, height: 16 * scale)
 
         ZStack(alignment: .leading) {
-          Text("Standup kopieren")
+          Text("Tagesbericht kopieren")
             .font(.custom("Figtree-Medium", size: 14 * scale))
             .lineLimit(1)
             .opacity(standupCopyState == .copied ? 0 : 1)
@@ -78,7 +91,7 @@ extension DailyView {
     .animation(.easeInOut(duration: 0.22), value: standupCopyState)
     .pointingHandCursorOnHover(reassertOnPressEnd: true)
     .accessibilityLabel(
-      Text(standupCopyState == .copied ? "Standup kopiert" : "Standup kopieren"))
+      Text(standupCopyState == .copied ? "Tagesbericht kopiert" : "Tagesbericht kopieren"))
   }
   func standupRegenerateButton(scale: CGFloat) -> some View {
     let transition = AnyTransition.opacity.combined(with: .scale(scale: 0.5))
@@ -722,7 +735,7 @@ extension DailyView {
     )
   }
   func standupSectionHeading(for date: Date) -> String {
-    "Standup für \(dailyDateTitle(for: date))"
+    "Tagesbericht für \\(dailyDateTitle(for: date))"
   }
   func standupHighlightsTitle(for sourceDay: DailyStandupDayInfo?) -> String {
     guard let sourceDay else { return "Letzte Highlights" }
