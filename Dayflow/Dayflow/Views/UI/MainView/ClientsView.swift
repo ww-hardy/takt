@@ -79,15 +79,15 @@ struct ClientsView: View {
   private var header: some View {
     HStack(alignment: .center) {
       VStack(alignment: .leading, spacing: 4) {
-        Text("Clients & projects")
+        Text("Kunden & Projekte")
           .font(TaktFont.display(34).weight(.bold))
           .foregroundColor(TaktColor.textPrimary)
-        Text("Describe your clients briefly — that makes recognizing your time easier.")
+        Text("Beschreibe deine Kunden kurz — das erleichtert die automatische Erkennung.")
           .font(TaktFont.ui(15))
           .foregroundColor(TaktColor.textSecondary)
       }
       Spacer()
-      TaktButton(title: "New client", variant: .primary, icon: "plus") {
+      TaktButton(title: "Neuer Kunde", variant: .primary, icon: "plus") {
         showAddClient = true
       }
     }
@@ -127,7 +127,7 @@ struct ClientsView: View {
   private var clientList: some View {
     ScrollView {
       LazyVStack(alignment: .leading, spacing: 12) {
-        Text("\(clients.count) CLIENT\(clients.count == 1 ? "" : "S")")
+        Text("\(clients.count) KUNDE\(clients.count == 1 ? "" : "N")")
           .taktLabel()
           .padding(.horizontal, 26)
           .padding(.top, 24)
@@ -159,11 +159,11 @@ struct ClientsView: View {
     VStack(alignment: .leading, spacing: 18) {
       HStack(alignment: .center) {
         VStack(alignment: .leading, spacing: 4) {
-          Text("TIME OVERVIEW · THIS WEEK")
+          Text("ZEITÜBERSICHT · DIESE WOCHE")
             .taktLabel()
           let total = summaryRows.reduce(0) { $0 + $1.totalHours }
           let billable = summaryRows.reduce(0) { $0 + $1.billableHours }
-          Text(String(format: "%.2f h · %.2f h billable", total, billable))
+          Text(String(format: "%.2f h · %.2f h abrechenbar", total, billable))
             .font(TaktFont.display(28).weight(.bold))
             .foregroundColor(TaktColor.textPrimary)
         }
@@ -191,10 +191,10 @@ struct ClientsView: View {
       // Table on a 1px grid
       VStack(spacing: 0) {
         HStack(spacing: 0) {
-          Text("CLIENT").frame(maxWidth: .infinity, alignment: .leading)
-          Text("PROJECT").frame(maxWidth: .infinity, alignment: .leading)
-          Text("HOURS").frame(width: 74, alignment: .trailing)
-          Text("BILLABLE").frame(width: 96, alignment: .trailing)
+          Text("KUNDE").frame(maxWidth: .infinity, alignment: .leading)
+          Text("PROJEKT").frame(maxWidth: .infinity, alignment: .leading)
+          Text("STUNDEN").frame(width: 74, alignment: .trailing)
+          Text("ABRECHNBAR").frame(width: 96, alignment: .trailing)
         }
         .font(TaktFont.label)
         .foregroundColor(TaktColor.textTertiary)
@@ -203,7 +203,7 @@ struct ClientsView: View {
         .background(TaktColor.surfaceSunken)
 
         if summaryRows.isEmpty {
-          Text("No tagged activities this week yet. Tag cards on the timeline to see them here.")
+          Text("Diese Woche noch keine getaggten Aktivitäten. Weise Karten in der Timeline Kunde und Projekt zu.")
             .font(TaktFont.body)
             .foregroundColor(TaktColor.textSecondary)
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -246,7 +246,7 @@ struct ClientsView: View {
       // AI detection banner
       aiDetectionBanner
 
-      Text("AI detection suggests clients and projects from your client descriptions — review and correct on the timeline.")
+      Text("Die KI-Erkennung schlägt Kunde und Projekt anhand deiner Kundenbeschreibungen vor — prüfen und in der Timeline korrigieren.")
         .font(TaktFont.ui(14))
         .foregroundColor(TaktColor.textTertiary)
     }
@@ -257,14 +257,14 @@ struct ClientsView: View {
   private var aiDetectionBanner: some View {
     let untaggedCount = untaggedThisWeek()
     return VStack(alignment: .leading, spacing: 8) {
-      Text("\(untaggedCount) untagged activit\(untaggedCount == 1 ? "y" : "ies") this week")
+      Text("\(untaggedCount) ungetaggte Aktivitäten diese Woche")
         .font(TaktFont.ui(15, .semibold))
         .foregroundColor(TaktColor.textPrimary)
-      Text("AI detection uses your client descriptions to suggest a client and project for each card.")
+      Text("Die KI-Erkennung nutzt deine Kundenbeschreibungen, um für jede Karte Kunde und Projekt vorzuschlagen.")
         .font(TaktFont.ui(14))
         .foregroundColor(Color(hex: "7A5A32"))
       TaktButton(
-        title: isTagging ? "Detecting…" : "AI detection",
+        title: isTagging ? "Erkenne…" : "KI-Erkennung",
         variant: .primary,
         icon: isTagging ? nil : "sparkles"
       ) {
@@ -408,7 +408,7 @@ private struct ClientRow: View {
           TaktBadge(title: "billable", variant: .orange)
         }
         Spacer()
-        Button("+ Project", action: onAddProject)
+        Button("+ Projekt", action: onAddProject)
           .buttonStyle(.plain)
           .font(TaktFont.ui(13))
           .foregroundColor(TaktColor.textTertiary)

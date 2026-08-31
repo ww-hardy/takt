@@ -118,9 +118,9 @@ extension DailyView {
   func workflowSection(scale: CGFloat, isViewingToday: Bool) -> some View {
     let headingText: String
     if isViewingToday {
-      headingText = "Today so far. Come back tomorrow for the full day view."
+      headingText = "Heute bisher. Komm morgen für die ganze Tagesübersicht zurück."
     } else if isYesterdaySelection(selectedDate) {
-      headingText = "Your workflow yesterday"
+      headingText = "Dein Workflow von gestern"
     } else {
       let displayDate = timelineDisplayDate(from: selectedDate)
       headingText = "Your workflow on \(dailyStandupSectionDayFormatter.string(from: displayDate))"
@@ -398,10 +398,10 @@ extension DailyView {
   }
   func workflowTotalsTitle(for date: Date) -> String {
     if isTodaySelection(date) {
-      return "Today's total so far"
+      return "Heute bisher insgesamt"
     }
     if isYesterdaySelection(date) {
-      return "Yesterday's total"
+      return "Gestrige Gesamtzeit"
     }
 
     let displayDate = timelineDisplayDate(from: date)

@@ -18,7 +18,7 @@ struct ClientFilterBar: View {
         ScrollView(.horizontal, showsIndicators: false) {
           HStack(spacing: 8) {
             TaktChip(
-              title: "All clients",
+              title: "Alle Kunden",
               isSelected: selectedClientIds.isEmpty,
               action: { selectedClientIds = [] }
             )

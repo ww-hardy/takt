@@ -75,7 +75,7 @@ struct TaktDateStepper: View {
     .buttonStyle(.plain)
     .disabled(!enabled)
     .pointingHandCursor()
-    .accessibilityLabel(enabled ? (systemName.contains("left") ? "Previous day" : "Next day") : "")
+    .accessibilityLabel(enabled ? (systemName.contains("left") ? "Vorheriger Tag" : "Nächster Tag") : "")
   }
 }
 

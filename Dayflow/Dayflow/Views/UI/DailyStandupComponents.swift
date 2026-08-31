@@ -176,7 +176,7 @@ struct DailyBulletCard: View {
           .foregroundStyle(Color(hex: "999999"))
           .frame(width: 18 * scale, height: 18 * scale)
 
-        Text("Add item")
+        Text("Eintrag hinzufügen")
           .font(.custom("Figtree-Regular", size: 13 * scale))
           .foregroundStyle(Color(hex: "999999"))
           .lineLimit(1)
@@ -282,7 +282,7 @@ struct DailyBlockersSection: View {
 
   var body: some View {
     VStack(alignment: .leading, spacing: 8 * scale) {
-      TextField("Blockers", text: $title)
+      TextField("Blocker", text: $title)
         .font(TaktFont.ui(14, .semibold))
         .foregroundStyle(TaktColor.blockersLabel)
         .textFieldStyle(.plain)
@@ -291,7 +291,7 @@ struct DailyBlockersSection: View {
         DailyDragHandleIcon(scale: scale)
           .frame(width: 18 * scale, height: 18 * scale)
 
-        TextField("Fill in any blockers you may have", text: $prompt, axis: .vertical)
+        TextField("Gib an, was dich gerade blockiert", text: $prompt, axis: .vertical)
           .font(.custom("Figtree-Regular", size: 14 * scale))
           .foregroundStyle(Color(hex: "929292"))
           .textFieldStyle(.plain)

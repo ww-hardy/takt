@@ -31,15 +31,15 @@ enum SidebarIcon: CaseIterable {
   var displayName: String {
     switch self {
     case .timeline: return "Timeline"
-    case .daily: return "Daily"
-    case .weekly: return "Weekly"
+    case .daily: return "Tag"
+    case .weekly: return "Woche"
     case .chat: return "Chat"
     case .flow: return "Flow"
     case .agents: return "Agents"
-    case .clients: return "Clients"
+    case .clients: return "Kunden"
     case .journal: return "Journal"
-    case .bug: return "Report"
-    case .settings: return "Settings"
+    case .bug: return "Bericht"
+    case .settings: return "Einstellungen"
     }
   }
 
@@ -183,7 +183,7 @@ struct SidebarView: View {
 
   private var weekBlock: some View {
     VStack(alignment: .leading, spacing: 6) {
-      Text("THIS WEEK")
+      Text("DIESE WOCHE")
         .taktLabel()
         .foregroundColor(TaktColor.textSecondary)
       Text(formattedWeeklyTotal)
@@ -200,7 +200,7 @@ struct SidebarView: View {
         }
       }
       .frame(height: SidebarMetrics.progressHeight)
-      Text("\(Int(weeklyProgress * 100))% of \(formattedWeeklyTarget)")
+      Text("\(Int(weeklyProgress * 100))% von \(formattedWeeklyTarget)")
         .font(TaktFont.ui(SidebarMetrics.progressCaptionFontSize))
         .foregroundColor(TaktColor.textTertiary)
     }

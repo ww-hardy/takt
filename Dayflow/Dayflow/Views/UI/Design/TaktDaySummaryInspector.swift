@@ -135,7 +135,7 @@ struct TaktDaySummaryInspector: View {
 
   private var headerBlock: some View {
     VStack(alignment: .leading, spacing: 6) {
-      Text("DAY SUMMARY")
+      Text("TAGESÜBERSICHT")
         .taktLabel()
       Text(daySummarySentence)
         .font(TaktFont.display(19).weight(.semibold))
@@ -151,16 +151,16 @@ struct TaktDaySummaryInspector: View {
     let minutes = Int((total.truncatingRemainder(dividingBy: 3600)) / 60)
     let timeText = hours > 0 ? "\(hours)h \(minutes)m" : "\(minutes)m"
     let blockCount = max(1, focusBlocks.count)
-    let blockText = blockCount == 1 ? "1 focus block" : "\(blockCount) focus blocks"
-    return "\(timeText) tracked across \(blockText)."
+    let blockText = blockCount == 1 ? "1 Fokusblock" : "\(blockCount) Fokusblocks"
+    return "\(timeText) erfasst in \(blockText)."
   }
 
   private var statGrid: some View {
     let stats: [(label: String, value: String)] = [
-      ("Longest focus", formatDuration(longestFocus)),
-      ("Context switches", "\(contextSwitchCount)"),
-      ("Billable", "\(Int(billableFraction * 100))%"),
-      ("Distraction", formatDuration(totalDistracted)),
+      ("Längster Fokus", formatDuration(longestFocus)),
+      ("Kontextwechsel", "\(contextSwitchCount)"),
+      ("Abrechnbar", "\(Int(billableFraction * 100))%"),
+      ("Ablenkung", formatDuration(totalDistracted)),
     ]
     return LazyVGrid(
       columns: [
@@ -195,7 +195,7 @@ struct TaktDaySummaryInspector: View {
 
   private var whereTimeWent: some View {
     VStack(alignment: .leading, spacing: 12) {
-      Text("WHERE THE TIME WENT")
+      Text("ZEITVERTEILUNG")
         .taktLabel()
 
       GeometryReader { proxy in
@@ -260,12 +260,12 @@ struct TaktDaySummaryInspector: View {
 
       HStack(spacing: 8) {
         TaktButton(
-          title: cardsToReviewCount > 0 ? "Review \(cardsToReviewCount) cards" : "Review",
+          title: cardsToReviewCount > 0 ? "\(cardsToReviewCount) Karten prüfen" : "Karten prüfen",
           variant: .primary,
           action: onReviewTap
         )
         .disabled(cardsToReviewCount == 0)
-        TaktButton(title: "Copy timeline", variant: .secondary, action: onCopyTimeline)
+        TaktButton(title: "Timeline kopieren", variant: .secondary, action: onCopyTimeline)
       }
     }
   }
@@ -273,8 +273,8 @@ struct TaktDaySummaryInspector: View {
   private var footerSentence: String {
     let billableText: String
     let billable = Int(billableFraction * 100)
-    billableText = billable > 0 ? "\(billable)% billable" : "not billable"
-    return "\(formatDuration(totalCaptured)) tracked · \(billableText) · 4am day boundary."
+    billableText = billable > 0 ? "\(billable)% abrechenbar" : "nicht abrechenbar"
+    return "\(formatDuration(totalCaptured)) erfasst · \(billableText) · Tagesgrenze 4 Uhr."
   }
 
   private func formatDuration(_ interval: TimeInterval) -> String {

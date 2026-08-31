@@ -435,7 +435,7 @@ extension MainView {
           HStack(spacing: 4) {
             Image(systemName: "checkmark")
               .font(.system(size: 11.5, weight: .medium))
-            Text("Copied")
+            Text("Kopiert")
               .font(TaktFont.ui(11.5, .medium))
           }
           .transition(.asymmetric(insertion: enterTransition, removal: exitTransition))
@@ -443,7 +443,7 @@ extension MainView {
           HStack(spacing: 4) {
             Image(systemName: "doc.on.doc")
               .font(.system(size: 11.5, weight: .medium))
-            Text("Copy timeline")
+            Text("Timeline kopieren")
               .font(TaktFont.ui(11.5, .medium))
           }
           .transition(.asymmetric(insertion: enterTransition, removal: exitTransition))
@@ -472,7 +472,7 @@ extension MainView {
       enabled: copyTimelineState != .copying,
       reassertOnPressEnd: true
     )
-    .accessibilityLabel(Text("Copy timeline to clipboard"))
+    .accessibilityLabel(Text("Timeline in die Zwischenablage kopieren"))
   }
 }
 

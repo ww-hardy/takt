@@ -118,7 +118,7 @@ struct TaktWeeklyView: View {
         Text(formatMinutes(dashboardSnapshot.donut.totalMinutes))
           .font(TaktFont.display(32).weight(.bold))
           .foregroundColor(TaktColor.textPrimary)
-        Text("tracked, idle excluded")
+        Text("erfasst, ohne Leerlauf")
           .font(TaktFont.ui(15))
           .foregroundColor(TaktColor.textSecondary)
       }
@@ -169,7 +169,7 @@ struct TaktWeeklyView: View {
 
   private var focusHeatmapBlock: some View {
     VStack(alignment: .leading, spacing: 12) {
-      Text("FOCUS HEATMAP")
+      Text("FOKUS-HEATMAP")
         .taktLabel()
       WeeklyFocusHeatmapSection(
         snapshot: dashboardSnapshot.heatmap,
@@ -182,12 +182,12 @@ struct TaktWeeklyView: View {
 
   private var applicationsBlock: some View {
     VStack(alignment: .leading, spacing: 12) {
-      Text("APPLICATIONS")
+      Text("ANWENDUNGEN")
         .taktLabel()
 
       let apps = topApps
       if apps.isEmpty {
-        Text("No applications tracked this week.")
+        Text("Diese Woche keine Anwendungen erfasst.")
           .font(TaktFont.body)
           .foregroundColor(TaktColor.textSecondary)
       } else {
@@ -226,13 +226,13 @@ struct TaktWeeklyView: View {
   private var topApps: [WeeklySankeySnapshotApp] {
     let all = dashboardSnapshot.sankey.apps.sorted { $0.minutes > $1.minutes }
     let top = Array(all.prefix(7))
-    // Coalesce the overflow into an "Other" bucket (matches the existing rule)
+    // Coalesce the overflow into an "Sonstige" bucket (matches the existing rule)
     let overflowMinutes = all.dropFirst(7).reduce(0) { $0 + $1.minutes }
     if overflowMinutes > 0 {
       var result = top
       result.append(
         WeeklySankeySnapshotApp(
-          id: "other", name: "Other", minutes: overflowMinutes,
+          id: "other", name: "Sonstige", minutes: overflowMinutes,
           colorHex: "BBBBBB", faviconPrimaryRaw: nil, faviconSecondaryRaw: nil))
       return result
     }
@@ -263,7 +263,7 @@ struct TaktWeeklyView: View {
 
   private var donutBlock: some View {
     VStack(alignment: .leading, spacing: 14) {
-      Text("CATEGORIES")
+      Text("KATEGORIEN")
         .taktLabel()
 
       HStack(alignment: .center, spacing: 20) {
@@ -283,7 +283,7 @@ struct TaktWeeklyView: View {
             Text(formatMinutes(dashboardSnapshot.donut.totalMinutes))
               .font(TaktFont.display(19).weight(.bold))
               .foregroundColor(TaktColor.textPrimary)
-            Text("total")
+            Text("gesamt")
               .font(TaktFont.ui(11))
               .foregroundColor(TaktColor.textTertiary)
           }
@@ -308,7 +308,7 @@ struct TaktWeeklyView: View {
         .frame(maxWidth: .infinity)
       }
 
-      Text("Idle time is left out of the total.")
+      Text("Leerlauf zählt nicht in die Summe.")
         .font(TaktFont.ui(13))
         .foregroundColor(TaktColor.textTertiary)
     }
@@ -330,14 +330,14 @@ struct TaktWeeklyView: View {
 
   private var againstLastWeekBlock: some View {
     VStack(alignment: .leading, spacing: 12) {
-      Text("AGAINST LAST WEEK")
+      Text("GEGENÜBER LETZTER WOCHE")
         .taktLabel()
 
       VStack(spacing: 0) {
-        comparisonRow("Tracked", value: formatMinutes(dashboardSnapshot.donut.totalMinutes), delta: nil)
-        comparisonRow("Context switches", value: "0", delta: nil)
-        comparisonRow("Longest focus", value: "—", delta: nil)
-        comparisonRow("Distraction", value: "—", delta: nil)
+        comparisonRow("Erfasst", value: formatMinutes(dashboardSnapshot.donut.totalMinutes), delta: nil)
+        comparisonRow("Kontextwechsel", value: "0", delta: nil)
+        comparisonRow("Längster Fokus", value: "—", delta: nil)
+        comparisonRow("Ablenkung", value: "—", delta: nil)
       }
       .background(TaktColor.borderGrid)
       .overlay(
@@ -380,7 +380,7 @@ struct TaktWeeklyView: View {
         .frame(height: 1)
         .padding(.top, 6)
 
-      Text("WORTH NOTICING")
+      Text("BEMERKENSWERT")
         .taktLabel()
 
       Text(worthNoticingText)
@@ -396,7 +396,7 @@ struct TaktWeeklyView: View {
     if let top = items.max(by: { $0.minutes < $1.minutes }) {
       return "\(top.name) led the week at \(formatMinutes(top.minutes)). Keep an eye on whether that focus is moving you toward your goals."
     }
-    return "No data recorded this week."
+    return "Diese Woche keine Daten erfasst."
   }
 
   private func formatMinutes(_ minutes: Int) -> String {

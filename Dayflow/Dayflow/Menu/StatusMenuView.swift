@@ -23,13 +23,13 @@ struct StatusMenuView: View {
 
       MenuDivider()
 
-      MenuRow(title: "Open Dayflow", assetImage: "DayflowLogo", action: openDayflow)
-      MenuRow(title: "Open Recordings", action: openRecordingsFolder)
-      MenuRow(title: "Check for Updates", action: checkForUpdates)
+      MenuRow(title: "TAKT öffnen", assetImage: "DayflowLogo", action: openDayflow)
+      MenuRow(title: "Aufnahmen öffnen", action: openRecordingsFolder)
+      MenuRow(title: "Nach Updates suchen", action: checkForUpdates)
 
       MenuDivider()
 
-      MenuRow(title: "Quit Completely", systemImage: "power", accent: .red, action: quitDayflow)
+      MenuRow(title: "Vollständig beenden", systemImage: "power", accent: .red, action: quitDayflow)
     }
     .padding(.vertical, 9)
     .padding(.horizontal, 9)
@@ -103,7 +103,7 @@ private struct PauseSection: View {
   var body: some View {
     VStack(alignment: .leading, spacing: 6) {
       // Header
-      Text("Pause Dayflow")
+      Text("TAKT pausieren")
         .font(.system(size: 12, weight: .medium))
         .foregroundStyle(.secondary)
         .padding(.horizontal, 5)
@@ -201,7 +201,7 @@ private struct PausedSection: View {
 
       // Resume button
       MenuRow(
-        title: "Resume Dayflow",
+        title: "TAKT fortsetzen",
         systemImage: "play.circle",
         accent: .accentColor,
         action: onResume
@@ -217,7 +217,7 @@ private struct CountdownBadge: View {
 
   var body: some View {
     HStack(spacing: 0) {
-      Text("Dayflow paused for ")
+      Text("Pausiert seit ")
         .font(.system(size: 11, weight: .medium))
       Text(remainingTime)
         .font(.system(size: 11, weight: .bold).monospacedDigit())

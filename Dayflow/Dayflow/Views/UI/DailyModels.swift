@@ -5,13 +5,15 @@ import UserNotifications
 
 let dailyTodayDisplayFormatter: DateFormatter = {
   let formatter = DateFormatter()
-  formatter.dateFormat = "'Today,' MMMM d"
+  formatter.locale = Locale(identifier: "de-CH")
+  formatter.dateFormat = "'Heute,' d. MMMM"
   return formatter
 }()
 
 let dailyOtherDayDisplayFormatter: DateFormatter = {
   let formatter = DateFormatter()
-  formatter.dateFormat = "EEEE, MMMM d"
+  formatter.locale = Locale(identifier: "de-CH")
+  formatter.dateFormat = "EEEE, d. MMMM"
   return formatter
 }()
 
@@ -23,6 +25,7 @@ let dailyStandupSectionDayFormatter: DateFormatter = {
 
 let dailyStandupWeekdayFormatter: DateFormatter = {
   let formatter = DateFormatter()
+  formatter.locale = Locale(identifier: "de-CH")
   formatter.dateFormat = "EEEE"
   return formatter
 }()

@@ -6,13 +6,15 @@ import SwiftUI
 
 let cachedTodayDisplayFormatter: DateFormatter = {
   let formatter = DateFormatter()
-  formatter.dateFormat = "'Today,' MMM d"
+  formatter.locale = Locale(identifier: "de-CH")
+  formatter.dateFormat = "'Heute,' d. MMM"
   return formatter
 }()
 
 let cachedOtherDayDisplayFormatter: DateFormatter = {
   let formatter = DateFormatter()
-  formatter.dateFormat = "E, MMM d"
+  formatter.locale = Locale(identifier: "de-CH")
+  formatter.dateFormat = "EEE d. MMM"
   return formatter
 }()
 

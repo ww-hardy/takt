@@ -42,12 +42,12 @@ extension DailyView {
         .frame(width: 16 * scale, height: 16 * scale)
 
         ZStack(alignment: .leading) {
-          Text("Copy standup update")
+          Text("Standup kopieren")
             .font(.custom("Figtree-Medium", size: 14 * scale))
             .lineLimit(1)
             .opacity(standupCopyState == .copied ? 0 : 1)
 
-          Text("Copied")
+          Text("Kopiert")
             .font(.custom("Figtree-Medium", size: 14 * scale))
             .lineLimit(1)
             .opacity(standupCopyState == .copied ? 1 : 0)
@@ -78,7 +78,7 @@ extension DailyView {
     .animation(.easeInOut(duration: 0.22), value: standupCopyState)
     .pointingHandCursorOnHover(reassertOnPressEnd: true)
     .accessibilityLabel(
-      Text(standupCopyState == .copied ? "Copied standup update" : "Copy standup update"))
+      Text(standupCopyState == .copied ? "Standup kopiert" : "Standup kopieren"))
   }
   func standupRegenerateButton(scale: CGFloat) -> some View {
     let transition = AnyTransition.opacity.combined(with: .scale(scale: 0.5))
@@ -146,7 +146,7 @@ extension DailyView {
     .pointingHandCursorOnHover(
       enabled: canRegenerateStandup, reassertOnPressEnd: true
     )
-    .accessibilityLabel(Text("Regenerate standup highlights"))
+    .accessibilityLabel(Text("Highlights neu generieren"))
     .help(regenerateButtonHelpText)
     .background {
       if standupRegenerateState == .regenerating {
@@ -530,7 +530,7 @@ extension DailyView {
     var lines: [String] = []
     lines.append(titles.highlights)
     if yesterdayItems.isEmpty {
-      lines.append("- None right now")
+      lines.append("- Aktuell keine")
     } else {
       yesterdayItems.forEach { lines.append("- \($0)") }
     }
@@ -538,7 +538,7 @@ extension DailyView {
 
     lines.append(titles.tasks)
     if todayItems.isEmpty {
-      lines.append("- None right now")
+      lines.append("- Aktuell keine")
     } else {
       todayItems.forEach { lines.append("- \($0)") }
     }
@@ -546,7 +546,7 @@ extension DailyView {
 
     lines.append(titles.blockers)
     if blockersItems.isEmpty {
-      lines.append("- None right now")
+      lines.append("- Aktuell keine")
     } else {
       blockersItems.forEach { lines.append("- \($0)") }
     }
@@ -684,17 +684,17 @@ extension DailyView {
   var regenerateButtonLabel: String {
     switch standupRegenerateState {
     case .regenerating:
-      return "Regenerating" + String(repeating: ".", count: standupRegeneratingDotsPhase)
+      return "Neu generieren" + String(repeating: ".", count: standupRegeneratingDotsPhase)
     case .idle, .regenerated, .noData:
-      return "Regenerate"
+      return "Neu generieren"
     }
   }
   var transientRegenerateButtonLabel: String? {
     switch standupRegenerateState {
     case .regenerated:
-      return "Regenerated"
+      return "Neu generiert"
     case .noData:
-      return "No data"
+      return "Keine Daten"
     case .idle, .regenerating:
       return nil
     }
@@ -718,27 +718,21 @@ extension DailyView {
     return DailyStandupSectionTitles(
       highlights: standupHighlightsTitle(for: sourceDay),
       tasks: standupTasksTitle(for: targetDay),
-      blockers: "Blockers"
+      blockers: "Blocker"
     )
   }
   func standupSectionHeading(for date: Date) -> String {
-    "Standup for \(dailyDateTitle(for: date))"
+    "Standup für \(dailyDateTitle(for: date))"
   }
   func standupHighlightsTitle(for sourceDay: DailyStandupDayInfo?) -> String {
-    guard let sourceDay else { return "Recent highlights" }
+    guard let sourceDay else { return "Letzte Highlights" }
 
     let label = standupDayLabelText(for: sourceDay.startOfDay)
-    if label == "Today" || label == "Yesterday" || label.hasPrefix("Last ") {
-      return "\(label)'s highlights"
-    }
-    return "Highlights from \(label)"
+    return "Highlights von \(label)"
   }
   func standupTasksTitle(for targetDay: DailyStandupDayInfo) -> String {
     let label = standupDayLabelText(for: targetDay.startOfDay)
-    if label == "Today" || label == "Yesterday" {
-      return "\(label)'s tasks"
-    }
-    return "Tasks for \(label)"
+    return "Aufgaben für \(label)"
   }
   func standupDayLabelText(for date: Date) -> String {
     let calendar = Calendar.current
@@ -746,7 +740,7 @@ extension DailyView {
     let timelineToday = timelineDisplayDate(from: Date())
 
     if calendar.isDate(displayDate, inSameDayAs: timelineToday) {
-      return "Today"
+      return "heute"
     }
 
     guard let timelineYesterday = calendar.date(byAdding: .day, value: -1, to: timelineToday)
@@ -755,12 +749,12 @@ extension DailyView {
     }
 
     if calendar.isDate(displayDate, inSameDayAs: timelineYesterday) {
-      return "Yesterday"
+      return "gestern"
     }
 
     let daysAgo = calendar.dateComponents([.day], from: displayDate, to: timelineToday).day ?? 99
     if (2...6).contains(daysAgo) {
-      return "Last \(dailyStandupWeekdayFormatter.string(from: displayDate))"
+      return "letzten \(dailyStandupWeekdayFormatter.string(from: displayDate))"
     }
 
     return dailyOtherDayDisplayFormatter.string(from: displayDate)

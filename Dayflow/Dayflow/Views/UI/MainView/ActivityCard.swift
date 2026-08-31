@@ -115,14 +115,14 @@ struct ActivityCard: View {
       VStack(spacing: 10) {
         Spacer()
         if hasAnyActivities {
-          Text("Select an activity to view details")
+          Text("Aktivität auswählen für Details")
             .font(.custom("Figtree", size: 15))
             .fontWeight(.regular)
             .foregroundColor(.gray.opacity(0.5))
         } else {
           if appState.isRecording {
             VStack(spacing: 6) {
-              Text("No cards yet")
+              Text("Noch keine Karten")
                 .font(.system(size: 14, weight: .semibold))
                 .foregroundColor(.gray.opacity(0.7))
               Text(
@@ -135,10 +135,10 @@ struct ActivityCard: View {
             }
           } else {
             VStack(spacing: 6) {
-              Text("Recording is off")
+              Text("Aufnahme aus")
                 .font(.system(size: 14, weight: .semibold))
                 .foregroundColor(.gray.opacity(0.7))
-              Text("TAKT recording is currently turned off, so cards aren’t being produced.")
+              Text("TAKT zeichnet gerade nicht auf – es entstehen keine neuen Karten.")
                 .font(.custom("Figtree", size: 13))
                 .foregroundColor(.gray.opacity(0.6))
                 .multilineTextAlignment(.center)
@@ -215,7 +215,7 @@ struct ActivityCard: View {
                 }
                 .buttonStyle(PlainButtonStyle())
                 .pointingHandCursorOnHover(reassertOnPressEnd: true)
-                .accessibilityLabel(Text("Change category"))
+                .accessibilityLabel(Text("Kategorie ändern"))
               }
             }
           }
@@ -395,7 +395,7 @@ struct ActivityCard: View {
           }
           .buttonStyle(PlainButtonStyle())
           .pointingHandCursorOnHover(reassertOnPressEnd: true)
-          .accessibilityLabel(Text("Edit title"))
+          .accessibilityLabel(Text("Titel bearbeiten"))
         }
       }
       .onHover { hovering in
@@ -422,7 +422,7 @@ struct ActivityCard: View {
   private func summaryContent(for activity: TimelineActivity) -> some View {
     VStack(alignment: .leading, spacing: 8) {
       VStack(alignment: .leading, spacing: 3) {
-        Text("WHAT HAPPENED")
+        Text("VERLAUF")
           .taktLabel()
 
         renderMarkdownText(activity.summary)
@@ -435,7 +435,7 @@ struct ActivityCard: View {
 
       if !activity.detailedSummary.isEmpty && activity.detailedSummary != activity.summary {
         VStack(alignment: .leading, spacing: 3) {
-          Text("DETAILED SUMMARY")
+          Text("DETAILS")
             .taktLabel()
 
           renderMarkdownText(formattedDetailedSummary(activity.detailedSummary))
@@ -522,7 +522,7 @@ struct ActivityCard: View {
           .scaleEffect(0.7)
           .frame(width: 16, height: 16)
 
-        Text("Processing")
+        Text("In Bearbeitung")
           .font(.custom("Figtree", size: 13))
           .foregroundColor(Color(red: 0.4, green: 0.4, blue: 0.4))
           .lineLimit(1)
@@ -535,7 +535,7 @@ struct ActivityCard: View {
       // Retry button - orange pill
       Button(action: { handleRetry(for: activity) }) {
         HStack(alignment: .center, spacing: 4) {
-          Text("Retry")
+          Text("Erneut versuchen")
             .font(.custom("Figtree", size: 13).weight(.medium))
           Image(systemName: "arrow.clockwise")
             .font(.system(size: 13, weight: .medium))
@@ -604,7 +604,7 @@ struct ActivityCard: View {
               HStack(spacing: 8) {
                 ProgressView()
                   .scaleEffect(0.8)
-                Text("Preparing timelapse...")
+                Text("Zeitraffer wird vorbereitet…")
                   .font(TaktFont.ui(12, .semibold))
                   .foregroundColor(.white)
               }

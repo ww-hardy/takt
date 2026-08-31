@@ -93,7 +93,7 @@ private struct TimelineNavigationButton: View {
       }
     }
     .pointingHandCursorOnHover(enabled: isEnabled, reassertOnPressEnd: true)
-    .accessibilityLabel(chevronName == "chevron.left" ? "Previous day" : "Next day")
+    .accessibilityLabel(chevronName == "chevron.left" ? "Vorheriger Tag" : "Nächster Tag")
   }
 }
 
@@ -419,7 +419,7 @@ extension MainView {
       HStack(spacing: 4) {
         Image(systemName: "calendar.badge.clock")
           .font(.system(size: 11, weight: .medium))
-        Text("Today")
+        Text("Heute")
           .font(TaktFont.ui(14, .regular))
       }
       .foregroundColor(TaktColor.textSecondary)
@@ -434,7 +434,7 @@ extension MainView {
     }
     .buttonStyle(.plain)
     .pointingHandCursorOnHover(reassertOnPressEnd: true)
-    .accessibilityLabel("Go to today")
+    .accessibilityLabel("Zum heutigen Tag")
   }
 
   private var timelineHeaderDateLabel: some View {

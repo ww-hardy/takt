@@ -45,6 +45,7 @@ struct TimelineCalendarPopover: View {
 
   private static let monthYearFormatter: DateFormatter = {
     let f = DateFormatter()
+    f.locale = Locale(identifier: "de-CH")
     f.dateFormat = "MMMM yyyy"
     return f
   }()
