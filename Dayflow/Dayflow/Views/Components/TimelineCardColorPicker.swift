@@ -126,7 +126,7 @@ struct ColorOrganizerRoot: View {
 
       VStack(spacing: verticalSpacing) {
         if stage == .details && showsTitles {
-          Text("Customize your categories")
+          Text("Kategorien anpassen")
             .font(Font.custom("Instrument Serif", size: 44))
             .foregroundColor(.black)
             .frame(maxWidth: .infinity, alignment: .center)
@@ -175,12 +175,12 @@ struct ColorOrganizerRoot: View {
     VStack(alignment: .leading, spacing: showTitles ? 20 : 16) {
       if showTitles {
         VStack(alignment: .leading, spacing: 6) {
-          Text("Part 1 of 2")
+          Text("Teil 1 von 2")
             .font(Font.custom("Figtree", size: 14).weight(.bold))
             .foregroundColor(Color(red: 0.98, green: 0.43, blue: 0))
             .frame(maxWidth: .infinity, alignment: .leading)
 
-          Text("Edit title and description")
+          Text("Titel und Beschreibung bearbeiten")
             .font(Font.custom("Instrument Serif", size: 30))
             .foregroundColor(.black)
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -191,20 +191,20 @@ struct ColorOrganizerRoot: View {
         instructionRow(
           icon: "CategoriesOrganize",
           text:
-            "TAKT organizes your activities by the category titles and descriptions you provide."
+            "TAKT ordnet deine Aktivitäten den Kategorien-Titeln und -Beschreibungen zu, die du angibst."
         )
         .frame(maxWidth: isCompact ? .infinity : 280, alignment: .leading)
 
         instructionRow(
           icon: "CategoriesTextSelect",
           text:
-            "Try to provide as much details in the descriptions as you can to help TAKT understand your workflow and habits."
+            "Gib in den Beschreibungen möglichst viele Details an, damit TAKT deinen Workflow und deine Gewohnheiten versteht."
         )
         .frame(maxWidth: isCompact ? .infinity : 280, alignment: .leading)
       }
 
       Text(
-        "This step is optional. You can customize the categories or create new ones anytime while using TAKT."
+        "Dieser Schritt ist optional. Du kannst die Kategorien jederzeit während der Nutzung von TAKT anpassen oder neue erstellen."
       )
       .font(Font.custom("Figtree", size: 12).weight(.medium))
       .foregroundColor(Color(red: 0.48, green: 0.48, blue: 0.48))
@@ -229,12 +229,12 @@ struct ColorOrganizerRoot: View {
     VStack(alignment: .leading, spacing: 24) {
       if showTitles {
         VStack(alignment: .leading, spacing: 6) {
-          Text("Part 2 of 2")
+          Text("Teil 2 von 2")
             .font(Font.custom("Figtree", size: 14).weight(.bold))
             .foregroundColor(Color(red: 0.98, green: 0.43, blue: 0))
             .frame(maxWidth: .infinity, alignment: .leading)
 
-          Text("Edit colors")
+          Text("Farben bearbeiten")
             .font(Font.custom("Instrument Serif", size: 30))
             .foregroundColor(.black)
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -271,8 +271,8 @@ struct ColorOrganizerRoot: View {
       VStack(alignment: .leading, spacing: 12) {
         Text(
           isDraggingColor
-            ? "Drop on a category →"
-            : "Click and drag on the canvas above to change the color palette. Then drag a color onto a category."
+            ? "Auf eine Kategorie ziehen →"
+            : "Klicke und ziehe auf der Fläche oben, um die Farbpalette zu ändern. Ziehe dann eine Farbe auf eine Kategorie."
         )
         .font(Font.custom("Figtree", size: 13).weight(.medium))
         .foregroundColor(Color(red: 0.3, green: 0.3, blue: 0.3))
@@ -312,7 +312,7 @@ struct ColorOrganizerRoot: View {
           .font(.system(size: 10, weight: .bold))
           .foregroundColor(Color(red: 0.49, green: 0.33, blue: 0.16))
 
-        Text("Create a new category")
+        Text("Neue Kategorie erstellen")
           .font(Font.custom("Figtree", size: 14).weight(.bold))
           .foregroundColor(Color(red: 0.49, green: 0.33, blue: 0.16))
       }
@@ -389,7 +389,7 @@ struct ColorOrganizerRoot: View {
       .frame(maxWidth: isCompact ? .infinity : 708)
       .frame(height: containerHeight, alignment: .topLeading)
 
-      Text("This step is optional. You can change the colors anytime while using TAKT.")
+      Text("Dieser Schritt ist optional. Du kannst die Farben jederzeit während der Nutzung von TAKT ändern.")
         .font(Font.custom("Figtree", size: 12).weight(.medium))
         .foregroundColor(Color(red: 0.48, green: 0.48, blue: 0.48))
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -494,7 +494,7 @@ struct ColorOrganizerRoot: View {
   }
 
   private var emptyState: some View {
-    Text("Add a category to get started.")
+    Text("Füge eine Kategorie hinzu, um loszulegen.")
       .font(Font.custom("Figtree", size: 13).weight(.medium))
       .foregroundColor(Color(red: 0.35, green: 0.35, blue: 0.35))
       .frame(maxWidth: .infinity, alignment: .leading)

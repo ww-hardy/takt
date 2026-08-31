@@ -298,66 +298,66 @@ private enum OnboardingCategoryPreset: String {
         (
           "Coding / Debugging",
           "#6A7EFF",
-          "Writing, refactoring, and fixing code in an IDE or terminal"
+          "Code in einer IDE oder im Terminal schreiben, refaktorieren und fixen"
         ),
         (
           "Code Review",
           "#56CFEE",
-          "Reviewing PRs, reading diffs, and leaving comments"
+          "PRs reviewen, Diffs lesen und Kommentare hinterlassen"
         ),
         (
           "Research",
           "#C787F7",
-          "Reading docs, Stack Overflow, exploring tools and APIs, and writing design docs or technical specs"
+          "Doku lesen, Stack Overflow, Tools und APIs erkunden sowie Design-Docs oder technische Spezifikationen schreiben"
         ),
         (
           "Communication",
           "#FFAE8C",
-          "Meetings, standups, Slack, email, video calls, messaging, and syncs"
+          "Meetings, Standups, Slack, E-Mail, Video-Calls, Nachrichten und Syncs"
         ),
         (
           "Distraction",
           "#FF4721",
-          "Unfocused browsing and passive content consumption: social media feeds, random videos, idle scrolling, entertainment with no clear intent, and gaming"
+          "Unfokussiertes Surfen und passiver Konsum: Social-Media-Feeds, zufällige Videos, zielloses Scrollen, Unterhaltung ohne klares Ziel und Gaming"
         ),
         (
           "Personal",
           "#ADE3E3",
-          "Intentional non-work activity with a purpose: messaging friends and family, managing finances, booking travel, errands, life admin, and hobbies"
+          "Absichtliche Nicht-Arbeits-Aktivitäten mit Zweck: Nachrichten mit Freunden und Familie, Finanzen verwalten, Reisen buchen, Besorgungen, Alltag und Hobbys"
         ),
       ]
 
     case .founderExecutive:
       return [
         (
-          "Engineering / Product",
+          "Engineering / Produkt",
           "#6A7EFF",
-          "Coding, design work, shipping features, and hands-on building"
+          "Coden, Design-Arbeit, Features ausliefern und Hands-on-Building"
         ),
         (
-          "Research & Strategy",
+          "Research & Strategie",
           "#56CFEE",
-          "Competitive research, positioning, long-form thinking, and investor prep"
+          "Wettbewerbsrecherche, Positionierung, Long-form-Denken und Investor-Vorbereitung"
         ),
         (
-          "Data & Insights",
+          "Daten & Insights",
           "#C787F7",
-          "Dashboards, retention data, funnels, and financials"
+          "Dashboards, Retentionsdaten, Funnels und Finanzkennzahlen"
         ),
         (
           "Communication",
           "#FFAE8C",
-          "Team syncs, investor calls, user demos, and hiring"
+          "Team-Syncs, Investor-Calls, User-Demos und Einstellungen"
         ),
         (
           "Distraction",
           "#FF4721",
-          "Unfocused browsing and passive content consumption: social media feeds, random videos, idle scrolling, entertainment with no clear intent, and gaming"
+          "Unfokussiertes Surfen und passiver Konsum: Social-Media-Feeds, zufällige Videos, zielloses Scrollen, Unterhaltung ohne klares Ziel und Gaming"
         ),
         (
           "Personal",
           "#ADE3E3",
-          "Intentional non-work activity with a purpose: messaging friends and family, managing finances, booking travel, errands, life admin, and hobbies"
+          "Absichtliche Nicht-Arbeits-Aktivitäten mit Zweck: Nachrichten mit Freunden und Familie, Finanzen verwalten, Reisen buchen, Besorgungen, Alltag und Hobbys"
         ),
       ]
 
@@ -366,143 +366,143 @@ private enum OnboardingCategoryPreset: String {
         (
           "Design",
           "#6A7EFF",
-          "Prototyping, UI components, user flows, visual design, and handoff specs"
+          "Prototyping, UI-Komponenten, User Flows, visuelles Design und Handoff-Specs"
         ),
         (
           "Research",
           "#56CFEE",
-          "Browsing patterns, competitive audits, user studies, and reviewing metrics"
+          "Browsing-Muster, Wettbewerbs-Audits, User Studies und Metrik-Review"
         ),
         (
           "Communication",
           "#FFAE8C",
-          "Design reviews, standups, critique sessions, and presenting concepts"
+          "Design-Reviews, Standups, Kritik-Sessions und Konzept-Präsentationen"
         ),
         (
           "Distraction",
           "#FF4721",
-          "Unfocused browsing and passive content consumption: social media feeds, random videos, idle scrolling, entertainment with no clear intent, and gaming"
+          "Unfokussiertes Surfen und passiver Konsum: Social-Media-Feeds, zufällige Videos, zielloses Scrollen, Unterhaltung ohne klares Ziel und Gaming"
         ),
         (
           "Personal",
           "#ADE3E3",
-          "Intentional non-work activity with a purpose: messaging friends and family, managing finances, booking travel, errands, life admin, and hobbies"
+          "Absichtliche Nicht-Arbeits-Aktivitäten mit Zweck: Nachrichten mit Freunden und Familie, Finanzen verwalten, Reisen buchen, Besorgungen, Alltag und Hobbys"
         ),
       ]
 
     case .student:
       return [
         (
-          "Studying",
+          "Lernen",
           "#6A7EFF",
-          "Lectures, reading, reviewing slides, flashcards, and course material"
+          "Vorlesungen, Lesen, Folien wiederholen, Karteikarten und Kursmaterial"
         ),
         (
-          "Assignments",
+          "Aufgaben",
           "#56CFEE",
-          "Papers, problem sets, coding projects, and lab reports"
+          "Papiere, Übungsserien, Coding-Projekte und Laborberichte"
         ),
         (
           "Communication",
           "#FFAE8C",
-          "Study groups, office hours, group chats, and emailing professors"
+          "Lerngruppen, Sprechstunden, Gruppen-Chats und E-Mails an Dozierende"
         ),
         (
           "Distraction",
           "#FF4721",
-          "Unfocused browsing and passive content consumption: social media feeds, random videos, idle scrolling, entertainment with no clear intent, and gaming"
+          "Unfokussiertes Surfen und passiver Konsum: Social-Media-Feeds, zufällige Videos, zielloses Scrollen, Unterhaltung ohne klares Ziel und Gaming"
         ),
         (
           "Personal",
           "#ADE3E3",
-          "Intentional non-work activity with a purpose: messaging friends and family, managing finances, booking travel, errands, life admin, and hobbies"
+          "Absichtliche Nicht-Arbeits-Aktivitäten mit Zweck: Nachrichten mit Freunden und Familie, Finanzen verwalten, Reisen buchen, Besorgungen, Alltag und Hobbys"
         ),
       ]
 
     case .productManager:
       return [
         (
-          "Specs & Planning",
+          "Specs & Planung",
           "#6A7EFF",
-          "PRDs, roadmaps, backlog grooming, sprint planning, and tickets"
+          "PRDs, Roadmaps, Backlog-Pflege, Sprint-Planung und Tickets"
         ),
         (
-          "Research & Analysis",
+          "Research & Analyse",
           "#56CFEE",
-          "User research, metrics review, competitive analysis, and A/B tests"
+          "User Research, Metrik-Review, Wettbewerbsanalyse und A/B-Tests"
         ),
         (
-          "Communication",
+          "Kommunikation",
           "#FFAE8C",
-          "Standups, stakeholder syncs, design reviews, and engineering check-ins"
+          "Standups, Stakeholder-Syncs, Design-Reviews und Engineering-Check-ins"
         ),
         (
-          "Distraction",
+          "Ablenkung",
           "#FF4721",
-          "Unfocused browsing and passive content consumption: social media feeds, random videos, idle scrolling, entertainment with no clear intent, and gaming"
+          "Unfokussiertes Surfen und passiver Konsum: Social-Media-Feeds, zufällige Videos, zielloses Scrollen, Unterhaltung ohne klares Ziel und Gaming"
         ),
         (
-          "Personal",
+          "Persönlich",
           "#ADE3E3",
-          "Intentional non-work activity with a purpose: messaging friends and family, managing finances, booking travel, errands, life admin, and hobbies"
+          "Absichtliche Nicht-Arbeits-Aktivitäten mit Zweck: Nachrichten mit Freunden und Familie, Finanzen verwalten, Reisen buchen, Besorgungen, Alltag und Hobbys"
         ),
       ]
 
     case .dataScientist:
       return [
         (
-          "Analysis & Modeling",
+          "Analyse & Modellierung",
           "#6A7EFF",
-          "Notebooks, statistical analysis, ML training, and data exploration"
+          "Notebooks, statistische Analysen, ML-Training und Datenexploration"
         ),
         (
           "Data Engineering",
           "#56CFEE",
-          "SQL queries, pipelines, data cleaning, and ETL scripts"
+          "SQL-Abfragen, Pipelines, Datenbereinigung und ETL-Skripte"
         ),
         (
-          "Research",
+          "Forschung",
           "#C787F7",
-          "Reading papers, docs, and exploring new methods and tools"
+          "Papiere und Doku lesen, neue Methoden und Tools erkunden"
         ),
         (
-          "Communication",
+          "Kommunikation",
           "#FFAE8C",
-          "Presenting findings, stakeholder syncs, and team discussions"
+          "Ergebnisse präsentieren, Stakeholder-Syncs und Team-Diskussionen"
         ),
         (
-          "Distraction",
+          "Ablenkung",
           "#FF4721",
-          "Unfocused browsing and passive content consumption: social media feeds, random videos, idle scrolling, entertainment with no clear intent, and gaming"
+          "Unfokussiertes Surfen und passiver Konsum: Social-Media-Feeds, zufällige Videos, zielloses Scrollen, Unterhaltung ohne klares Ziel und Gaming"
         ),
         (
-          "Personal",
+          "Persönlich",
           "#ADE3E3",
-          "Intentional non-work activity with a purpose: messaging friends and family, managing finances, booking travel, errands, life admin, and hobbies"
+          "Absichtliche Nicht-Arbeits-Aktivitäten mit Zweck: Nachrichten mit Freunden und Familie, Finanzen verwalten, Reisen buchen, Besorgungen, Alltag und Hobbys"
         ),
       ]
 
     case .other:
       return [
         (
-          "Work",
+          "Arbeit",
           "#6A7EFF",
-          "Focused work tasks and professional responsibilities that do not fit a more specific category"
+          "Fokussierte Arbeitsaufgaben und berufliche Pflichten, die in keine spezifischere Kategorie passen"
         ),
         (
-          "Communication",
+          "Kommunikation",
           "#FFAE8C",
-          "Meetings, standups, Slack, email, video calls, messaging, and syncs"
+          "Meetings, Standups, Slack, E-Mail, Video-Calls, Nachrichten und Syncs"
         ),
         (
-          "Distraction",
+          "Ablenkung",
           "#FF4721",
-          "Unfocused browsing and passive content consumption: social media feeds, random videos, idle scrolling, entertainment with no clear intent, and gaming"
+          "Unfokussiertes Surfen und passiver Konsum: Social-Media-Feeds, zufällige Videos, zielloses Scrollen, Unterhaltung ohne klares Ziel und Gaming"
         ),
         (
-          "Personal",
+          "Persönlich",
           "#ADE3E3",
-          "Intentional non-work activity with a purpose: messaging friends and family, managing finances, booking travel, errands, life admin, and hobbies"
+          "Absichtliche Nicht-Arbeits-Aktivitäten mit Zweck: Nachrichten mit Freunden und Familie, Finanzen verwalten, Reisen buchen, Besorgungen, Alltag und Hobbys"
         ),
       ]
     }
