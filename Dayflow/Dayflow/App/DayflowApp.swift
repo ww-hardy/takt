@@ -114,7 +114,6 @@ struct DayflowApp: App {
   @AppStorage("didOnboard") private var didOnboard = false
   @AppStorage("useBlankUI") private var useBlankUI = false
   @AppStorage("hasCompletedJournalOnboarding") private var hasCompletedJournalOnboarding = false
-  @State private var showVideoLaunch = true
   @State private var contentOpacity = 0.0
   @State private var contentScale = 0.98
   @StateObject private var categoryStore = CategoryStore()
@@ -131,7 +130,7 @@ struct DayflowApp: App {
   var body: some Scene {
     Window("TAKT", id: "main") {
       ZStack {
-        // Main app UI or onboarding with entrance animation
+        // Main app UI or onboarding (TAKT: minimal 4-step wizard)
         Group {
           if didOnboard {
             // Show UI after onboarding
@@ -139,8 +138,8 @@ struct DayflowApp: App {
               .environmentObject(categoryStore)
               .environmentObject(updaterManager)
               .environmentObject(journalCoordinator)
-          } else if !showVideoLaunch {
-            OnboardingFlow()
+          } else {
+            TaktOnboardingView()
               .environmentObject(AppState.shared)
               .environmentObject(categoryStore)
               .environmentObject(updaterManager)
@@ -150,39 +149,21 @@ struct DayflowApp: App {
         .scaleEffect(contentScale)
         .animation(.easeOut(duration: 0.3).delay(0.15), value: contentOpacity)
         .animation(.easeOut(duration: 0.3).delay(0.15), value: contentScale)
-
-        // Video overlay on top with scale + opacity exit
-        if showVideoLaunch {
-          VideoLaunchView()
-            .onVideoComplete {
-              // Overlapping animations for smooth handoff
-              withAnimation(.easeOut(duration: 0.25)) {
-                // Start revealing content while video fades
-                contentOpacity = 1.0
-                contentScale = 1.0
-              }
-
-              // Slightly delayed video exit for overlap
-              DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                withAnimation(.easeIn(duration: 0.2)) {
-                  showVideoLaunch = false
-                }
-              }
-
-              dispatchPendingNotificationNavigation(after: 0.3)
-            }
-            .opacity(showVideoLaunch ? 1 : 0)
-            .scaleEffect(showVideoLaunch ? 1 : 1.02)
-            .animation(.easeIn(duration: 0.2), value: showVideoLaunch)
-            .onAppear {
-              // Skip video if opening via notification tap
-              if hasPendingNotificationNavigation {
-                showVideoLaunch = false
-                contentOpacity = 1.0
-                contentScale = 1.0
-                dispatchPendingNotificationNavigation(after: 0.1)
-              }
-            }
+        .onAppear {
+          withAnimation(.easeOut(duration: 0.3)) {
+            contentOpacity = 1.0
+            contentScale = 1.0
+          }
+          if didOnboard {
+            dispatchPendingNotificationNavigation(after: 0.1)
+          }
+        }
+        .onReceive(
+          NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)
+        ) { _ in
+          if didOnboard {
+            dispatchPendingNotificationNavigation(after: 0.1)
+          }
         }
 
         // Journal onboarding video (full window coverage, above sidebar)
@@ -213,18 +194,6 @@ struct DayflowApp: App {
           .ignoresSafeArea()
           .allowsHitTesting(false)
           .accessibilityHidden(true)
-        }
-      }
-      .onAppear {
-        if !showVideoLaunch {
-          dispatchPendingNotificationNavigation(after: 0.1)
-        }
-      }
-      .onReceive(
-        NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)
-      ) { _ in
-        if !showVideoLaunch {
-          dispatchPendingNotificationNavigation(after: 0.1)
         }
       }
       .frame(minWidth: 900, maxWidth: .infinity, minHeight: 508, maxHeight: .infinity)
