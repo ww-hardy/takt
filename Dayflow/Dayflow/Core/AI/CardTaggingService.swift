@@ -45,6 +45,31 @@ struct CardTaggingService {
     let skippedCount: Int
   }
 
+  /// Cards that can be offered to the automatic tagging pass.
+  ///
+  /// System and idle cards are intentionally not customer work. A card that
+  /// has already been tagged must not be overwritten, including manual tags.
+  /// `skip`/`duplicate` are terminal classifications produced by the tagging
+  /// pipeline and therefore must not reappear as open work.
+  static func taggingCandidates(from cards: [TimelineCard]) -> [TimelineCard] {
+    cards.filter { card in
+      guard card.recordId != nil, card.clientId == nil else { return false }
+
+      let category = card.category.trimmingCharacters(in: .whitespacesAndNewlines)
+        .lowercased()
+      guard category != "system", category != "idle" else { return false }
+
+      let source = card.tagSource?.trimmingCharacters(in: .whitespacesAndNewlines)
+        .lowercased()
+      guard source != "manual", source != "corrected",
+        source != "skip", source != "duplicate", source != "duplikat"
+      else {
+        return false
+      }
+      return true
+    }
+  }
+
   private struct TagPayload: Codable {
     let card_id: Int64
     let client_id: Int64?
@@ -91,7 +116,8 @@ struct CardTaggingService {
 
   /// Classifies the given cards in a single text pass and persists AI tags.
   func tagCards(_ cards: [TimelineCard]) async throws -> TaggingOutcome {
-    guard !cards.isEmpty else {
+    let candidates = Self.taggingCandidates(from: cards)
+    guard !candidates.isEmpty else {
       return TaggingOutcome(taggedCount: 0, skippedCount: 0)
     }
     guard let config = OpenAICompatiblePreferences.load(), config.isComplete, isConfigured else {
@@ -104,7 +130,7 @@ struct CardTaggingService {
       throw TaggingError.noClients
     }
 
-    let prompt = buildPrompt(cards: cards, clients: clients, projects: projects)
+    let prompt = buildPrompt(cards: candidates, clients: clients, projects: projects)
     let text = try await sendChatCompletion(config: config, prompt: prompt)
     let payloads = try parsePayloads(text)
 
@@ -117,7 +143,7 @@ struct CardTaggingService {
 
     var tagged = 0
     for payload in payloads {
-      guard let card = cards.first(where: { $0.recordId == payload.card_id }),
+      guard let card = candidates.first(where: { $0.recordId == payload.card_id }),
         let cardId = card.recordId
       else { continue }
 
@@ -152,7 +178,7 @@ struct CardTaggingService {
       tagged += 1
     }
 
-    return TaggingOutcome(taggedCount: tagged, skippedCount: cards.count - tagged)
+    return TaggingOutcome(taggedCount: tagged, skippedCount: candidates.count - tagged)
   }
 
   // MARK: - Prompt building

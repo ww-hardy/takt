@@ -111,22 +111,25 @@ extension MainView {
   // child widths, no `.animation(...value: trailingReservation)` firing
   // concurrently with the Day/Week matchedGeometryEffect toggle.
   var timelineHeader: some View {
-    ZStack(alignment: .trailing) {
-      GeometryReader { geo in
-        let visibility = computeHeaderVisibility(availableWidth: geo.size.width)
-        timelineLeadingControls(visibility: visibility)
-          .padding(.trailing, timelineHeaderTrailingReservation)
-          // maxHeight: .infinity is load-bearing — without it the HStack pins
-          // to the GR's top edge while the Pause pill sits center-vertically
-          // in the sibling ZStack, visibly misaligning the two clusters.
-          // `Alignment.leading` = horizontal .leading + vertical .center.
-          .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
-      }
-
-      timelineTrailingControls
-        .trackTimelineHeaderTrailingWidth()
+    GeometryReader { geo in
+      let visibility = computeHeaderVisibility(availableWidth: geo.size.width)
+      timelineLeadingControls(visibility: visibility)
+        .padding(.trailing, timelineHeaderTrailingReservation)
+        // maxHeight: .infinity keeps the leading cluster vertically centered
+        // in the fixed header row.
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
     }
     .frame(height: 36)
+    // An overlay gives the trailing control an explicit containing width.
+    // This keeps the pill right-pinned rather than letting the GeometryReader
+    // and the trailing sibling negotiate a narrower ZStack width.
+    .overlay(alignment: .topTrailing) {
+      timelineTrailingControls
+        // The inspector header begins 2pt below the timeline pane's 24pt
+        // inset; the 32pt pill therefore aligns with its 26pt top padding.
+        .padding(.top, 2)
+        .trackTimelineHeaderTrailingWidth()
+    }
     .padding(.horizontal, 10)
     .onPreferenceChange(TimelineHeaderTrailingWidthPreferenceKey.self) { width in
       timelineHeaderTrailingWidth = width

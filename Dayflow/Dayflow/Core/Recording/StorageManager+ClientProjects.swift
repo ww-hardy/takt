@@ -263,23 +263,66 @@ extension StorageManager {
     return rows
   }
 
-  /// CSV export of the client summary.
-  func clientSummaryCSV(_ rows: [ClientSummaryRow]) -> String {
-    var csv = "Kunde;Projekt;Stunden;Abrechenbar\n"
+  /// CSV export of the client summary, including the selected period.
+  func clientSummaryCSV(_ rows: [ClientSummaryRow], from: Date, to: Date) -> String {
+    let fromText = clientSummaryDateFormatter.string(from: from)
+    let toText = clientSummaryDateFormatter.string(from: to)
+    var csv = "Kunde;Projekt;Zeitraum von;Zeitraum bis;Stunden;Abrechenbar;Nicht abrechenbar\n"
     for row in rows {
-      let project = row.projectName ?? ""
-      csv += "\(row.clientName);\(project);\(String(format: "%.2f", row.totalHours));\(String(format: "%.2f", row.billableHours))\n"
+      let total = roundedClientSummaryHours(row.totalHours)
+      let billable = roundedClientSummaryHours(row.billableHours)
+      let nonBillable = roundedClientSummaryHours(max(0, row.totalHours - row.billableHours))
+      let values = [row.clientName, row.projectName ?? "", fromText, toText,
+                    clientSummaryNumber(total), clientSummaryNumber(billable), clientSummaryNumber(nonBillable)]
+      csv += values.map(clientSummaryCSVField).joined(separator: ";") + "\n"
     }
     return csv
   }
 
-  /// Markdown export of the client summary.
-  func clientSummaryMarkdown(_ rows: [ClientSummaryRow]) -> String {
-    var md = "# Kunden-Zeitübersicht\n\n| Kunde | Projekt | Stunden | Abrechenbar |\n|---|---|---|---|\n"
+  /// Markdown export of the client summary, including period and totals.
+  func clientSummaryMarkdown(_ rows: [ClientSummaryRow], from: Date, to: Date) -> String {
+    let fromText = clientSummaryDateFormatter.string(from: from)
+    let toText = clientSummaryDateFormatter.string(from: to)
+    var md = "# Kunden-Zeitübersicht\n\nZeitraum: **\(fromText) bis \(toText)**\n\n"
+    md += "| Kunde | Projekt | Stunden | Abrechenbar | Nicht abrechenbar |\n|---|---|---:|---:|---:|\n"
     for row in rows {
-      md += "| \(row.clientName) | \(row.projectName ?? "—") | \(String(format: "%.2f", row.totalHours)) | \(String(format: "%.2f", row.billableHours)) |\n"
+      let total = roundedClientSummaryHours(row.totalHours)
+      let billable = roundedClientSummaryHours(row.billableHours)
+      let nonBillable = roundedClientSummaryHours(max(0, row.totalHours - row.billableHours))
+      md += "| \(clientSummaryMarkdownField(row.clientName)) | \(clientSummaryMarkdownField(row.projectName ?? "—")) | \(clientSummaryNumber(total)) | \(clientSummaryNumber(billable)) | \(clientSummaryNumber(nonBillable)) |\n"
     }
+    let total = rows.reduce(0) { $0 + $1.totalHours }
+    let billable = rows.reduce(0) { $0 + $1.billableHours }
+    md += "\n**Gesamt:** \(clientSummaryNumber(roundedClientSummaryHours(total))) h, **abrechenbar:** \(clientSummaryNumber(roundedClientSummaryHours(billable))) h\n"
     md += "\n*Exportiert von TAKT*\n"
     return md
+  }
+
+  private static let clientSummaryDateFormatter: DateFormatter = {
+    let formatter = DateFormatter()
+    formatter.locale = Locale(identifier: "en_US_POSIX")
+    formatter.calendar = Calendar(identifier: .gregorian)
+    formatter.dateFormat = "yyyy-MM-dd"
+    return formatter
+  }()
+
+  private var clientSummaryDateFormatter: DateFormatter { Self.clientSummaryDateFormatter }
+
+  private func roundedClientSummaryHours(_ value: Double) -> Double {
+    (value * 100).rounded() / 100
+  }
+
+  private func clientSummaryNumber(_ value: Double) -> String {
+    String(format: "%.2f", locale: Locale(identifier: "de_CH"), value)
+      .replacingOccurrences(of: ".", with: ",")
+  }
+
+  private func clientSummaryCSVField(_ value: String) -> String {
+    let escaped = value.replacingOccurrences(of: "\"", with: "\"\"")
+    return (escaped.contains(";") || escaped.contains("\"") || escaped.contains("\n")) ? "\"\(escaped)\"" : escaped
+  }
+
+  private func clientSummaryMarkdownField(_ value: String) -> String {
+    value.replacingOccurrences(of: "|", with: "\\|").replacingOccurrences(of: "\n", with: " ")
   }
 }

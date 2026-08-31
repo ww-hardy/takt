@@ -255,26 +255,32 @@ struct ClientsView: View {
   }
 
   private var aiDetectionBanner: some View {
-    let untaggedCount = untaggedThisWeek()
+    let candidateCount = taggingCandidateCountThisWeek()
     return VStack(alignment: .leading, spacing: 8) {
-      Text("\(untaggedCount) ungetaggte Aktivitäten diese Woche")
+      Text(
+        candidateCount == 0
+          ? "Diese Woche ist alles erkannt — kein Handlungsbedarf."
+          : "\(candidateCount) erkennbare Aktivitäten diese Woche"
+      )
         .font(TaktFont.ui(15, .semibold))
         .foregroundColor(TaktColor.textPrimary)
-      Text("Die KI-Erkennung nutzt deine Kundenbeschreibungen, um für jede Karte Kunde und Projekt vorzuschlagen.")
-        .font(TaktFont.ui(14))
-        .foregroundColor(Color(hex: "7A5A32"))
-      TaktButton(
-        title: isTagging ? "Erkenne…" : "KI-Erkennung",
-        variant: .primary,
-        icon: isTagging ? nil : "sparkles"
-      ) {
-        runAITagging()
-      }
-      .disabled(isTagging || clients.isEmpty)
-      .overlay {
-        if isTagging {
-          ProgressView()
-            .controlSize(.small)
+      if candidateCount > 0 {
+        Text("Die KI-Erkennung nutzt deine Kundenbeschreibungen, um für jede Karte Kunde und Projekt vorzuschlagen.")
+          .font(TaktFont.ui(14))
+          .foregroundColor(Color(hex: "7A5A32"))
+        TaktButton(
+          title: isTagging ? "Erkenne…" : "KI-Erkennung",
+          variant: .primary,
+          icon: isTagging ? nil : "sparkles"
+        ) {
+          runAITagging()
+        }
+        .disabled(isTagging || clients.isEmpty)
+        .overlay {
+          if isTagging {
+            ProgressView()
+              .controlSize(.small)
+          }
         }
       }
     }
@@ -287,11 +293,15 @@ struct ClientsView: View {
     )
   }
 
-  private func untaggedThisWeek() -> Int {
+  private func taggingCandidatesThisWeek() -> [TimelineCard] {
     let range = currentWeekRange()
     let cards = StorageManager.shared.fetchTimelineCardsByTimeRange(
       from: range.start, to: range.end)
-    return cards.filter { $0.clientId == nil }.count
+    return CardTaggingService.taggingCandidates(from: cards)
+  }
+
+  private func taggingCandidateCountThisWeek() -> Int {
+    taggingCandidatesThisWeek().count
   }
 
   private func runAITagging() {
@@ -303,11 +313,11 @@ struct ClientsView: View {
     let range = currentWeekRange()
     let cards = StorageManager.shared.fetchTimelineCardsByTimeRange(
       from: range.start, to: range.end)
-    let untagged = cards.filter { $0.clientId == nil }
+    let untagged = CardTaggingService.taggingCandidates(from: cards)
 
     guard !untagged.isEmpty else {
       isTagging = false
-      taggingStatus = "Keine ungetaggten Karten"
+      taggingStatus = "Keine erkennbaren Aktivitäten"
       clearStatusSoon()
       return
     }
@@ -353,12 +363,14 @@ struct ClientsView: View {
   }
 
   private func exportCSV() {
-    let content = StorageManager.shared.clientSummaryCSV(summaryRows)
+    let range = currentWeekRange()
+    let content = StorageManager.shared.clientSummaryCSV(summaryRows, from: range.start, to: range.end)
     saveFile(content: content, defaultName: "takt-kunden-uebersicht.csv", fileType: "csv")
   }
 
   private func exportMarkdown() {
-    let content = StorageManager.shared.clientSummaryMarkdown(summaryRows)
+    let range = currentWeekRange()
+    let content = StorageManager.shared.clientSummaryMarkdown(summaryRows, from: range.start, to: range.end)
     saveFile(content: content, defaultName: "takt-kunden-uebersicht.md", fileType: "md")
   }
 
