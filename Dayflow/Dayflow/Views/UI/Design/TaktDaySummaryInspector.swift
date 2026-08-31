@@ -19,6 +19,7 @@ struct TaktDaySummaryInspector: View {
 
   @State private var timelineCards: [TimelineCard] = []
   @State private var hasLoaded = false
+  @State private var goalPlan: DayGoalPlan?
 
   private var timelineDayInfo: (dayString: String, startOfDay: Date, endOfDay: Date) {
     let timelineDate = timelineDisplayDate(from: selectedDate)
@@ -50,6 +51,11 @@ struct TaktDaySummaryInspector: View {
 
   private func loadData() {
     timelineCards = storageManager.fetchTimelineCards(forDay: timelineDayInfo.dayString)
+    goalPlan = DaySummaryStats.carriedForwardGoalPlan(
+      day: timelineDayInfo.dayString,
+      storageManager: storageManager,
+      categories: categories
+    )
     hasLoaded = true
   }
 
@@ -57,8 +63,12 @@ struct TaktDaySummaryInspector: View {
     DaySummaryStats.precomputeCardDurations(timelineCards)
   }
 
-  private var emptySnapshots: [DayGoalCategorySnapshot] {
-    []
+  private var focusSnapshots: [DayGoalCategorySnapshot] {
+    goalPlan?.focusCategories ?? []
+  }
+
+  private var distractionSnapshots: [DayGoalCategorySnapshot] {
+    goalPlan?.distractionCategories ?? []
   }
 
   private var dayStart: Date {
@@ -75,17 +85,17 @@ struct TaktDaySummaryInspector: View {
 
   private var totalFocus: TimeInterval {
     DaySummaryStats.computeTotalFocusTime(
-      from: cardDurations, snapshots: emptySnapshots, categories: categories)
+      from: cardDurations, snapshots: focusSnapshots, categories: categories)
   }
 
   private var totalDistracted: TimeInterval {
     DaySummaryStats.computeTotalDistractedTime(
-      from: cardDurations, snapshots: emptySnapshots, categories: categories)
+      from: cardDurations, snapshots: distractionSnapshots, categories: categories)
   }
 
   private var focusBlocks: [FocusBlock] {
     DaySummaryStats.computeFocusBlocks(
-      from: cardDurations, snapshots: emptySnapshots, baseDate: dayStart,
+      from: cardDurations, snapshots: focusSnapshots, baseDate: dayStart,
       categories: categories)
   }
 
