@@ -306,22 +306,22 @@ private enum OnboardingCategoryPreset: String {
           "PRs reviewen, Diffs lesen und Kommentare hinterlassen"
         ),
         (
-          "Research",
+          "Forschung",
           "#C787F7",
           "Doku lesen, Stack Overflow, Tools und APIs erkunden sowie Design-Docs oder technische Spezifikationen schreiben"
         ),
         (
-          "Communication",
+          "Kommunikation",
           "#FFAE8C",
           "Meetings, Standups, Slack, E-Mail, Video-Calls, Nachrichten und Syncs"
         ),
         (
-          "Distraction",
+          "Ablenkung",
           "#FF4721",
           "Unfokussiertes Surfen und passiver Konsum: Social-Media-Feeds, zufällige Videos, zielloses Scrollen, Unterhaltung ohne klares Ziel und Gaming"
         ),
         (
-          "Personal",
+          "Persönlich",
           "#ADE3E3",
           "Absichtliche Nicht-Arbeits-Aktivitäten mit Zweck: Nachrichten mit Freunden und Familie, Finanzen verwalten, Reisen buchen, Besorgungen, Alltag und Hobbys"
         ),
@@ -345,17 +345,17 @@ private enum OnboardingCategoryPreset: String {
           "Dashboards, Retentionsdaten, Funnels und Finanzkennzahlen"
         ),
         (
-          "Communication",
+          "Kommunikation",
           "#FFAE8C",
           "Team-Syncs, Investor-Calls, User-Demos und Einstellungen"
         ),
         (
-          "Distraction",
+          "Ablenkung",
           "#FF4721",
           "Unfokussiertes Surfen und passiver Konsum: Social-Media-Feeds, zufällige Videos, zielloses Scrollen, Unterhaltung ohne klares Ziel und Gaming"
         ),
         (
-          "Personal",
+          "Persönlich",
           "#ADE3E3",
           "Absichtliche Nicht-Arbeits-Aktivitäten mit Zweck: Nachrichten mit Freunden und Familie, Finanzen verwalten, Reisen buchen, Besorgungen, Alltag und Hobbys"
         ),
@@ -369,22 +369,22 @@ private enum OnboardingCategoryPreset: String {
           "Prototyping, UI-Komponenten, User Flows, visuelles Design und Handoff-Specs"
         ),
         (
-          "Research",
+          "Forschung",
           "#56CFEE",
           "Browsing-Muster, Wettbewerbs-Audits, User Studies und Metrik-Review"
         ),
         (
-          "Communication",
+          "Kommunikation",
           "#FFAE8C",
           "Design-Reviews, Standups, Kritik-Sessions und Konzept-Präsentationen"
         ),
         (
-          "Distraction",
+          "Ablenkung",
           "#FF4721",
           "Unfokussiertes Surfen und passiver Konsum: Social-Media-Feeds, zufällige Videos, zielloses Scrollen, Unterhaltung ohne klares Ziel und Gaming"
         ),
         (
-          "Personal",
+          "Persönlich",
           "#ADE3E3",
           "Absichtliche Nicht-Arbeits-Aktivitäten mit Zweck: Nachrichten mit Freunden und Familie, Finanzen verwalten, Reisen buchen, Besorgungen, Alltag und Hobbys"
         ),
@@ -403,17 +403,17 @@ private enum OnboardingCategoryPreset: String {
           "Papiere, Übungsserien, Coding-Projekte und Laborberichte"
         ),
         (
-          "Communication",
+          "Kommunikation",
           "#FFAE8C",
           "Lerngruppen, Sprechstunden, Gruppen-Chats und E-Mails an Dozierende"
         ),
         (
-          "Distraction",
+          "Ablenkung",
           "#FF4721",
           "Unfokussiertes Surfen und passiver Konsum: Social-Media-Feeds, zufällige Videos, zielloses Scrollen, Unterhaltung ohne klares Ziel und Gaming"
         ),
         (
-          "Personal",
+          "Persönlich",
           "#ADE3E3",
           "Absichtliche Nicht-Arbeits-Aktivitäten mit Zweck: Nachrichten mit Freunden und Familie, Finanzen verwalten, Reisen buchen, Besorgungen, Alltag und Hobbys"
         ),
@@ -550,32 +550,32 @@ enum CategoryPersistence {
     let now = Date()
     let base: [(String, String, Bool, Bool, String)] = [
       (
-        "Work",
+        "Arbeit",
         "#B984FF",
         false,
         false,
-        "Career, school, or productivity-focused activities (projects, emails, assignments, video calls, learning skills, etc.)"
+        "Karriere-, schul- oder produktivitätsfokussierte Aktivitäten (Projekte, E-Mails, Aufgaben, Video-Calls, Lernen von Fähigkeiten usw.)"
       ),
       (
-        "Personal",
+        "Persönlich",
         "#6AADFF",
         false,
         false,
-        "Purposeful non-work activities or life tasks (paying bills, fitness tracking, meal planning, personal research, creative hobbies, etc.)"
+        "Sinnvolle Nicht-Arbeits-Aktivitäten oder Lebensaufgaben (Rechnungen zahlen, Fitness-Tracking, Essensplanung, persönliche Recherche, kreative Hobbys usw.)"
       ),
       (
-        "Distraction",
+        "Ablenkung",
         "#FF5950",
         false,
         false,
-        "Passive consumption or aimless browsing (scrolling feeds, watching random videos, clicking through news, mindless games, etc.)"
+        "Passiver Konsum oder zielloses Surfen (Feeds scrollen, zufällige Videos schauen, durch Nachrichten klicken, gedankenlose Spiele usw.)"
       ),
       (
-        "Idle",
+        "Leerlauf",
         "#A0AEC0",
         true,
         true,
-        "For when the user is idle for most of the time."
+        "Für Zeiten, in denen der Nutzer die meiste Zeit inaktiv ist."
       ),
     ]
     return base.enumerated().map { idx, entry in
@@ -602,9 +602,9 @@ enum CategoryPersistence {
     let order = (categories.map { $0.order }.max() ?? -1) + 1
     let now = Date()
     let idle = TimelineCategory(
-      name: "Idle",
+      name: "Leerlauf",
       colorHex: "#A0AEC0",
-      details: "Mark sessions where the user is idle for most of the time.",
+      details: "Markiert Zeiten, in denen der Nutzer die meiste Zeit inaktiv ist.",
       order: order,
       isSystem: true,
       isIdle: true,
