@@ -118,8 +118,9 @@ struct TabFilterBar: View {
   }
 
   private var overflowGradient: some View {
+    // TAKT redesign: fade uses the app surface token, not the old warm tint.
     LinearGradient(
-      gradient: Gradient(colors: [Color.clear, Color(hex: "FFF8F1")]),
+      gradient: Gradient(colors: [Color.clear, TaktColor.surface]),
       startPoint: .leading,
       endPoint: .trailing
     )

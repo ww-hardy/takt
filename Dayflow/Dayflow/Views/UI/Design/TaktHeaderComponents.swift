@@ -3,7 +3,7 @@
 //  Dayflow
 //
 //  TAKT redesign — square date stepper and Day/Week segmented switch.
-//  Replace the circular DateNavigationControls pills and DayflowPillButton.
+//  Replace the circular date-stepper pills with square TAKT controls.
 //  These are visual shells: they call the existing navigation actions.
 //
 

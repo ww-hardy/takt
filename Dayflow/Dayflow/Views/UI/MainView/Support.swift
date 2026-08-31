@@ -2,7 +2,7 @@ import OSLog
 import SwiftUI
 
 // MARK: - Cached DateFormatters (creating DateFormatters is expensive due to ICU initialization)
-// These are internal (not private) so they can be shared with DateNavigationControls
+// Internal (not private) so header and timeline views can share one instance.
 
 let cachedTodayDisplayFormatter: DateFormatter = {
   let formatter = DateFormatter()

@@ -136,8 +136,7 @@ extension MainView {
   // Actual pixel width of the current date label text, measured via NSFont
   // metrics. Replaces a conservative 240pt estimate — "Today, Apr 16" is
   // ~170pt, "September 12 - September 18" is ~330pt, so a single estimate
-  // either over- or under-reserves. This matches the measurement pattern
-  // used in `DateNavigationControls.swift:calculateOptimalPillWidth()`.
+  // either over- or under-reserves.
   private var measuredDateLabelWidth: CGFloat {
     let font =
       NSFont(name: "InstrumentSerif-Regular", size: 26)
