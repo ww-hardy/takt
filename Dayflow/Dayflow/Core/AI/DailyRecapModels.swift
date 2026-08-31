@@ -107,7 +107,7 @@ enum DailyRecapProvider: String, Codable, CaseIterable, Sendable {
   var pickerSubtitle: String {
     switch self {
     case .local:
-      return "Uses Ollama, LM Studio, or another local-compatible server on this Mac."
+      return "Nutzt Ollama, LM Studio oder einen anderen lokalen Server auf diesem Mac."
     case .gemini:
       return "Gemini 3.5 Flash"
     case .chatgpt:

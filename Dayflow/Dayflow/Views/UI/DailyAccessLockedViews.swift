@@ -155,40 +155,42 @@ struct DailyProviderOnboardingView: View {
                 VStack(alignment: .leading, spacing: 3) {
                   Text(provider.displayName)
                     .font(.custom("Figtree-SemiBold", size: 13))
-                    .foregroundStyle(Color(hex: isSelected ? "8F522C" : "2F241D"))
+                    .foregroundStyle(TaktColor.textPrimary)
 
                   Text(availability.detail)
                     .font(.custom("Figtree-Regular", size: 11))
-                    .foregroundStyle(Color(hex: availability.isAvailable ? "8B6B59" : "B07A74"))
+                    .foregroundStyle(
+                      availability.isAvailable ? TaktColor.textSecondary : TaktColor.textMuted
+                    )
                     .multilineTextAlignment(.leading)
                 }
 
                 Spacer(minLength: 0)
 
-                Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
+                Image(systemName: isSelected ? "checkmark.square.fill" : "square")
                   .font(.system(size: 13, weight: .semibold))
                   .foregroundStyle(
-                    isSelected ? Color(hex: "C96F3A") : Color(hex: "D3C6BE")
+                    isSelected ? TaktColor.accent : TaktColor.textTertiary
                   )
               }
               .padding(.horizontal, 12)
               .padding(.vertical, 10)
               .background(
-                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                RoundedRectangle(cornerRadius: TaktMetrics.radiusControl)
                   .fill(
                     isSelected
-                      ? Color(hex: "FFF4EC")
-                      : Color(hex: "FAF8F7")
+                      ? TaktColor.accentSoft
+                      : TaktColor.surface
                   )
               )
               .overlay(
-                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                RoundedRectangle(cornerRadius: TaktMetrics.radiusControl)
                   .stroke(
-                    isSelected ? Color(hex: "EBC4AB") : Color(hex: "E8E1DC"),
-                    lineWidth: 1.2
+                    isSelected ? TaktColor.accent : TaktColor.borderGrid,
+                    lineWidth: TaktMetrics.hairline
                   )
               )
-              .contentShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+              .contentShape(RoundedRectangle(cornerRadius: TaktMetrics.radiusControl))
             }
             .buttonStyle(.plain)
             .disabled(!availability.isAvailable)

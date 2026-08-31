@@ -70,31 +70,31 @@ extension DailyView {
   }
   var notificationPermissionButtonTitle: String {
     if isCheckingNotificationAuthorization || isRequestingNotificationPermission {
-      return "Checking..."
+      return "Prüfe …"
     }
 
     if notificationAuthorizationStatus == .authorized {
-      return "Opening Daily..."
+      return "Öffne Tagesbericht …"
     }
 
     if notificationAuthorizationStatus == .denied {
-      return "Open System Settings"
+      return "Systemeinstellungen öffnen"
     }
 
-    return "Turn on notifications"
+    return "Benachrichtigungen aktivieren"
   }
   var notificationPermissionMessage: String {
     if notificationAuthorizationStatus == .denied {
       return
-        "Notifications are currently off for Dayflow. Enable them in System Settings to finish unlocking Daily."
+        "Benachrichtigungen sind für TAKT deaktiviert. Aktiviere sie in den Systemeinstellungen, um den Tagesbericht freizuschalten."
     }
 
     if notificationAuthorizationStatus == .authorized {
-      return "Notifications are already enabled. We'll open Daily automatically."
+      return "Benachrichtigungen sind bereits aktiviert. Wir öffnen den Tagesbericht automatisch."
     }
 
     return
-      "Turn them on to continue. If you come back from System Settings, we'll check automatically."
+      "Aktiviere sie, um fortzufahren. Wenn du aus den Systemeinstellungen zurückkommst, prüfen wir automatisch."
   }
   func checkNotificationAuthorizationForUnlock() {
     guard !isCheckingNotificationAuthorization, !isRequestingNotificationPermission else {

@@ -210,7 +210,7 @@ struct JournalRemindersView: View {
       // Schedule a test notification in 3 seconds
       let content = UNMutableNotificationContent()
       content.title = "Test: Set your intentions"
-      content.body = "This is a test notification from Dayflow."
+      content.body = "Das ist eine Test-Benachrichtigung von TAKT."
       content.sound = .default
       content.categoryIdentifier = "journal_reminder"
 

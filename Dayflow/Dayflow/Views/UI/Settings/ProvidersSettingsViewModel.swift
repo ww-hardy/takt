@@ -660,10 +660,6 @@ final class ProvidersSettingsViewModel: ObservableObject {
   private var providerCatalog: [CompactProviderInfo] {
     [
       CompactProviderInfo(
-        id: .dayflow,
-        summary: "Hosted cards & transcription • no API keys • requires Pro"
-      ),
-      CompactProviderInfo(
         id: .claude,
         summary: "Uses Claude Code through your existing Claude plan"
       ),
