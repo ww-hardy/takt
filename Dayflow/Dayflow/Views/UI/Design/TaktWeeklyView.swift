@@ -173,9 +173,9 @@ struct TaktWeeklyView: View {
         .taktLabel()
       WeeklyFocusHeatmapSection(
         snapshot: dashboardSnapshot.heatmap,
-        width: 900,
-        cellGap: 3,
-        usesScrollContainers: false
+        width: WeeklyFocusHeatmapSection.exportWidth(for: dashboardSnapshot.heatmap),
+        cellGap: 1,
+        usesScrollContainers: true
       )
     }
   }
