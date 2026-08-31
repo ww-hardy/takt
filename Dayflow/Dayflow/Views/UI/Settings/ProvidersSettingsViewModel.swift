@@ -330,7 +330,10 @@ final class ProvidersSettingsViewModel: ObservableObject {
   }
 
   var routingProviders: [CompactProviderInfo] {
-    providerCatalog
+    // TAKT: nur OpenAI-kompatibel (Nous Portal) + Local anbieten.
+    // Dayflow-Backend (Cloud) widerspricht dem Privacy-Versprechen;
+    // Gemini/ChatGPT/Claude sind Dayflow-spezifisch.
+    providerCatalog.filter { $0.id == .openAICompatible || $0.id == .local }
   }
 
   var canModifyRouting: Bool {

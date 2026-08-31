@@ -6,14 +6,12 @@ enum DailyRecapProvider: String, Codable, CaseIterable, Sendable {
   case gemini
   case chatgpt
   case claude
+  case openAICompatible
   case none
 
   private static let storageKey = "dailyRecapProvider_v1"
   static let allCases: [DailyRecapProvider] = [
-    .dayflow,
-    .claude,
-    .chatgpt,
-    .gemini,
+    .openAICompatible,
     .local,
     .none,
   ]
@@ -55,7 +53,7 @@ enum DailyRecapProvider: String, Codable, CaseIterable, Sendable {
     case .local:
       return .local
     case .openAICompatible:
-      return .none
+      return .openAICompatible
     }
   }
 
@@ -68,15 +66,17 @@ enum DailyRecapProvider: String, Codable, CaseIterable, Sendable {
     case .dayflow:
       return "Dayflow backend"
     case .local:
-      return "Local"
+      return "Lokal"
     case .gemini:
       return "Gemini"
     case .chatgpt:
       return "ChatGPT"
     case .claude:
       return "Claude"
+    case .openAICompatible:
+      return "OpenAI-kompatibel"
     case .none:
-      return "No provider"
+      return "Kein Anbieter"
     }
   }
 
@@ -85,15 +85,17 @@ enum DailyRecapProvider: String, Codable, CaseIterable, Sendable {
     case .dayflow:
       return "Dayflow backend"
     case .local:
-      return "Local"
+      return "Lokal"
     case .gemini:
       return "Gemini 3.5 Flash"
     case .chatgpt:
       return "GPT-5.4"
     case .claude:
       return "Claude Opus"
+    case .openAICompatible:
+      return "OpenAI-kompatibel (z. B. Nous Portal)"
     case .none:
-      return "No provider selected (Daily off)"
+      return "Kein Anbieter (Daily aus)"
     }
   }
 
@@ -109,8 +111,10 @@ enum DailyRecapProvider: String, Codable, CaseIterable, Sendable {
       return "GPT-5.4"
     case .claude:
       return "Claude Opus"
+    case .openAICompatible:
+      return "Nutzt den OpenAI-kompatiblen Anbieter aus den Einstellungen (z. B. Nous Portal)."
     case .none:
-      return "Turns off Daily recap generation until you pick another provider."
+      return "Schaltet die Daily-Zusammenfassung aus, bis du einen Anbieter wählst."
     }
   }
 
@@ -124,6 +128,8 @@ enum DailyRecapProvider: String, Codable, CaseIterable, Sendable {
       return "gemini_direct"
     case .chatgpt, .claude:
       return "chat_cli"
+    case .openAICompatible:
+      return "openai_compatible"
     case .none:
       return "disabled"
     }
@@ -141,6 +147,8 @@ enum DailyRecapProvider: String, Codable, CaseIterable, Sendable {
       return "gpt-5.4"
     case .claude:
       return "opus"
+    case .openAICompatible:
+      return OpenAICompatiblePreferences.load()?.modelID
     case .none:
       return nil
     }
@@ -215,8 +223,10 @@ struct DailyStandupGenerationMetadata: Codable, Equatable, Sendable {
       return "GPT-5.4"
     case .claude:
       return "Claude Opus"
+    case .openAICompatible:
+      return modelOrTool ?? "OpenAI-kompatibel"
     case .none:
-      return "No provider"
+      return "Kein Anbieter"
     }
   }
 }

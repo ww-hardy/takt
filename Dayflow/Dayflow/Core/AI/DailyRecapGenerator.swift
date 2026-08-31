@@ -24,6 +24,7 @@ enum DailyRecapGeneratorError: LocalizedError {
   case missingGeminiAPIKey
   case missingCodexCLI
   case missingClaudeCLI
+  case missingOpenAICompatibleConfiguration
   case emptyGeneratedContent(day: String)
   case invalidJSONResponse(rawResponse: String)
   case invalidResponseShape(rawResponse: String)
@@ -46,6 +47,8 @@ enum DailyRecapGeneratorError: LocalizedError {
       return "Codex CLI is not installed."
     case .missingClaudeCLI:
       return "Claude Code is not installed."
+    case .missingOpenAICompatibleConfiguration:
+      return "Kein OpenAI-kompatibler Anbieter konfiguriert. Richte ihn in den Einstellungen ein."
     case .emptyGeneratedContent(let day):
       return "Daily generation returned no usable items for \(day)."
     case .invalidJSONResponse(let rawResponse):
@@ -147,42 +150,23 @@ final class DailyRecapGenerator {
   }
 
   func availabilitySnapshot() -> [DailyRecapProvider: DailyRecapProviderAvailability] {
-    let geminiKey =
-      KeychainManager.shared.retrieve(for: "gemini")?
-      .trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
-    let codexInstalled = LoginShellRunner.isInstalled("codex")
-    let claudeInstalled = LoginShellRunner.isInstalled("claude")
     let isLocalConfigured = localProviderIsConfigured()
     let localModel = DailyRecapProvider.local.modelOrTool
+    let isOpenAICompatibleConfigured = openAICompatibleIsConfigured()
 
     return [
-      .dayflow: DailyRecapProviderAvailability(
-        isAvailable: true,
-        detail: DailyRecapProvider.dayflow.pickerSubtitle
+      .openAICompatible: DailyRecapProviderAvailability(
+        isAvailable: isOpenAICompatibleConfigured,
+        detail: isOpenAICompatibleConfigured
+          ? (OpenAICompatiblePreferences.load()?.modelID
+            ?? DailyRecapProvider.openAICompatible.pickerSubtitle)
+          : "OpenAI-kompatiblen Anbieter in den Einstellungen einrichten"
       ),
       .local: DailyRecapProviderAvailability(
         isAvailable: isLocalConfigured,
         detail: isLocalConfigured
           ? (localModel ?? DailyRecapProvider.local.pickerSubtitle)
           : "Configure Ollama or LM Studio before using this provider"
-      ),
-      .gemini: DailyRecapProviderAvailability(
-        isAvailable: !geminiKey.isEmpty,
-        detail: geminiKey.isEmpty
-          ? "Add a Gemini API key before using this provider"
-          : DailyRecapProvider.gemini.pickerSubtitle
-      ),
-      .chatgpt: DailyRecapProviderAvailability(
-        isAvailable: codexInstalled,
-        detail: codexInstalled
-          ? DailyRecapProvider.chatgpt.pickerSubtitle
-          : "Install Codex CLI before using this provider"
-      ),
-      .claude: DailyRecapProviderAvailability(
-        isAvailable: claudeInstalled,
-        detail: claudeInstalled
-          ? DailyRecapProvider.claude.pickerSubtitle
-          : "Install Claude Code before using this provider"
       ),
       .none: DailyRecapProviderAvailability(
         isAvailable: true,
@@ -203,16 +187,13 @@ final class DailyRecapGenerator {
     )
 
     switch provider {
-    case .dayflow:
-      return try await generateWithDayflow(context: context, metadata: metadata)
+    case .openAICompatible:
+      return try await generateWithOpenAICompatible(context: context, metadata: metadata)
     case .local:
       return try await generateWithLocal(context: context, metadata: metadata)
-    case .gemini:
-      return try await generateWithGemini(context: context, metadata: metadata)
-    case .chatgpt:
-      return try await generateWithChatGPT(context: context, metadata: metadata)
-    case .claude:
-      return try await generateWithClaude(context: context, metadata: metadata)
+    case .dayflow, .gemini, .chatgpt, .claude:
+      // These providers are not offered in TAKT; treat as no provider.
+      throw DailyRecapGeneratorError.noProviderSelected
     case .none:
       throw DailyRecapGeneratorError.noProviderSelected
     }
@@ -390,6 +371,100 @@ final class DailyRecapGenerator {
     )
     let parsed = try Self.parseLocalResponse(rawText)
     return try makeDraft(from: parsed, context: context, metadata: metadata)
+  }
+
+  private func generateWithOpenAICompatible(
+    context: DailyRecapGenerationContext,
+    metadata: DailyStandupGenerationMetadata
+  ) async throws -> DailyStandupDraft {
+    guard let config = OpenAICompatiblePreferences.load(), config.isComplete,
+      openAICompatibleIsConfigured()
+    else {
+      throw DailyRecapGeneratorError.missingOpenAICompatibleConfiguration
+    }
+
+    let prompt = Self.makeLocalPrompt(day: context.sourceDayString, cards: context.cards)
+    let rawText = try await sendOpenAICompatibleChat(
+      config: config,
+      prompt: prompt
+    )
+    let parsed = try Self.parseLocalResponse(rawText)
+    return try makeDraft(from: parsed, context: context, metadata: metadata)
+  }
+
+  private func openAICompatibleIsConfigured() -> Bool {
+    guard let config = OpenAICompatiblePreferences.load(), config.isComplete else {
+      return false
+    }
+    let key = KeychainManager.shared.retrieve(for: OpenAICompatiblePreferences.keychainProvider)?
+      .trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+    return !key.isEmpty
+  }
+
+  private func sendOpenAICompatibleChat(
+    config: OpenAICompatibleConfiguration,
+    prompt: String
+  ) async throws -> String {
+    struct ChatMessage: Codable {
+      let role: String
+      let content: String
+    }
+    struct ChatRequest: Codable {
+      let model: String
+      let messages: [ChatMessage]
+      let temperature: Double
+      let max_tokens: Int
+    }
+    struct ChatResponse: Codable {
+      struct Choice: Codable {
+        struct Message: Codable {
+          let content: String?
+        }
+        let message: Message
+      }
+      let choices: [Choice]
+    }
+
+    guard let url = config.chatCompletionsURL else {
+      throw DailyRecapGeneratorError.missingOpenAICompatibleConfiguration
+    }
+
+    let key = KeychainManager.shared.retrieve(for: OpenAICompatiblePreferences.keychainProvider)?
+      .trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+
+    var request = URLRequest(url: url)
+    request.httpMethod = "POST"
+    request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+    // Nous Portal is behind Cloudflare bot protection; browser UA required.
+    request.setValue(
+      "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 "
+        + "(KHTML, like Gecko) Chrome/120.0 Safari/537.36",
+      forHTTPHeaderField: "User-Agent")
+    if !key.isEmpty {
+      request.setValue("Bearer \(key)", forHTTPHeaderField: "Authorization")
+    }
+    request.httpBody = try JSONEncoder().encode(
+      ChatRequest(
+        model: config.modelID,
+        messages: [ChatMessage(role: "user", content: prompt)],
+        temperature: 0.2,
+        max_tokens: 2048
+      ))
+    request.timeoutInterval = 120
+
+    let (data, response) = try await URLSession.shared.data(for: request)
+    guard let http = response as? HTTPURLResponse, (200..<300).contains(http.statusCode) else {
+      let body = String(data: data, encoding: .utf8) ?? ""
+      throw NSError(
+        domain: "DailyRecapGenerator", code: (response as? HTTPURLResponse)?.statusCode ?? -1,
+        userInfo: [NSLocalizedDescriptionKey: "KI-Anbieter antwortete mit Fehler. \(body.prefix(200))"])
+    }
+
+    let decoded = try JSONDecoder().decode(ChatResponse.self, from: data)
+    guard let content = decoded.choices.first?.message.content, !content.isEmpty else {
+      throw DailyRecapGeneratorError.emptyGeneratedContent(day: "")
+    }
+    return content
   }
 
   private func generateWithChatGPT(
