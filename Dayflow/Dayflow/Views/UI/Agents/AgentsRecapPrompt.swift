@@ -26,7 +26,7 @@ enum AgentsRecapPrompt {
     let codexDayPath = day.replacingOccurrences(of: "-", with: "/")
 
     return """
-      \(runMarker) — you are running headlessly to generate data for Dayflow's Agents view. Do not ask questions; make reasonable judgment calls and finish in one shot.
+      \(runMarker) — you are running headlessly to generate data for TAKT's Agents view. Do not ask questions; make reasonable judgment calls and finish in one shot.
 
       ## Goal
       Read every Claude Code and Codex CLI session from \(day) (local time) on this machine, and produce ONE JSON file that summarizes the day's agent activity as workstreams → threads → condensed turns. A macOS app renders this file directly, so the JSON must match the schema below exactly.
@@ -61,12 +61,12 @@ enum AgentsRecapPrompt {
         - "completed" — everything else (thread concluded, question answered, work acknowledged).
       - latestOutcome: one line, the current end-state of the thread (max 90 chars).
       - artifacts: if a turn produced a distinct deliverable (a report, doc, PR, generated file), set artifactName (short label) and artifactPath (absolute path if known) on that turn.
-      - sessionPath: the absolute path of the transcript file. source: "claude" or "codex". projectName: human-readable project folder name (e.g. "Dayflow", "DayflowWeb"), empty string if none.
+      - sessionPath: the absolute path of the transcript file. source: "claude" or "codex". projectName: human-readable project folder name (e.g. "TAKT", "Website"), empty string if none.
 
       ## Workstreams
-      Group the threads into 3–7 workstreams by project and purpose, with short human names ("Dayflow Backend", "Research", "SEO", "Marketing"). Use "Miscellaneous" for stragglers rather than inventing thin groups. Each workstream gets:
+      Group the threads into 3–7 workstreams by project and purpose, with short human names ("TAKT App", "Research", "SEO", "Marketing"). Use "Miscellaneous" for stragglers rather than inventing thin groups. Each workstream gets:
       - summary: one line describing what happened there today (max 90 chars).
-      - bullets: 2–5 accomplishment strings, outcome-phrased ("Found out users used Dayflow for 500k hours").
+      - bullets: 2–5 accomplishment strings, outcome-phrased ("Found out users used TAKT for 500k hours").
 
       ## Output
       Write the JSON to exactly this path (create the directory if needed): \(outputPath)
@@ -78,8 +78,8 @@ enum AgentsRecapPrompt {
         "generatedAt": "<ISO-8601 timestamp with offset>",
         "workstreams": [
           {
-            "id": "dayflow-backend",
-            "name": "Dayflow Backend",
+            "id": "takt-app",
+            "name": "TAKT App",
             "summary": "Finding solutions for expired credits, updated Sonnet",
             "bullets": ["Explored solutions for expiring credits, switched to Gemini"],
             "threads": [
@@ -87,8 +87,8 @@ enum AgentsRecapPrompt {
                 "id": "expired-openai-credits",
                 "title": "Find solutions for addressing expired OpenAI credits",
                 "source": "claude",
-                "projectName": "DayflowWeb",
-                "sessionPath": "\(home)/.claude/projects/-Users-x-DayflowWeb/0199-example.jsonl",
+                "projectName": "Website",
+                "sessionPath": "\(home)/.claude/projects/-Users-x-TAKT/0199-example.jsonl",
                 "status": "reviewReady",
                 "startedAt": "\(day)T09:14:00-07:00",
                 "endedAt": "\(day)T11:32:00-07:00",

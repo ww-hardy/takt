@@ -342,7 +342,7 @@ struct WeeklyView: View {
   }
 
   private func openNotificationSettings() {
-    let bundleID = Bundle.main.bundleIdentifier ?? "ai.dayflow.Dayflow"
+    let bundleID = Bundle.main.bundleIdentifier ?? "ch.wertwandler.takt"
     let settingsURLString =
       "x-apple.systempreferences:com.apple.preference.notifications?id=\(bundleID)"
 
@@ -957,7 +957,7 @@ private struct WeeklyExportWatermark: View {
         .scaledToFit()
         .frame(width: 16, height: 16)
 
-      WeeklyGeneratedWithDayflowText()
+      WeeklyGeneratedWithTaktText()
     }
     .padding(.leading, 7)
     .padding(.trailing, 9)
@@ -974,7 +974,7 @@ private struct WeeklyExportWatermark: View {
   }
 }
 
-private struct WeeklyGeneratedWithDayflowText: View {
+private struct WeeklyGeneratedWithTaktText: View {
   var body: some View {
     HStack(spacing: 3) {
       Text("Generated with")

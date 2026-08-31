@@ -229,7 +229,7 @@ extension StorageManager {
 
   // MARK: - Onboarding Card
 
-  /// Creates a dummy "Installed Dayflow!" card when onboarding completes.
+  /// Creates a dummy "TAKT installiert!" card when onboarding completes.
   /// This gives users an immediate example of what cards look like.
   func createOnboardingCard() {
     let now = Date()
@@ -284,7 +284,7 @@ extension StorageManager {
           startTs,
           endTs,
           dayString,
-          "Installed Dayflow!",
+          "TAKT installiert!",
           summary,
           category,
           "Setup",
@@ -300,22 +300,22 @@ extension StorageManager {
     switch selectedProvider {
     case .gemini:
       return
-        "You successfully installed Dayflow and configured it with Gemini AI. Come back in 30 minutes to see your first real activity card! ✨ (This is a sample card, so you can see what your timeline will look like.)"
+        "Du hast TAKT erfolgreich installiert und mit Gemini AI konfiguriert. Come back in 30 minutes to see your first real activity card! ✨ (This is a sample card, so you can see what your timeline will look like.)"
 
     case .chatGPT:
       return
-        "You successfully installed Dayflow with ChatGPT. Come back in 30 minutes to see your first real activity card! ✨ (This is a sample card, so you can see what your timeline will look like.)"
+        "Du hast TAKT erfolgreich mit ChatGPT konfiguriert. Come back in 30 minutes to see your first real activity card! ✨ (This is a sample card, so you can see what your timeline will look like.)"
 
     case .claude:
       return
-        "You successfully installed Dayflow with Claude. Come back in 30 minutes to see your first real activity card! ✨ (This is a sample card, so you can see what your timeline will look like.)"
+        "Du hast TAKT erfolgreich mit Claude konfiguriert. Come back in 30 minutes to see your first real activity card! ✨ (This is a sample card, so you can see what your timeline will look like.)"
 
     case .local:
       // Check which local engine they picked
       let localEngine = UserDefaults.standard.string(forKey: "llmLocalEngine") ?? "ollama"
       if localEngine == "lmstudio" {
         return
-          "You successfully installed Dayflow with LM Studio — your data stays 100% on your device. Come back in 30 minutes to see your first real activity card! ✨ (This is a sample card, so you can see what your timeline will look like.)"
+          "Du hast TAKT erfolgreich mit LM Studio konfiguriert — deine Daten bleiben zu 100% auf deinem Gerät. Come back in 30 minutes to see your first real activity card! ✨ (This is a sample card, so you can see what your timeline will look like.)"
       } else {
         return
           "You successfully installed Dayflow with Ollama — your data stays 100% on your device. Come back in 30 minutes to see your first real activity card! ✨ (This is a sample card, so you can see what your timeline will look like.)"

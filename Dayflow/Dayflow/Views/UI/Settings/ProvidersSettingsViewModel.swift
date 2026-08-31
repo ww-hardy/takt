@@ -324,7 +324,7 @@ final class ProvidersSettingsViewModel: ObservableObject {
     } catch {
       hasLoadedRouting = false
       providerRoutingErrorMessage =
-        "Dayflow couldn't load your provider routing. Your saved providers were left unchanged."
+        "Deine Provider-Einstellungen konnten nicht geladen werden. Deine gespeicherten Provider bleiben unverändert."
     }
   }
 
@@ -612,7 +612,7 @@ final class ProvidersSettingsViewModel: ObservableObject {
       return true
     } catch {
       providerRoutingErrorMessage =
-        "Dayflow couldn't save your provider routing. Your previous selection is still active."
+        "Deine Provider-Einstellungen konnten nicht gespeichert werden. Deine vorherige Auswahl bleibt aktiv."
       return false
     }
   }

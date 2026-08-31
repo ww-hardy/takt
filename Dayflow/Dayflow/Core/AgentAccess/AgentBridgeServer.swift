@@ -142,12 +142,12 @@ final class AgentBridgeServer {
     }
 
     guard (message["protocol_version"] as? Int) == 1 else {
-      return failure("protocol_mismatch", "Update Dayflow — the CLI and app disagree on protocol.")
+      return failure("protocol_mismatch", "Update TAKT — CLI und App sind sich beim Protokoll uneinig.")
     }
 
     // Authoritative permission check, independent of whether the CLI checked.
     guard AgentAccessPreferences.editsEnabled else {
-      return failure("edits_disabled", "Editing is off in Dayflow → Settings → MCP / CLI.")
+      return failure("edits_disabled", "Bearbeiten ist in TAKT → Einstellungen → MCP / CLI deaktiviert.")
     }
 
     let arguments = message["arguments"] as? [String: Any] ?? [:]

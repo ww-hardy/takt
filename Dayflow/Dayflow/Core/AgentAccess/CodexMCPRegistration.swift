@@ -82,7 +82,7 @@ struct CodexMCPRegistration: @unchecked Sendable {
     }
 
     guard status(using: executableURL) == .connected else {
-      return .failed("Codex updated its configuration, but Dayflow couldn't verify the connection.")
+      return .failed("Codex hat seine Konfiguration aktualisiert, aber TAKT konnte die Verbindung nicht prüfen.")
     }
     return .connected
   }
@@ -109,7 +109,7 @@ struct CodexMCPRegistration: @unchecked Sendable {
     }
 
     guard status(using: executableURL) == .available else {
-      return .failed("Codex removed the connection, but Dayflow couldn't verify the change.")
+      return .failed("Codex hat die Verbindung entfernt, aber TAKT konnte die Änderung nicht prüfen.")
     }
     return .disconnected
   }
@@ -140,7 +140,7 @@ struct CodexMCPRegistration: @unchecked Sendable {
     guard let data = result.stdout.data(using: .utf8),
       let configuration = try? JSONDecoder().decode(ServerConfiguration.self, from: data)
     else {
-      return .failed("Codex returned an unreadable Dayflow MCP configuration.")
+      return .failed("Codex hat eine unlesbare TAKT-MCP-Konfiguration zurückgegeben.")
     }
 
     let transport = configuration.transport

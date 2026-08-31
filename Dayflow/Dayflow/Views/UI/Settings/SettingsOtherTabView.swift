@@ -21,7 +21,7 @@ struct SettingsOtherTabView: View {
     ) {
       VStack(alignment: .leading, spacing: 0) {
         SettingsRow(
-          label: "Launch Dayflow at login",
+          label: "TAKT beim Anmelden starten",
           subtitle:
             "Keeps the menu bar controller running right after you sign in so capture can resume instantly."
         ) {
@@ -39,7 +39,7 @@ struct SettingsOtherTabView: View {
 
         SettingsRow(
           label: "Show Dock icon",
-          subtitle: "When off, Dayflow runs as a menu bar-only app."
+          subtitle: "Wenn deaktiviert, läuft TAKT nur als Menüleisten-App."
         ) {
           SettingsToggle(isOn: $viewModel.showDockIcon)
         }
@@ -54,7 +54,7 @@ struct SettingsOtherTabView: View {
         SettingsRow(
           label: "Show daily goal popups",
           subtitle:
-            "When off, Dayflow won't automatically open goal setup or yesterday's review after 4am."
+            "Wenn deaktiviert, öffnet TAKT nach 4 Uhr morgens nicht automatisch die Ziel-Einrichtung oder die gestrige Übersicht."
         ) {
           SettingsToggle(isOn: $viewModel.showDailyGoalPopups)
         }

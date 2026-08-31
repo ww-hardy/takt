@@ -430,7 +430,7 @@ extension ChatView {
             .frame(width: 42, height: 42)
 
             VStack(alignment: .leading, spacing: 2) {
-              Text("Ask about your Dayflow data")
+              Text("Frage zu deinen TAKT-Daten")
                 .font(.custom("InstrumentSerif-Regular", size: 30))
                 .foregroundColor(Color(hex: "2F2A24"))
 
@@ -510,7 +510,7 @@ extension ChatView {
       // Feature description (below title)
       VStack(spacing: 6) {
         Text(
-          "Chat lets you ask questions about your Dayflow activity and get summaries, comparisons, and insights."
+          "Der Chat lässt dich Fragen zu deiner TAKT-Aktivität stellen und liefert Zusammenfassungen, Vergleiche und Einblicke."
         )
         .font(.custom("Figtree-Regular", size: 14))
         .foregroundColor(Color(hex: "593D2A").opacity(0.85))
@@ -547,7 +547,7 @@ extension ChatView {
               .foregroundColor(Color(hex: "593D2A"))
 
             Text(
-              "Chat unlocks after Dayflow has analyzed enough activity. \(chatAccessProgressText)"
+              "Der Chat wird freigeschaltet, sobald TAKT genug Aktivität analysiert hat. \(chatAccessProgressText)"
             )
             .font(.custom("Figtree-Regular", size: 13))
             .foregroundColor(Color(hex: "593D2A").opacity(0.8))
@@ -679,7 +679,7 @@ extension ChatView {
         text: $inputText,
         isFocused: $isInputFocused,
         focusToken: composerFocusToken,
-        placeholder: "Ask about your Dayflow data...",
+        placeholder: "Frage zu deinen TAKT-Daten...",
         onSubmit: submitCurrentInputIfAllowed
       )
       .frame(maxWidth: .infinity, alignment: .leading)

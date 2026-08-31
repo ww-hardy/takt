@@ -118,7 +118,7 @@ enum IdleBatchClassifier {
     formatter.timeZone = TimeZone.current
 
     let detailedSummary =
-      "Idle period. Dayflow skipped activity summarization for this block."
+      "Idle-Zeitraum. TAKT hat die Aktivitäts-Zusammenfassung für diesen Block übersprungen."
 
     return TimelineCardShell(
       startTimestamp: formatter.string(from: startDate),

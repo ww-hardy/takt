@@ -40,7 +40,7 @@ enum ChatPromptBuilder {
     let metadataSection = metadataContractSection()
 
     return """
-      You are a friendly assistant in Dayflow, a macOS app that tracks computer activity.
+      Du bist ein freundlicher Assistent in TAKT, einer macOS-App, die Computeraktivität erfasst.
 
       Current date: \(currentDate)
       Current time: \(currentTime)
@@ -195,7 +195,7 @@ enum ChatPromptBuilder {
       - **Afternoon/evening:** back to work on code with a couple videos mixed in"
 
       BAD example:
-      "Morning focus started with a 9:20–10:04 work block researching Dayflow/ChatCLI logging and UX notes, then shifted into about an hour of personal/break time watching League clips, YouTube Shorts..."
+      "Morning focus started with a 9:20–10:04 work block researching TAKT/ChatCLI logging and UX notes, then shifted into about an hour of personal/break time watching League clips, YouTube Shorts..."
 
       NEVER mention: seconds, specific timestamps (9:20-10:04), epoch times, table names, SQL syntax, raw column values
 
@@ -218,7 +218,7 @@ enum ChatPromptBuilder {
     let metadataSection = metadataContractSection()
 
     return """
-      You are a friendly assistant in Dayflow, a macOS app that tracks computer activity.
+      Du bist ein freundlicher Assistent in TAKT, einer macOS-App, die Computeraktivität erfasst.
 
       Current date: \(currentDate)
       Current time: \(currentTime)
@@ -373,7 +373,7 @@ enum ChatPromptBuilder {
       - **Afternoon/evening:** back to work on code with a couple videos mixed in"
 
       BAD example:
-      "Morning focus started with a 9:20–10:04 work block researching Dayflow/ChatCLI logging and UX notes, then shifted into about an hour of personal/break time watching League clips, YouTube Shorts..."
+      "Morning focus started with a 9:20–10:04 work block researching TAKT/ChatCLI logging and UX notes, then shifted into about an hour of personal/break time watching League clips, YouTube Shorts..."
 
       NEVER mention: seconds, specific timestamps (9:20-10:04), epoch times, table names, SQL syntax, raw column values
 
@@ -398,7 +398,7 @@ enum ChatPromptBuilder {
     }
 
     return """
-      You are the AI assistant inside Dayflow, a macOS app that records what people do on their computer and builds a semantic timeline of their day. You have deep visibility into the user's work patterns — what they built, where they got stuck, how they spent their time. Use that context to give answers that feel like a well-informed colleague, not a generic chatbot.
+      Du bist der KI-Assistent in TAKT, einer macOS-App, die aufzeichnet, was Menschen am Computer tun, und eine semantische Zeitleiste ihres Tages aufbaut. Du hast tiefe Einblicke in die Arbeitsmuster des Nutzers — was er gebaut hat, wo er festhing, wie er seine Zeit verbracht hat. Nutze diesen Kontext, um Antworten zu geben, die sich wie ein gut informierter Kollege anfühlen, nicht wie ein generischer Chatbot.
 
       Current date: \(currentDate)
       Current time: \(currentTime)

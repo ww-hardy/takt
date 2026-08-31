@@ -421,19 +421,19 @@ final class LLMService: LLMServicing {
 
     if rateLimited && !backupConfigured {
       return
-        "Dayflow hit a rate limit and no backup provider is configured. Add a backup in Settings > Providers to avoid interruptions."
+        "TAKT ist an ein Rate-Limit gestossen und kein Backup-Provider ist konfiguriert. Füge in Einstellungen > Anbieter einen Backup hinzu, um Unterbrechungen zu vermeiden."
     }
 
     switch operation {
     case .transcribing:
       return
-        "Dayflow couldn't transcribe this batch. Check Settings > Providers and configure a backup provider."
+        "TAKT konnte diesen Batch nicht transkribieren. Prüfe Einstellungen > Anbieter und konfiguriere einen Backup-Provider."
     case .generatingCards:
       return
-        "Dayflow couldn't generate timeline cards for this batch. Check Settings > Providers and configure a backup provider."
+        "TAKT konnte für diesen Batch keine Timeline-Karten erzeugen. Prüfe Einstellungen > Anbieter und konfiguriere einen Backup-Provider."
     case .none:
       return
-        "Dayflow couldn't finish this batch. Check Settings > Providers and configure a backup provider."
+        "TAKT konnte diesen Batch nicht abschliessen. Prüfe Einstellungen > Anbieter und konfiguriere einen Backup-Provider."
     }
   }
 

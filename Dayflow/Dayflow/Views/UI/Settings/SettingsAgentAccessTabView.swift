@@ -25,8 +25,8 @@ struct SettingsAgentAccessTabView: View {
     SettingsSection(
       title: "Connect to AI tools",
       subtitle:
-        "Let Codex, Claude, Cursor, and other AI tools read your Dayflow timeline. "
-        + "Connections are saved to each tool's user configuration, so Dayflow is "
+        "Lass Codex, Claude, Cursor und andere KI-Tools deine TAKT-Zeitleiste lesen. "
+        + "Verbindungen werden in der Nutzerkonfiguration jedes Tools gespeichert, damit TAKT "
         + "available across projects on this Mac. Nothing leaves your Mac except what "
         + "you send in your own conversations."
     ) {
@@ -121,7 +121,7 @@ struct SettingsAgentAccessTabView: View {
         SettingsRow(
           label: viewModel.editsEnabled ? "Edits are on" : "Edits are off",
           subtitle: viewModel.editsEnabled
-            ? "AI tools can make changes through Dayflow while it's running."
+            ? "KI-Tools können über TAKT Änderungen vornehmen, während es läuft."
             : nil,
           showsDivider: false
         ) {
@@ -137,7 +137,7 @@ struct SettingsAgentAccessTabView: View {
       subtitle:
         "Adds a `dayflow` command so you can see your timeline from any terminal. "
         + "This isn't a separate package like an npm install: it links to the CLI already "
-        + "inside Dayflow, so the CLI always stays in sync with the app and can't break "
+        + "innerhalb von TAKT, damit die CLI immer mit der App synchron bleibt und nichts "
         + "when the app updates. Nothing is downloaded and your shell configuration isn't touched."
     ) {
       VStack(alignment: .leading, spacing: 12) {
