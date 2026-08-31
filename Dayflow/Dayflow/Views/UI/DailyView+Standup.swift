@@ -70,22 +70,13 @@ extension DailyView {
       .foregroundStyle(.white)
       .padding(.horizontal, 12 * scale)
       .padding(.vertical, 10 * scale)
-      .background(
-        LinearGradient(
-          colors: [
-            Color(hex: "FF986F"),
-            Color(hex: "BDAAFF"),
-          ],
-          startPoint: .topLeading,
-          endPoint: .bottomTrailing
-        )
-      )
-      .clipShape(Capsule(style: .continuous))
+      .background(TaktColor.standupAccent)
+      .clipShape(RoundedRectangle(cornerRadius: TaktMetrics.radiusControl))
       .overlay(
-        Capsule(style: .continuous)
-          .stroke(Color(hex: "F2D7C3"), lineWidth: max(1.2, 1.5 * scale))
+        RoundedRectangle(cornerRadius: TaktMetrics.radiusControl)
+          .stroke(TaktColor.standupAccent, lineWidth: TaktMetrics.hairline)
       )
-      .contentShape(Capsule(style: .continuous))
+      .contentShape(RoundedRectangle(cornerRadius: TaktMetrics.radiusControl))
     }
     .buttonStyle(DailyCopyPressButtonStyle())
     .animation(.easeInOut(duration: 0.22), value: standupCopyState)
@@ -136,22 +127,13 @@ extension DailyView {
       .foregroundStyle(.white)
       .padding(.horizontal, 12 * scale)
       .padding(.vertical, 10 * scale)
-      .background(
-        LinearGradient(
-          colors: [
-            Color(hex: "FFB58A"),
-            Color(hex: "ED9BC0"),
-          ],
-          startPoint: .topLeading,
-          endPoint: .bottomTrailing
-        )
-      )
-      .clipShape(Capsule(style: .continuous))
+      .background(TaktColor.standupAccent)
+      .clipShape(RoundedRectangle(cornerRadius: TaktMetrics.radiusControl))
       .overlay(
-        Capsule(style: .continuous)
-          .stroke(Color(hex: "F2D7C3"), lineWidth: max(1.2, 1.5 * scale))
+        RoundedRectangle(cornerRadius: TaktMetrics.radiusControl)
+          .stroke(TaktColor.standupAccent, lineWidth: TaktMetrics.hairline)
       )
-      .contentShape(Capsule(style: .continuous))
+      .contentShape(RoundedRectangle(cornerRadius: TaktMetrics.radiusControl))
     }
     .buttonStyle(DailyCopyPressButtonStyle())
     .animation(.easeInOut(duration: 0.22), value: standupRegenerateState)

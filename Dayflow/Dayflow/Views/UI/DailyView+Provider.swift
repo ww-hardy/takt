@@ -42,19 +42,18 @@ extension DailyView {
       isShowingProviderPicker.toggle()
     } label: {
       ZStack {
-        Circle()
-          .fill(Color(hex: "F7F3F1"))
+        RoundedRectangle(cornerRadius: TaktMetrics.radiusControl)
+          .fill(TaktColor.surface)
 
-        Circle()
-          .stroke(Color(hex: "E4D7D0"), lineWidth: max(1.1, 1.3 * scale))
+        RoundedRectangle(cornerRadius: TaktMetrics.radiusControl)
+          .stroke(TaktColor.borderStrong, lineWidth: TaktMetrics.hairline)
 
         Image(systemName: "gearshape.fill")
           .font(.system(size: 13 * scale, weight: .semibold))
-          .foregroundStyle(Color(hex: "B46531"))
+          .foregroundStyle(TaktColor.standupAccent)
       }
       .frame(width: 38 * scale, height: 38 * scale)
-      .shadow(color: Color.black.opacity(0.03), radius: 5, x: 0, y: 2)
-      .contentShape(Circle())
+      .contentShape(RoundedRectangle(cornerRadius: TaktMetrics.radiusControl))
     }
     .buttonStyle(DailyCopyPressButtonStyle())
     .disabled(standupRegenerateState == .regenerating)
@@ -78,11 +77,11 @@ extension DailyView {
         VStack(alignment: .leading, spacing: 2 * scale) {
           Text("Tagesbericht-Provider")
             .font(.custom("InstrumentSerif-Regular", size: 22 * scale))
-            .foregroundStyle(Color(hex: "2E221B"))
+            .foregroundStyle(TaktColor.textPrimary)
 
           Text("Wähle, wie der Tagesbericht erstellt wird, oder deaktiviere die Generierung.")
             .font(.custom("Figtree-Regular", size: 12 * scale))
-            .foregroundStyle(Color(hex: "8B6B59"))
+            .foregroundStyle(TaktColor.textSecondary)
         }
 
         Spacer(minLength: 0)
@@ -90,7 +89,7 @@ extension DailyView {
         if isRefreshingProviderAvailability {
           ProgressView()
             .controlSize(.small)
-            .tint(Color(hex: "B46531"))
+            .tint(TaktColor.standupAccent)
         }
       }
 
@@ -108,40 +107,42 @@ extension DailyView {
               VStack(alignment: .leading, spacing: 2 * scale) {
                 Text(provider.displayName)
                   .font(.custom("Figtree-SemiBold", size: 13 * scale))
-                  .foregroundStyle(Color(hex: isSelected ? "8F522C" : "2F241D"))
+                  .foregroundStyle(TaktColor.textPrimary)
 
                 Text(availability.detail)
                   .font(.custom("Figtree-Regular", size: 12 * scale))
-                  .foregroundStyle(Color(hex: availability.isAvailable ? "8B6B59" : "B07A74"))
+                  .foregroundStyle(
+                    availability.isAvailable ? TaktColor.textSecondary : TaktColor.textMuted
+                  )
                   .multilineTextAlignment(.leading)
               }
 
               Spacer(minLength: 0)
 
-              Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
+              Image(systemName: isSelected ? "checkmark.square.fill" : "square")
                 .font(.system(size: 14 * scale, weight: .semibold))
                 .foregroundStyle(
-                  isSelected ? Color(hex: "C96F3A") : Color(hex: "D3C6BE")
+                  isSelected ? TaktColor.accent : TaktColor.textTertiary
                 )
             }
             .padding(.horizontal, 12 * scale)
             .padding(.vertical, 10 * scale)
             .background(
-              RoundedRectangle(cornerRadius: 14 * scale, style: .continuous)
+              RoundedRectangle(cornerRadius: TaktMetrics.radiusControl)
                 .fill(
                   isSelected
-                    ? Color(hex: "FFF4EC")
-                    : Color(hex: "FAF8F7")
+                    ? TaktColor.accentSoft
+                    : TaktColor.surface
                 )
             )
             .overlay(
-              RoundedRectangle(cornerRadius: 14 * scale, style: .continuous)
+              RoundedRectangle(cornerRadius: TaktMetrics.radiusControl)
                 .stroke(
-                  isSelected ? Color(hex: "EBC4AB") : Color(hex: "E8E1DC"),
-                  lineWidth: max(1, 1.2 * scale)
+                  isSelected ? TaktColor.accent : TaktColor.borderGrid,
+                  lineWidth: TaktMetrics.hairline
                 )
             )
-            .contentShape(RoundedRectangle(cornerRadius: 14 * scale, style: .continuous))
+            .contentShape(RoundedRectangle(cornerRadius: TaktMetrics.radiusControl))
           }
           .buttonStyle(.plain)
           .disabled(!availability.isAvailable)
