@@ -1,18 +1,19 @@
 import SwiftUI
 
 private enum SidebarMetrics {
-  static let itemSpacing: CGFloat = 5.25
-  static let scale: CGFloat = 1.1
-  static let itemSize: CGFloat = 56 * scale
-  static let selectedBackgroundSize: CGFloat = 30 * scale
-  static let iconSize: CGFloat = 16 * scale
-  static let fallbackSymbolSize: CGFloat = 15 * scale
-  static let badgeSize: CGFloat = 8 * scale
-  static let badgeOffsetX: CGFloat = 10 * scale
-  static let badgeOffsetY: CGFloat = -10 * scale
-  static let iconContainerSize: CGFloat = 34 * scale
-  static let iconLabelSpacing: CGFloat = 3
-  static let labelFontSize: CGFloat = 11 * scale
+  static let railWidth: CGFloat = 208
+  static let itemPaddingV: CGFloat = 11
+  static let itemPaddingH: CGFloat = 22
+  static let wordmarkPaddingBottom: CGFloat = 34
+  static let wordmarkDot: CGFloat = 11
+  static let wordmarkFontSize: CGFloat = 21
+  static let itemFontSize: CGFloat = 15
+  static let countFontSize: CGFloat = 13
+  static let weekLabelFontSize: CGFloat = 12
+  static let weekTotalFontSize: CGFloat = 30
+  static let progressHeight: CGFloat = 3
+  static let progressCaptionFontSize: CGFloat = 13
+  static let badgeDot: CGFloat = 7
 }
 
 enum SidebarIcon: CaseIterable {
@@ -27,32 +28,6 @@ enum SidebarIcon: CaseIterable {
   case bug
   case settings
 
-  var assetName: String? {
-    switch self {
-    case .timeline: return "TimelineIcon"
-    case .daily: return "DailyIcon"
-    case .weekly: return "WeeklyIcon"
-    case .chat: return "ChatIcon"
-    case .flow: return nil
-    case .agents: return nil
-    case .clients: return nil
-    case .journal: return "JournalIcon"
-    case .bug: return nil
-    case .settings: return nil
-    }
-  }
-
-  var systemNameFallback: String? {
-    switch self {
-    case .flow: return "water.waves"
-    case .agents: return "sparkles"
-    case .clients: return "briefcase.fill"
-    case .bug: return "exclamationmark.bubble.fill"
-    case .settings: return "gearshape.fill"
-    default: return nil
-    }
-  }
-
   var displayName: String {
     switch self {
     case .timeline: return "Timeline"
@@ -61,7 +36,7 @@ enum SidebarIcon: CaseIterable {
     case .chat: return "Chat"
     case .flow: return "Flow"
     case .agents: return "Agents"
-    case .clients: return "Kunden"
+    case .clients: return "Clients"
     case .journal: return "Journal"
     case .bug: return "Report"
     case .settings: return "Settings"
@@ -89,6 +64,13 @@ struct SidebarView: View {
   @ObservedObject private var badgeManager = NotificationBadgeManager.shared
   @ObservedObject private var authManager = DayflowAuthManager.shared
 
+  /// Weekly tracked minutes + target, filled by MainView via environment/binding.
+  var weeklyTrackedMinutes: Int = 0
+  var weeklyTargetMinutes: Int = 40 * 60
+
+  /// Number of clients, shown in the rail next to Clients.
+  var clientCount: Int = 0
+
   private var visibleIcons: [SidebarIcon] {
     SidebarIcon.allCases.filter { icon in
       if icon == .journal || icon == .agents { return false }
@@ -97,98 +79,146 @@ struct SidebarView: View {
     }
   }
 
-  /// Flow is a whitelisted beta: the signed-in account must be flagged by the
-  /// backend (flow_enabled). Signed out or unflagged → no tab, in all builds.
   static func showsFlowTab(flowEnabled: Bool) -> Bool {
     flowEnabled
   }
 
   var body: some View {
-    VStack(alignment: .center, spacing: SidebarMetrics.itemSpacing) {
+    HStack(spacing: 0) {
+      rail
+      Spacer(minLength: 0)
+    }
+    .frame(width: SidebarMetrics.railWidth)
+    .background(TaktColor.ink)
+  }
+
+  // MARK: - Rail
+
+  private var rail: some View {
+    VStack(alignment: .leading, spacing: 0) {
+      wordmark
+      navItems
+      Spacer(minLength: 0)
+      weekBlock
+    }
+    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+    .padding(.vertical, 26)
+  }
+
+  private var wordmark: some View {
+    HStack(spacing: 11) {
+      Circle()
+        .fill(TaktColor.accent)
+        .frame(width: SidebarMetrics.wordmarkDot, height: SidebarMetrics.wordmarkDot)
+      Text("TAKT")
+        .font(TaktFont.display(SidebarMetrics.wordmarkFontSize).weight(.bold))
+        .kerning(0.4)
+        .foregroundColor(.white)
+    }
+    .padding(.horizontal, SidebarMetrics.itemPaddingH)
+    .padding(.bottom, SidebarMetrics.wordmarkPaddingBottom)
+  }
+
+  private var navItems: some View {
+    VStack(alignment: .leading, spacing: 0) {
       ForEach(visibleIcons, id: \.self) { icon in
-        SidebarIconButton(
-          icon: icon,
-          isSelected: selectedIcon == icon,
-          showBadge: shouldShowBadge(for: icon),
-          action: { selectedIcon = icon }
-        )
-        .frame(width: SidebarMetrics.itemSize, height: SidebarMetrics.itemSize)
+        navItem(icon)
       }
     }
   }
 
-  private func shouldShowBadge(for icon: SidebarIcon) -> Bool {
-    switch icon {
-    case .journal:
-      return badgeManager.hasPendingJournalReminder
-    case .daily:
-      return badgeManager.hasPendingDailyRecap
-    default:
-      return false
-    }
-  }
-}
-
-struct SidebarIconButton: View {
-  let icon: SidebarIcon
-  let isSelected: Bool
-  var showBadge: Bool = false
-  let action: () -> Void
-
-  var body: some View {
-    Button(action: action) {
-      VStack(spacing: SidebarMetrics.iconLabelSpacing) {
-        ZStack {
-          if isSelected {
-            Image("IconBackground")
-              .resizable()
-              .interpolation(.high)
-              .renderingMode(.original)
-              .frame(
-                width: SidebarMetrics.selectedBackgroundSize,
-                height: SidebarMetrics.selectedBackgroundSize
-              )
-          }
-
-          if let asset = icon.assetName {
-            Image(asset)
-              .resizable()
-              .interpolation(.high)
-              .renderingMode(.template)
-              .foregroundColor(
-                isSelected ? Color(hex: "F96E00") : Color(red: 0.6, green: 0.4, blue: 0.3)
-              )
-              .aspectRatio(contentMode: .fit)
-              .frame(width: SidebarMetrics.iconSize, height: SidebarMetrics.iconSize)
-          } else if let sys = icon.systemNameFallback {
-            Image(systemName: sys)
-              .font(.system(size: SidebarMetrics.fallbackSymbolSize))
-              .foregroundColor(
-                isSelected ? Color(hex: "F96E00") : Color(red: 0.6, green: 0.4, blue: 0.3))
-          }
-
-          if showBadge {
-            Circle()
-              .fill(Color(hex: "F96E00"))
-              .frame(width: SidebarMetrics.badgeSize, height: SidebarMetrics.badgeSize)
-              .offset(x: SidebarMetrics.badgeOffsetX, y: SidebarMetrics.badgeOffsetY)
-          }
-        }
-        .frame(width: SidebarMetrics.iconContainerSize, height: SidebarMetrics.iconContainerSize)
-
+  private func navItem(_ icon: SidebarIcon) -> some View {
+    let isSelected = selectedIcon == icon
+    return Button {
+      selectedIcon = icon
+    } label: {
+      HStack {
         Text(icon.displayName)
-          .font(.custom("Figtree", size: SidebarMetrics.labelFontSize))
+          .font(TaktFont.ui(SidebarMetrics.itemFontSize, isSelected ? .semibold : .regular))
           .lineLimit(1)
-          .minimumScaleFactor(0.75)
-          .foregroundColor(
-            isSelected ? Color(hex: "F96E00") : Color(red: 0.6, green: 0.4, blue: 0.3))
+        Spacer(minLength: 0)
+        trailingSlot(for: icon)
       }
-      .frame(width: SidebarMetrics.itemSize, height: SidebarMetrics.itemSize)
+      .foregroundColor(isSelected ? .white : TaktColor.textMuted)
+      .padding(.vertical, SidebarMetrics.itemPaddingV)
+      .padding(.horizontal, SidebarMetrics.itemPaddingH)
+      .background(isSelected ? TaktColor.inkRaised : Color.clear)
+      .overlay(
+        HStack {
+          Rectangle()
+            .fill(isSelected ? TaktColor.accent : Color.clear)
+            .frame(width: 3)
+          Spacer(minLength: 0)
+        }
+      )
       .contentShape(Rectangle())
     }
-    .buttonStyle(DayflowPressScaleButtonStyle())
-    .contentShape(Rectangle())
-    .hoverScaleEffect(scale: 1.02)
-    .pointingHandCursor()
+    .buttonStyle(.plain)
+    .onHover { hovering in
+      // hover handled via foreground change below; kept simple
+    }
+  }
+
+  @ViewBuilder
+  private func trailingSlot(for icon: SidebarIcon) -> some View {
+    switch icon {
+    case .clients:
+      if clientCount > 0 {
+        Text("\(clientCount)")
+          .font(TaktFont.ui(SidebarMetrics.countFontSize))
+          .foregroundColor(TaktColor.textTertiary)
+      }
+    case .daily:
+      if badgeManager.hasPendingDailyRecap {
+        Circle()
+          .fill(TaktColor.accent)
+          .frame(width: SidebarMetrics.badgeDot, height: SidebarMetrics.badgeDot)
+      }
+    default:
+      EmptyView()
+    }
+  }
+
+  // MARK: - This week block
+
+  private var weekBlock: some View {
+    VStack(alignment: .leading, spacing: 6) {
+      Text("THIS WEEK")
+        .taktLabel()
+        .foregroundColor(TaktColor.textSecondary)
+      Text(formattedWeeklyTotal)
+        .font(TaktFont.display(SidebarMetrics.weekTotalFontSize).weight(.bold))
+        .foregroundColor(.white)
+        .lineLimit(1)
+      GeometryReader { proxy in
+        ZStack(alignment: .leading) {
+          Rectangle()
+            .fill(TaktColor.inkDivider)
+          Rectangle()
+            .fill(TaktColor.accent)
+            .frame(width: proxy.size.width * weeklyProgress)
+        }
+      }
+      .frame(height: SidebarMetrics.progressHeight)
+      Text("\(Int(weeklyProgress * 100))% of \(formattedWeeklyTarget)")
+        .font(TaktFont.ui(SidebarMetrics.progressCaptionFontSize))
+        .foregroundColor(TaktColor.textTertiary)
+    }
+    .padding(.horizontal, SidebarMetrics.itemPaddingH)
+  }
+
+  private var weeklyProgress: CGFloat {
+    guard weeklyTargetMinutes > 0 else { return 0 }
+    return min(1, CGFloat(weeklyTrackedMinutes) / CGFloat(weeklyTargetMinutes))
+  }
+
+  private var formattedWeeklyTotal: String {
+    let h = weeklyTrackedMinutes / 60
+    let m = weeklyTrackedMinutes % 60
+    return h > 0 ? "\(h)h \(m)m" : "\(m)m"
+  }
+
+  private var formattedWeeklyTarget: String {
+    "\(weeklyTargetMinutes / 60)h"
   }
 }

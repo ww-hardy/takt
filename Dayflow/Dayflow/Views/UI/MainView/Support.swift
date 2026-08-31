@@ -113,7 +113,9 @@ extension MainView {
   var timelineInspectorWidth: CGFloat {
     switch timelineMode {
     case .day:
-      return 358
+      // TAKT redesign: 372pt day summary, 468pt when an activity is selected
+      // (activity detail gets more room per the handoff).
+      return selectedActivity != nil ? TaktMetrics.inspectorDetailWidth : TaktMetrics.inspectorWidth
     case .week:
       return isWeekTimelineInspectorVisible ? weekInspectorWidth : 0
     }

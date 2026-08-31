@@ -410,21 +410,19 @@ struct DailyStatChip: View {
   var body: some View {
     HStack(spacing: 4) {
       Text(title)
-        .font(.custom("Figtree-Regular", size: 10 * scale))
-        .foregroundStyle(Color(hex: "5D5651"))
+        .font(TaktFont.ui(12))
+        .foregroundColor(TaktColor.textTertiary)
       Text(value)
-        .font(.custom("Figtree-SemiBold", size: 10 * scale))
-        .foregroundStyle(Color(hex: "D77A43"))
+        .font(TaktFont.display(22).weight(.bold))
+        .foregroundColor(TaktColor.textPrimary)
     }
-    .padding(.horizontal, 12 * scale)
-    .padding(.vertical, 6 * scale)
-    .background(
-      Capsule(style: .continuous)
-        .fill(Color(hex: "F7F3F0"))
-    )
+    .padding(.horizontal, 16)
+    .padding(.vertical, 13)
+    .frame(maxWidth: .infinity, alignment: .leading)
+    .background(TaktColor.surface)
     .overlay(
-      Capsule(style: .continuous)
-        .stroke(Color(hex: "DDD6CF"), lineWidth: max(0.6, 0.8 * scale))
+      Rectangle()
+        .stroke(TaktColor.borderGrid, lineWidth: 1)
     )
   }
 }

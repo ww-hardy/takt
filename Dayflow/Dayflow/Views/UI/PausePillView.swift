@@ -69,12 +69,6 @@ struct PausePillView: View {
 
   private var statusSpacing: CGFloat { 10 }
 
-  private var pillScale: CGFloat {
-    let hoverScale = isPillHovered && phase == .idle ? 1.02 : 1
-    let pressScale = isPillPressed && phase != .menu ? 0.97 : 1
-    return hoverScale * pressScale
-  }
-
   private var showsChips: Bool {
     phase == .menu || chipOpacity.contains { $0 > 0.001 }
   }
@@ -135,14 +129,6 @@ struct PausePillView: View {
       .allowsHitTesting(false)
       .animation(.easeInOut(duration: 0.35), value: phase)
 
-      ZStack {
-        shineLayer(Col.shineIdle).opacity(phase == .idle ? 1 : 0)
-        shineLayer(Col.shineMenu).opacity(phase == .menu ? 1 : 0)
-        shineLayer(Col.shinePaused).opacity(phase == .paused ? 1 : 0)
-      }
-      .allowsHitTesting(false)
-      .animation(.easeInOut(duration: 0.35), value: phase)
-
       if showsPrimaryContent || showsChips {
         HStack(spacing: 0) {
           if showsPrimaryContent {
@@ -163,13 +149,13 @@ struct PausePillView: View {
           .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
       }
 
-      Capsule()
-        .strokeBorder(Color(hex: "FFE1C9"), lineWidth: 1.25)
+      Rectangle()
+        .strokeBorder(TaktColor.borderStrong, lineWidth: 1)
         .allowsHitTesting(false)
     }
     .frame(width: pillWidth, height: 32)
-    .clipShape(Capsule())
-    .contentShape(Capsule())
+    .clipShape(Rectangle())
+    .contentShape(Rectangle())
     .onTapGesture(perform: handlePillTap)
     .simultaneousGesture(
       DragGesture(minimumDistance: 0)
@@ -178,8 +164,7 @@ struct PausePillView: View {
           state = true
         }
     )
-    .scaleEffect(pillScale)
-    .animation(.spring(duration: 0.2, bounce: 0), value: pillScale)
+    .animation(.spring(duration: 0.2, bounce: 0), value: phase)
     .onHover { isPillHovered = $0 }
     .pointingHandCursor()
   }
@@ -222,20 +207,6 @@ struct PausePillView: View {
     .scaleEffect(resumeScale)
     .blur(radius: resumeBlur)
     .allowsHitTesting(false)
-  }
-
-  // MARK: - Shine
-
-  private func shineLayer(_ color: Color) -> some View {
-    // CSS: inset ±3px 0 5px — horizontal glow on left/right edges only
-    HStack(spacing: 0) {
-      LinearGradient(colors: [color, color.opacity(0)], startPoint: .leading, endPoint: .trailing)
-        .frame(width: 8)
-      Spacer(minLength: 0)
-      LinearGradient(colors: [color.opacity(0), color], startPoint: .leading, endPoint: .trailing)
-        .frame(width: 8)
-    }
-    .clipShape(Capsule())
   }
 
   // MARK: - Chip Button
@@ -639,66 +610,23 @@ private struct PillChipButtonStyle: ButtonStyle {
 
 // MARK: - Gradients (exact from React CSS tokens)
 
+// TAKT redesign: flat state fills (no gradients). The pill is a square control;
+// states differ by fill color only.
 private enum Grad {
-  static let idle = LinearGradient(
-    stops: [
-      .init(color: Color(red: 1, green: 0.973, blue: 0.949).opacity(0.6), location: 0),
-      .init(color: Color(red: 1, green: 0.906, blue: 0.827).opacity(0.6), location: 0.495),
-      .init(color: Color(red: 1, green: 0.804, blue: 0.690).opacity(0.6), location: 0.755),
-      .init(color: Color(red: 1, green: 0.906, blue: 0.827).opacity(0.6), location: 1),
-    ],
-    startPoint: .top, endPoint: .bottom
-  )
-
-  static let menu = LinearGradient(
-    stops: [
-      .init(color: Color(red: 0.973, green: 0.784, blue: 0.675).opacity(0.6), location: 0),
-      .init(color: Color(red: 1, green: 0.906, blue: 0.835).opacity(0.6), location: 0.14),
-      .init(color: Color(red: 1, green: 0.816, blue: 0.694).opacity(0.6), location: 0.688),
-      .init(color: Color(red: 0.973, green: 0.784, blue: 0.675).opacity(0.6), location: 1),
-    ],
-    startPoint: .top, endPoint: .bottom
-  )
-
-  static let paused = LinearGradient(
-    stops: [
-      .init(color: Color(red: 1, green: 0.714, blue: 0.608), location: 0),
-      .init(color: Color(red: 1, green: 0.569, blue: 0.278), location: 0.495),
-      .init(color: Color(red: 1, green: 0.553, blue: 0.251), location: 0.760),
-      .init(color: Color(red: 1, green: 0.643, blue: 0.510), location: 1),
-    ],
-    startPoint: .top, endPoint: .bottom
-  )
-
-  // Chip default — 320deg CSS ≈ bottomTrailing→topLeading
-  static let chip = LinearGradient(
-    stops: [
-      .init(color: Color.white.opacity(0.72), location: 0),
-      .init(color: Color.white.opacity(0.56), location: 0.38),
-      .init(color: Color.white.opacity(0.44), location: 1),
-    ],
-    startPoint: UnitPoint(x: 0.91, y: 0.97),
-    endPoint: UnitPoint(x: 0.11, y: 0)
-  )
-
-  // Chip hover — orange gradient overlay
-  static let chipHover = LinearGradient(
-    stops: [
-      .init(color: Color(red: 1, green: 0.702, blue: 0.565).opacity(0.82), location: 0),
-      .init(color: Color(red: 1, green: 0.624, blue: 0.416).opacity(0.82), location: 0.42),
-      .init(color: Color(red: 1, green: 0.553, blue: 0.251).opacity(0.82), location: 1),
-    ],
-    startPoint: UnitPoint(x: 0.91, y: 0.97),
-    endPoint: UnitPoint(x: 0.11, y: 0)
-  )
+  static let idle = TaktColor.surface
+  static let menu = TaktColor.surfaceSunken
+  static let paused = TaktColor.accent
+  static let chip = TaktColor.surface
+  static let chipHover = TaktColor.accentSoft
 }
 
 // MARK: - Shine Colors (inset glow per state)
 
 private enum Col {
-  static let shineIdle = Color.white.opacity(0.5)
-  static let shineMenu = Color(red: 0.949, green: 0.749, blue: 0.655).opacity(0.5)
-  static let shinePaused = Color(red: 1, green: 0.894, blue: 0.761).opacity(0.5)
+  // Flat redesign: no shine layers.
+  static let shineIdle = Color.clear
+  static let shineMenu = Color.clear
+  static let shinePaused = Color.clear
 }
 
 // MARK: - Preview

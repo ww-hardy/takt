@@ -172,8 +172,8 @@ extension DailyView {
   ) -> some View {
     VStack(alignment: .leading, spacing: 8 * scale) {
       Text(heading)
-        .font(.custom("InstrumentSerif-Regular", size: 24 * scale))
-        .foregroundStyle(Color(hex: "B46531"))
+        .font(TaktFont.display(21).weight(.semibold))
+        .foregroundColor(TaktColor.standupAccent)
 
       if useSingleColumn {
         VStack(alignment: .leading, spacing: 12 * scale) {

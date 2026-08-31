@@ -168,19 +168,15 @@ struct ActivityCard: View {
             Text(
               "\(timeFormatter.string(from: activity.startTime)) - \(timeFormatter.string(from: activity.endTime))"
             )
-            .font(
-              Font.custom("Figtree", size: 12)
-            )
-            .foregroundColor(Color(red: 0.4, green: 0.4, blue: 0.4))
+            .font(TaktFont.ui(12))
+            .foregroundColor(TaktColor.textTertiary)
             .lineLimit(1)
-            .padding(.horizontal, 6)
+            .padding(.horizontal, 8)
             .padding(.vertical, 4)
-            .background(Color(red: 0.96, green: 0.94, blue: 0.91).opacity(0.9))
-            .cornerRadius(6)
+            .background(TaktColor.surfaceSunken)
             .overlay(
-              RoundedRectangle(cornerRadius: 6)
-                .inset(by: 0.38)
-                .stroke(Color(red: 0.9, green: 0.9, blue: 0.9), lineWidth: 0.75)
+              Rectangle()
+                .stroke(TaktColor.borderHairline, lineWidth: 1)
             )
 
             Spacer(minLength: 6)
@@ -193,18 +189,16 @@ struct ActivityCard: View {
                     .frame(width: 8, height: 8)
 
                   Text(badge.name)
-                    .font(Font.custom("Figtree", size: 12))
-                    .foregroundColor(Color(red: 0.2, green: 0.2, blue: 0.2))
+                    .font(TaktFont.ui(12))
+                    .foregroundColor(TaktColor.textPrimary)
                     .lineLimit(1)
                 }
                 .padding(.horizontal, 8)
                 .padding(.vertical, 4)
-                .background(Color.white.opacity(0.76))
-                .cornerRadius(6)
+                .background(TaktColor.surface)
                 .overlay(
-                  RoundedRectangle(cornerRadius: 6)
-                    .inset(by: 0.25)
-                    .stroke(Color(red: 0.88, green: 0.88, blue: 0.88), lineWidth: 0.5)
+                  Rectangle()
+                    .stroke(TaktColor.borderHairline, lineWidth: 1)
                 )
               }
 
@@ -220,7 +214,6 @@ struct ActivityCard: View {
                     .frame(width: 24, height: 24)
                 }
                 .buttonStyle(PlainButtonStyle())
-                .hoverScaleEffect(scale: 1.02)
                 .pointingHandCursorOnHover(reassertOnPressEnd: true)
                 .accessibilityLabel(Text("Change category"))
               }
@@ -313,19 +306,28 @@ struct ActivityCard: View {
           }
           if let billable = activity.billable {
             Text(billable ? "abrechenbar" : "nicht abrechenbar")
-              .font(.caption)
-              .padding(.horizontal, 5)
-              .padding(.vertical, 1)
-              .background(billable ? Color.orange.opacity(0.15) : Color.secondary.opacity(0.12))
-              .cornerRadius(4)
+              .font(TaktFont.ui(11, .semibold))
+              .padding(.horizontal, 6)
+              .padding(.vertical, 2)
+              .background(
+                billable ? TaktColor.accentSoft : TaktColor.surfaceSunken)
+              .foregroundColor(
+                billable ? TaktColor.accentPressed : TaktColor.textSecondary)
+              .overlay(
+                Rectangle()
+                  .stroke(TaktColor.borderHairline, lineWidth: 1)
+              )
           }
         }
-        .font(Font.custom("Figtree", size: 12))
-        .foregroundColor(.primary)
+        .font(TaktFont.ui(12))
+        .foregroundColor(TaktColor.textPrimary)
         .padding(.horizontal, 8)
         .padding(.vertical, 4)
-        .background(Color.secondary.opacity(0.08))
-        .cornerRadius(6)
+        .background(TaktColor.surfaceSunken)
+        .overlay(
+          Rectangle()
+            .stroke(TaktColor.borderHairline, lineWidth: 1)
+        )
       }
       .buttonStyle(PlainButtonStyle())
       .popover(isPresented: $showTagEditor, arrowEdge: .bottom) {
@@ -340,8 +342,8 @@ struct ActivityCard: View {
 
       if let task = activity.task, !task.isEmpty {
         Text(task)
-          .font(Font.custom("Figtree", size: 12))
-          .foregroundStyle(.secondary)
+          .font(TaktFont.ui(12))
+          .foregroundColor(TaktColor.textSecondary)
           .lineLimit(1)
       }
     }
@@ -379,11 +381,9 @@ struct ActivityCard: View {
     } else {
       HStack(alignment: .center, spacing: 6) {
         Text(activity.title)
-          .font(
-            Font.custom("Figtree", size: 16)
-              .weight(.semibold)
-          )
-          .foregroundColor(.black)
+          .font(TaktFont.display(27).weight(.bold))
+          .foregroundColor(TaktColor.textPrimary)
+          .lineSpacing(1)
           .onTapGesture { startTitleEdit(for: activity) }
 
         if isHoveringTitle && !isFailedCard(activity) {
@@ -422,18 +422,12 @@ struct ActivityCard: View {
   private func summaryContent(for activity: TimelineActivity) -> some View {
     VStack(alignment: .leading, spacing: 8) {
       VStack(alignment: .leading, spacing: 3) {
-        Text("SUMMARY")
-          .font(
-            Font.custom("Figtree", size: 12)
-              .weight(.semibold)
-          )
-          .foregroundColor(Color(red: 0.55, green: 0.55, blue: 0.55))
+        Text("WHAT HAPPENED")
+          .taktLabel()
 
         renderMarkdownText(activity.summary)
-          .font(
-            Font.custom("Figtree", size: 12)
-          )
-          .foregroundColor(.black)
+          .font(TaktFont.body)
+          .foregroundColor(TaktColor.textPrimary)
           .lineLimit(nil)
           .fixedSize(horizontal: false, vertical: true)
           .textSelection(.enabled)
@@ -442,17 +436,11 @@ struct ActivityCard: View {
       if !activity.detailedSummary.isEmpty && activity.detailedSummary != activity.summary {
         VStack(alignment: .leading, spacing: 3) {
           Text("DETAILED SUMMARY")
-            .font(
-              Font.custom("Figtree", size: 12)
-                .weight(.semibold)
-            )
-            .foregroundColor(Color(red: 0.55, green: 0.55, blue: 0.55))
+            .taktLabel()
 
           renderMarkdownText(formattedDetailedSummary(activity.detailedSummary))
-            .font(
-              Font.custom("Figtree", size: 12)
-            )
-            .foregroundColor(.black)
+            .font(TaktFont.body)
+            .foregroundColor(TaktColor.textPrimary)
             .lineLimit(nil)
             .fixedSize(horizontal: false, vertical: true)
             .textSelection(.enabled)
@@ -561,7 +549,6 @@ struct ActivityCard: View {
       .buttonStyle(PlainButtonStyle())
       .disabled(isDisabled)
       .opacity(isDisabled ? 0.6 : 1)
-      .hoverScaleEffect(enabled: !isDisabled, scale: 1.02)
       .pointingHandCursorOnHover(enabled: !isDisabled, reassertOnPressEnd: true)
     }
   }
@@ -599,41 +586,39 @@ struct ActivityCard: View {
               .scaleEffect(1.3)
               .frame(width: geometry.size.width, height: geometry.size.height)
               .clipped()
-              .cornerRadius(12)
           } else {
-            RoundedRectangle(cornerRadius: 12)
-              .fill(Color.gray.opacity(0.3))
+            Rectangle()
+              .fill(TaktColor.surfaceSunken)
               .overlay(
                 Image(systemName: "photo")
                   .font(.system(size: 18, weight: .medium))
-                  .foregroundColor(Color.white.opacity(0.9))
+                  .foregroundColor(TaktColor.textTertiary)
               )
           }
 
           if isPreparingSlideshow {
             ZStack {
-              RoundedRectangle(cornerRadius: 12)
+              Rectangle()
                 .fill(Color.black.opacity(0.28))
 
               HStack(spacing: 8) {
                 ProgressView()
                   .scaleEffect(0.8)
                 Text("Preparing timelapse...")
-                  .font(.custom("Figtree", size: 12).weight(.semibold))
+                  .font(TaktFont.ui(12, .semibold))
                   .foregroundColor(.white)
               }
             }
           } else {
             ZStack {
-              Circle()
-                .strokeBorder(Color.white.opacity(0.9), lineWidth: 2)
+              Rectangle()
+                .strokeBorder(TaktColor.surface, lineWidth: 2)
                 .frame(width: 64, height: 64)
-                .background(Circle().fill(Color.black.opacity(0.35)))
+                .background(Rectangle().fill(Color.black.opacity(0.35)))
               Image(systemName: "play.fill")
                 .foregroundColor(.white)
                 .font(.system(size: 24, weight: .bold))
             }
-            .shadow(color: .black.opacity(0.25), radius: 6, x: 0, y: 2)
           }
         }
         .contentShape(Rectangle())
@@ -644,7 +629,6 @@ struct ActivityCard: View {
           }
           openSlideshow(for: activity, cardId: cardId)
         }
-        .hoverScaleEffect(scale: 1.02)
         .pointingHandCursorOnHover(reassertOnPressEnd: true)
         .id(activity.id)
         .onAppear {
@@ -654,12 +638,16 @@ struct ActivityCard: View {
           loadTimelapsePreviewThumbnail(for: activity, size: geometry.size)
         }
       }
-      .frame(height: 200)
+      .frame(height: 176)
+      .overlay(
+        Rectangle()
+          .stroke(TaktColor.borderHairline, lineWidth: 1)
+      )
 
       if let errorMessage = slideshowError {
         Text(errorMessage)
-          .font(Font.custom("Figtree", size: 11))
-          .foregroundColor(Color(red: 0.76, green: 0.16, blue: 0.2))
+          .font(TaktFont.ui(11))
+          .foregroundColor(TaktColor.negative)
       }
     }
   }

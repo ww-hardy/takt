@@ -34,13 +34,23 @@ struct ClientsView: View {
   ]
 
   var body: some View {
-    VStack(alignment: .leading, spacing: 14) {
+    VStack(alignment: .leading, spacing: 0) {
       header
       if clients.isEmpty {
         emptyState
       } else {
-        clientList
-        summarySection
+        HStack(alignment: .top, spacing: 0) {
+          clientList
+            .frame(width: TaktMetrics.clientListWidth)
+            .overlay(
+              Rectangle()
+                .fill(TaktColor.borderHairline)
+                .frame(width: 1),
+              alignment: .trailing
+            )
+          summarySection
+            .frame(maxWidth: .infinity)
+        }
       }
     }
     .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
@@ -68,22 +78,28 @@ struct ClientsView: View {
 
   private var header: some View {
     HStack(alignment: .center) {
-      VStack(alignment: .leading, spacing: 2) {
-        Text("Kunden & Projekte")
-          .font(.title2)
-          .fontWeight(.semibold)
-        Text("Beschreibe deine Kunden kurz — das macht die Erkennung deiner Arbeitszeit einfacher.")
-          .font(.callout)
-          .foregroundStyle(.secondary)
+      VStack(alignment: .leading, spacing: 4) {
+        Text("Clients & projects")
+          .font(TaktFont.display(34).weight(.bold))
+          .foregroundColor(TaktColor.textPrimary)
+        Text("Describe your clients briefly — that makes recognizing your time easier.")
+          .font(TaktFont.ui(15))
+          .foregroundColor(TaktColor.textSecondary)
       }
       Spacer()
-      Button {
+      TaktButton(title: "New client", variant: .primary, icon: "plus") {
         showAddClient = true
-      } label: {
-        Label("Neuer Kunde", systemImage: "plus")
       }
-      .buttonStyle(.borderedProminent)
     }
+    .padding(.horizontal, 34)
+    .padding(.top, 30)
+    .padding(.bottom, 22)
+    .overlay(
+      Rectangle()
+        .fill(TaktColor.borderHairline)
+        .frame(height: 1),
+      alignment: .bottom
+    )
   }
 
   private var emptyState: some View {
@@ -110,7 +126,11 @@ struct ClientsView: View {
 
   private var clientList: some View {
     ScrollView {
-      LazyVStack(spacing: 10) {
+      LazyVStack(alignment: .leading, spacing: 12) {
+        Text("\(clients.count) CLIENT\(clients.count == 1 ? "" : "S")")
+          .taktLabel()
+          .padding(.horizontal, 26)
+          .padding(.top, 24)
         ForEach(clients) { client in
           ClientRow(
             client: client,
@@ -126,114 +146,152 @@ struct ClientsView: View {
               reload()
             }
           }
+          .padding(.horizontal, 26)
         }
       }
-      .padding(.vertical, 4)
+      .padding(.bottom, 24)
     }
   }
 
   // MARK: - Summary & export (TAKT)
 
   private var summarySection: some View {
-    VStack(alignment: .leading, spacing: 8) {
+    VStack(alignment: .leading, spacing: 18) {
       HStack(alignment: .center) {
-        VStack(alignment: .leading, spacing: 2) {
-          Text("Zeitübersicht (diese Woche)")
-            .font(.headline)
-          if !summaryRows.isEmpty {
-            let total = summaryRows.reduce(0) { $0 + $1.totalHours }
-            let billable = summaryRows.reduce(0) { $0 + $1.billableHours }
-            Text(String(format: "Total %.2f h · davon abrechenbar %.2f h", total, billable))
-              .font(.callout)
-              .foregroundStyle(.secondary)
-          }
+        VStack(alignment: .leading, spacing: 4) {
+          Text("TIME OVERVIEW · THIS WEEK")
+            .taktLabel()
+          let total = summaryRows.reduce(0) { $0 + $1.totalHours }
+          let billable = summaryRows.reduce(0) { $0 + $1.billableHours }
+          Text(String(format: "%.2f h · %.2f h billable", total, billable))
+            .font(TaktFont.display(28).weight(.bold))
+            .foregroundColor(TaktColor.textPrimary)
         }
         Spacer()
         if let taggingStatus {
           Text(taggingStatus)
-            .font(.caption)
-            .foregroundStyle(.secondary)
+            .font(TaktFont.caption)
+            .foregroundColor(TaktColor.textTertiary)
         }
-        Button {
-          runAITagging()
-        } label: {
-          if isTagging {
-            ProgressView()
-              .controlSize(.small)
-              .frame(width: 16)
-          } else {
-            Label("KI-Erkennung", systemImage: "sparkles")
-          }
-        }
-        .buttonStyle(.bordered)
-        .disabled(isTagging || clients.isEmpty)
-        .help(
-          "Erkennt automatisch Kunde und Projekt für alle ungetaggten Karten dieser Woche "
-            + "anhand deiner Kundenbeschreibungen.")
         if let exportStatus {
           Text(exportStatus)
-            .font(.caption)
-            .foregroundStyle(.secondary)
+            .font(TaktFont.caption)
+            .foregroundColor(TaktColor.textTertiary)
         }
-        Button {
+        TaktButton(title: "CSV", variant: .secondary, icon: "doc.text") {
           exportCSV()
-        } label: {
-          Label("CSV", systemImage: "doc.text")
         }
-        .buttonStyle(.bordered)
         .disabled(summaryRows.isEmpty)
-        Button {
+        TaktButton(title: "Markdown", variant: .secondary, icon: "doc.richtext") {
           exportMarkdown()
-        } label: {
-          Label("Markdown", systemImage: "doc.richtext")
         }
-        .buttonStyle(.bordered)
         .disabled(summaryRows.isEmpty)
       }
 
-      if summaryRows.isEmpty {
-        Text("Noch keine getaggten Aktivitäten diese Woche. Ordne Karten auf der Timeline einem Kunden zu, dann erscheinen sie hier.")
-          .font(.callout)
-          .foregroundStyle(.secondary)
-          .padding(.vertical, 6)
-      } else {
-        VStack(spacing: 0) {
-          HStack {
-            Text("Kunde").frame(maxWidth: .infinity, alignment: .leading)
-            Text("Projekt").frame(maxWidth: .infinity, alignment: .leading)
-            Text("Stunden").frame(width: 70, alignment: .trailing)
-            Text("Abrechenbar").frame(width: 90, alignment: .trailing)
-          }
-          .font(.caption)
-          .foregroundStyle(.secondary)
-          .padding(.horizontal, 10)
-          .padding(.vertical, 6)
+      // Table on a 1px grid
+      VStack(spacing: 0) {
+        HStack(spacing: 0) {
+          Text("CLIENT").frame(maxWidth: .infinity, alignment: .leading)
+          Text("PROJECT").frame(maxWidth: .infinity, alignment: .leading)
+          Text("HOURS").frame(width: 74, alignment: .trailing)
+          Text("BILLABLE").frame(width: 96, alignment: .trailing)
+        }
+        .font(TaktFont.label)
+        .foregroundColor(TaktColor.textTertiary)
+        .padding(.horizontal, 16)
+        .padding(.vertical, 10)
+        .background(TaktColor.surfaceSunken)
 
-          Divider()
-
+        if summaryRows.isEmpty {
+          Text("No tagged activities this week yet. Tag cards on the timeline to see them here.")
+            .font(TaktFont.body)
+            .foregroundColor(TaktColor.textSecondary)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(16)
+        } else {
           ForEach(summaryRows) { row in
-            HStack {
+            HStack(spacing: 0) {
               Text(row.clientName).frame(maxWidth: .infinity, alignment: .leading)
-              Text(row.projectName ?? "—").frame(maxWidth: .infinity, alignment: .leading)
-              Text(String(format: "%.2f", row.totalHours)).frame(width: 70, alignment: .trailing)
+              Text(row.projectName ?? "—")
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .foregroundColor(TaktColor.textSecondary)
+              Text(String(format: "%.2f", row.totalHours))
+                .frame(width: 74, alignment: .trailing)
+                .font(.system(.body, design: .monospaced))
               Text(String(format: "%.2f", row.billableHours))
-                .frame(width: 90, alignment: .trailing)
-                .foregroundStyle(row.billableHours > 0 ? Color.orange : Color.secondary)
+                .frame(width: 96, alignment: .trailing)
+                .font(.system(.body, design: .monospaced))
+                .foregroundColor(row.billableHours > 0 ? TaktColor.accentPressed : TaktColor.textTertiary)
             }
-            .font(.callout)
-            .padding(.horizontal, 10)
-            .padding(.vertical, 5)
-            Divider()
+            .font(TaktFont.ui(14))
+            .foregroundColor(TaktColor.textPrimary)
+            .padding(.horizontal, 16)
+            .padding(.vertical, 11)
+            .background(TaktColor.surface)
+            .overlay(
+              Rectangle()
+                .fill(TaktColor.borderGrid)
+                .frame(height: 1),
+              alignment: .top
+            )
           }
         }
-        .background(
-          RoundedRectangle(cornerRadius: 8)
-            .fill(Color.white)
-            .shadow(color: .black.opacity(0.04), radius: 3, x: 0, y: 1)
-        )
+      }
+      .background(TaktColor.borderGrid)
+      .overlay(
+        Rectangle()
+          .stroke(TaktColor.borderGrid, lineWidth: 1)
+      )
+
+      // AI detection banner
+      aiDetectionBanner
+
+      Text("AI detection suggests clients and projects from your client descriptions — review and correct on the timeline.")
+        .font(TaktFont.ui(14))
+        .foregroundColor(TaktColor.textTertiary)
+    }
+    .padding(.horizontal, 30)
+    .padding(.vertical, 24)
+  }
+
+  private var aiDetectionBanner: some View {
+    let untaggedCount = untaggedThisWeek()
+    return VStack(alignment: .leading, spacing: 8) {
+      Text("\(untaggedCount) untagged activit\(untaggedCount == 1 ? "y" : "ies") this week")
+        .font(TaktFont.ui(15, .semibold))
+        .foregroundColor(TaktColor.textPrimary)
+      Text("AI detection uses your client descriptions to suggest a client and project for each card.")
+        .font(TaktFont.ui(14))
+        .foregroundColor(Color(hex: "7A5A32"))
+      TaktButton(
+        title: isTagging ? "Detecting…" : "AI detection",
+        variant: .primary,
+        icon: isTagging ? nil : "sparkles"
+      ) {
+        runAITagging()
+      }
+      .disabled(isTagging || clients.isEmpty)
+      .overlay {
+        if isTagging {
+          ProgressView()
+            .controlSize(.small)
+        }
       }
     }
-    .padding(.top, 6)
+    .padding(18)
+    .frame(maxWidth: .infinity, alignment: .leading)
+    .background(TaktColor.accentSoft)
+    .overlay(
+      Rectangle()
+        .stroke(Color(hex: "FFE0B2"), lineWidth: 1)
+    )
+  }
+
+  private func untaggedThisWeek() -> Int {
+    let range = currentWeekRange()
+    let cards = StorageManager.shared.fetchTimelineCardsByTimeRange(
+      from: range.start, to: range.end)
+    return cards.filter { $0.clientId == nil }.count
   }
 
   private func runAITagging() {
@@ -338,56 +396,64 @@ private struct ClientRow: View {
   let onDelete: () -> Void
 
   var body: some View {
-    VStack(alignment: .leading, spacing: 8) {
+    VStack(alignment: .leading, spacing: 10) {
       HStack {
         Circle()
           .fill(color(from: client.color))
-          .frame(width: 10, height: 10)
+          .frame(width: 8, height: 8)
         Text(client.name)
-          .font(.headline)
+          .font(TaktFont.title)
+          .foregroundColor(TaktColor.textPrimary)
         if client.defaultBillable {
-          Text("abrechenbar")
-            .font(.caption)
-            .padding(.horizontal, 6)
-            .padding(.vertical, 2)
-            .background(Color.orange.opacity(0.15))
-            .cornerRadius(4)
+          TaktBadge(title: "billable", variant: .orange)
         }
         Spacer()
-        Button("+ Projekt", action: onAddProject)
-          .buttonStyle(.borderless)
+        Button("+ Project", action: onAddProject)
+          .buttonStyle(.plain)
+          .font(TaktFont.ui(13))
+          .foregroundColor(TaktColor.textTertiary)
+          .onHover { hovering in
+            // handled by style; kept simple
+          }
+          .pointingHandCursor()
         Button(role: .destructive) {
           onDelete()
         } label: {
           Image(systemName: "trash")
+            .font(.system(size: 12))
         }
-        .buttonStyle(.borderless)
+        .buttonStyle(.plain)
+        .foregroundColor(TaktColor.textTertiary)
+        .pointingHandCursor()
       }
       if let detail = client.detail, !detail.isEmpty {
         Text(detail)
-          .font(.callout)
-          .foregroundStyle(.secondary)
+          .font(TaktFont.ui(14))
+          .foregroundColor(TaktColor.textSecondary)
+          .lineSpacing(2)
+          .fixedSize(horizontal: false, vertical: true)
       }
       if !projects.isEmpty {
         FlowLayout(spacing: 6) {
           ForEach(projects) { project in
-            Text(project.name)
-              .font(.caption)
-              .padding(.horizontal, 8)
-              .padding(.vertical, 3)
-              .background(Color.secondary.opacity(0.12))
-              .cornerRadius(6)
+            TaktBadge(title: project.name, variant: .neutral)
           }
         }
       }
     }
-    .padding(12)
+    .padding(18)
     .frame(maxWidth: .infinity, alignment: .leading)
-    .background(
-      RoundedRectangle(cornerRadius: 8)
-        .fill(Color.white)
-        .shadow(color: .black.opacity(0.04), radius: 3, x: 0, y: 1)
+    .background(TaktColor.surface)
+    .overlay(
+      Rectangle()
+        .stroke(isSelected ? TaktColor.ink : TaktColor.borderHairline, lineWidth: 1)
     )
+    .overlay(alignment: .leading) {
+      Rectangle()
+        .fill(color(from: client.color))
+        .frame(width: 4)
+    }
+    .contentShape(Rectangle())
   }
 
   private func color(from hex: String?) -> Color {

@@ -172,60 +172,46 @@ struct CanvasActivityCard: View {
         maxHeight: height,
         alignment: isCompactCard ? .leading : .topLeading
       )
-      .background(isFailedCard ? Color(hex: "FFECE4") : Color(hex: "FFFBF8"))
-      .clipShape(RoundedRectangle(cornerRadius: 2, style: .continuous))
+      .background(isFailedCard ? Color(hex: "FFEBEE") : TaktColor.surface)
+      .clipShape(RoundedRectangle(cornerRadius: TaktMetrics.radius))
       .overlay(
-        RoundedRectangle(cornerRadius: 2, style: .continuous)
-          .inset(by: 0.25)
+        RoundedRectangle(cornerRadius: TaktMetrics.radius)
+          .inset(by: 0.5)
           .stroke(
-            isFailedCard ? Color(red: 1, green: 0.16, blue: 0.11) : Color(hex: "E8E8E8"),
+            isFailedCard ? TaktColor.negative : TaktColor.borderHairline,
             style: isFailedCard
-              ? StrokeStyle(lineWidth: 0.5, dash: [2.5, 2.5]) : StrokeStyle(lineWidth: 0.25)
+              ? StrokeStyle(lineWidth: 1, dash: [4, 3]) : StrokeStyle(lineWidth: 1)
           )
       )
       .overlay(alignment: .leading) {
         if !isFailedCard {
-          UnevenRoundedRectangle(
-            topLeadingRadius: 2,
-            bottomLeadingRadius: 2,
-            bottomTrailingRadius: 0,
-            topTrailingRadius: 0,
-            style: .continuous
-          )
-          .fill(style.accent)
-          .frame(width: 6)
+          Rectangle()
+            .fill(style.accent)
+            .frame(width: 5)
+        } else {
+          Rectangle()
+            .fill(Color.clear)
+            .frame(width: 5)
         }
       }
-      // Selection halo for the active activity
+      // The one allowed shadow: selected activity card.
       .overlay(
-        RoundedRectangle(cornerRadius: 2, style: .continuous)
-          .stroke(selectionStroke, lineWidth: 1.5)
-          .opacity(isSelected ? 1 : 0)
-      )
-      .overlay(
-        RoundedRectangle(cornerRadius: 2, style: .continuous)
-          .stroke(Color.black.opacity(isHovering ? 0.08 : 0), lineWidth: 1)
+        RoundedRectangle(cornerRadius: TaktMetrics.radius)
+          .stroke(isSelected ? TaktColor.ink : Color.clear, lineWidth: 1)
       )
       .shadow(
-        color: .black.opacity(isHovering ? 0.08 : 0),
-        radius: 1,
-        x: 0,
-        y: 1
-      )
-      .shadow(
-        color: .black.opacity(isHovering ? 0.06 : 0),
-        radius: 2,
+        color: isSelected ? .black.opacity(0.08) : .clear,
+        radius: 8,
         x: 0,
         y: 2
       )
     }
-    .buttonStyle(CanvasCardButtonStyle(pressedScale: pressedScale))
+    .buttonStyle(.plain)
     .pointingHandCursor()
-    .hoverScaleEffect(scale: hoverScale)
     .onHover { hovering in
-      isHovering = hovering
+      withAnimation(TaktMotion.hover) { isHovering = hovering }
     }
-    .animation(.easeOut(duration: 0.18), value: isHovering)
+    .animation(TaktMotion.hover, value: isHovering)
     .padding(.horizontal, 6)
   }
 }

@@ -57,30 +57,33 @@ private struct TimelineNavigationButton: View {
 
   @State private var isHovering = false
 
+  private var chevronName: String {
+    assetName == "LeftArrow" ? "chevron.left" : "chevron.right"
+  }
+
   var body: some View {
     Button(action: {
       guard isEnabled else { return }
       action()
     }) {
-      ZStack {
-        Circle()
-          .fill(Color(hex: "FFEBD3").opacity(0.79))
-          .frame(width: hoverCircleSize, height: hoverCircleSize)
-          .opacity(isHovering && isEnabled ? 1 : 0)
-
-        Image(assetName)
-          .resizable()
-          .scaledToFit()
-          .frame(width: arrowSize, height: arrowSize)
-          .opacity(isEnabled ? 1 : 0.35)
-      }
-      .frame(width: max(arrowSize, hoverCircleSize), height: max(arrowSize, hoverCircleSize))
-      .contentShape(Circle())
+      Image(systemName: chevronName)
+        .font(.system(size: 13, weight: .semibold))
+        .foregroundColor(
+          isEnabled
+            ? (isHovering ? TaktColor.accentPressed : TaktColor.ink)
+            : TaktColor.textMuted)
+        .frame(width: 32, height: TaktMetrics.controlHeight)
+        .background(TaktColor.surface)
+        .overlay(
+          Rectangle()
+            .stroke(isHovering ? TaktColor.ink : TaktColor.borderStrong, lineWidth: 1)
+        )
+        .contentShape(Rectangle())
     }
-    .buttonStyle(DayflowPressScaleButtonStyle(enabled: isEnabled))
+    .buttonStyle(.plain)
     .disabled(!isEnabled)
     .onHover { hovering in
-      withAnimation(.easeOut(duration: 0.12)) {
+      withAnimation(TaktMotion.hover) {
         isHovering = isEnabled && hovering
       }
     }
@@ -90,6 +93,7 @@ private struct TimelineNavigationButton: View {
       }
     }
     .pointingHandCursorOnHover(enabled: isEnabled, reassertOnPressEnd: true)
+    .accessibilityLabel(chevronName == "chevron.left" ? "Previous day" : "Next day")
   }
 }
 
@@ -254,8 +258,8 @@ extension MainView {
     }
   }
 
-  // Calendar pill — Figma 1:1 visuals (fill #FFA777, icon 16×16, h=30, border
-  // #F2D2BD). The arrowless card itself is rendered at the panel level so it
+  // Calendar button — TAKT redesign: square, SF "calendar" icon, hairline border.
+  // The arrowless card itself is rendered at the panel level so it
   // can own outside-click dismissal without taps leaking through to the
   // timeline below.
   private var timelineCalendarButton: some View {
@@ -267,48 +271,27 @@ extension MainView {
       }
     }) {
       ZStack {
-        Capsule(style: .continuous)
-          .fill(timelineCalendarButtonFillColor)
+        Rectangle()
+          .fill(TaktColor.surface)
           .overlay(
-            Capsule(style: .continuous)
-              .stroke(timelineCalendarButtonBorderColor, lineWidth: 1)
-          )
-          .shadow(
-            color: timelineCalendarButtonShadowColor,
-            radius: showTimelineCalendarPopover ? 8 : 0,
-            x: 0,
-            y: showTimelineCalendarPopover ? 2 : 0
+            Rectangle()
+              .stroke(
+                showTimelineCalendarPopover ? TaktColor.ink : TaktColor.borderStrong,
+                lineWidth: 1)
           )
 
-        Image("CalendarIcon")
-          .resizable()
-          .scaledToFit()
-          .frame(width: 16, height: 16)
+        Image(systemName: "calendar")
+          .font(.system(size: 14, weight: .medium))
+          .foregroundColor(
+            showTimelineCalendarPopover ? TaktColor.ink : TaktColor.textSecondary)
       }
       .frame(width: 36, height: 30)
-      .contentShape(Capsule(style: .continuous))
+      .contentShape(Rectangle())
     }
-    .buttonStyle(
-      DayflowPressScaleButtonStyle(
-        pressedScale: 0.985,
-        animation: .spring(response: 0.18, dampingFraction: 0.88)
-      )
-    )
+    .buttonStyle(.plain)
     .pointingHandCursorOnHover(reassertOnPressEnd: true)
     .animation(timelineCalendarButtonStateAnimation, value: showTimelineCalendarPopover)
     .trackTimelineCalendarButtonFrame()
-  }
-
-  private var timelineCalendarButtonFillColor: Color {
-    showTimelineCalendarPopover ? Color(hex: "FFB38E") : Color(hex: "FFA777")
-  }
-
-  private var timelineCalendarButtonBorderColor: Color {
-    showTimelineCalendarPopover ? Color(hex: "E8BDA1") : Color(hex: "F2D2BD")
-  }
-
-  private var timelineCalendarButtonShadowColor: Color {
-    showTimelineCalendarPopover ? .black.opacity(0.10) : .clear
   }
 
   private var timelineCalendarButtonStateAnimation: Animation {
@@ -410,57 +393,22 @@ extension MainView {
         Button(action: {
           setTimelineMode(mode)
         }) {
-          ZStack {
-            if isSelected {
-              Capsule(style: .continuous)
-                .fill(
-                  LinearGradient(
-                    colors: [
-                      Color(hex: "FFB18D").opacity(0.6),
-                      Color(hex: "FFA46F"),
-                      Color(hex: "FFB18D"),
-                    ],
-                    startPoint: .top,
-                    endPoint: .bottom
-                  )
-                )
-                .shadow(color: Color(hex: "E89A6C").opacity(0.18), radius: 4, x: 0, y: 1)
-                .matchedGeometryEffect(
-                  id: "timeline_mode_highlight",
-                  in: timelineModeSwitchNamespace
-                )
-            }
-
-            Text(mode.title)
-              .font(.custom("Figtree", size: 12).weight(.medium))
-              .foregroundColor(isSelected ? .white : Color(hex: "796E64"))
-              // Concrete width (52pt × 2 = 104pt container) instead of
-              // `.frame(maxWidth: .infinity)`. The infinity was being fought
-              // by the `.fixedSize(horizontal: true)` ancestor on
-              // `timelineLeadingControls`, which resolved the toggle's
-              // ideal width as ~0 and collapsed the cream background +
-              // "Day" label. Three independent parallel investigations
-              // converged on this exact change.
-              .frame(width: 52, height: 30)
-          }
-          .contentShape(Capsule(style: .continuous))
+          Text(mode.title)
+            .font(TaktFont.ui(14, isSelected ? .semibold : .regular))
+            .foregroundColor(isSelected ? .white : TaktColor.textSecondary)
+            .frame(width: 52, height: 30)
+            .background(isSelected ? TaktColor.ink : Color.clear)
+            .contentShape(Rectangle())
         }
-        // Reverted to PlainButtonStyle: DayflowPressScaleButtonStyle — even
-        // with `enabled: false` — still wraps the label in `.animation(...)`,
-        // which appears to conflict with the outer `.animation(...)` tied to
-        // the matchedGeometryEffect gradient. The press-darkening flash is
-        // the accepted tradeoff for a correctly-behaving matched slide.
         .buttonStyle(PlainButtonStyle())
-        .hoverScaleEffect(scale: 1.01)
         .pointingHandCursorOnHover(reassertOnPressEnd: true)
       }
     }
     .frame(width: 104, height: 30)
-    .background(Color(hex: "FFEFE4"))
-    .clipShape(Capsule(style: .continuous))
+    .background(TaktColor.surface)
     .overlay(
-      Capsule(style: .continuous)
-        .stroke(Color(hex: "F2D2BD"), lineWidth: 1)
+      Rectangle()
+        .stroke(TaktColor.borderStrong, lineWidth: 1)
     )
     .animation(timelineModeSwitchAnimation, value: timelineMode)
   }
@@ -469,26 +417,25 @@ extension MainView {
     Button(action: {
       navigateTimeline(to: timelineDisplayDate(from: Date()), method: "today")
     }) {
-      Text("Today")
-        .font(.custom("Figtree", size: 12).weight(.medium))
-        .foregroundColor(Color(hex: "796E64"))
-        .padding(.horizontal, 10)
-        // Explicit width pinned (natural ~52pt + 4pt safety margin). Same
-        // rationale as the calendar pill: under the ancestor's `.fixedSize`
-        // inside a `ViewThatFits`, implicit widths can resolve to unstable
-        // values mid-transition, nudging the Day/Week toggle's position and
-        // desyncing its `matchedGeometryEffect` anchors during a mode flip.
-        .frame(width: 56, height: 30)
-        .background(Color(hex: "FFEFE4"))
-        .clipShape(Capsule(style: .continuous))
-        .overlay(
-          Capsule(style: .continuous)
-            .stroke(Color(hex: "F2D2BD"), lineWidth: 1)
-        )
+      HStack(spacing: 4) {
+        Image(systemName: "calendar.badge.clock")
+          .font(.system(size: 11, weight: .medium))
+        Text("Today")
+          .font(TaktFont.ui(14, .regular))
+      }
+      .foregroundColor(TaktColor.textSecondary)
+      .padding(.horizontal, 10)
+      .frame(height: 30)
+      .background(TaktColor.surface)
+      .overlay(
+        Rectangle()
+          .stroke(TaktColor.borderStrong, lineWidth: 1)
+      )
+      .contentShape(Rectangle())
     }
-    .buttonStyle(DayflowPressScaleButtonStyle(pressedScale: 0.97))
-    .hoverScaleEffect(scale: 1.02)
+    .buttonStyle(.plain)
     .pointingHandCursorOnHover(reassertOnPressEnd: true)
+    .accessibilityLabel("Go to today")
   }
 
   private var timelineHeaderDateLabel: some View {

@@ -46,43 +46,18 @@ struct DailyBulletCard: View {
     style == .tasks ? 92 * scale : 154 * scale
   }
 
-  private var cardShape: UnevenRoundedRectangle {
-    let cornerRadius = 12 * scale
-    let cornerRadii: RectangleCornerRadii
-
-    switch seamMode {
-    case .standalone:
-      cornerRadii = .init(
-        topLeading: cornerRadius,
-        bottomLeading: cornerRadius,
-        bottomTrailing: cornerRadius,
-        topTrailing: cornerRadius
-      )
-    case .joinedLeading:
-      cornerRadii = .init(
-        topLeading: cornerRadius,
-        bottomLeading: cornerRadius,
-        bottomTrailing: 0,
-        topTrailing: 0
-      )
-    case .joinedTrailing:
-      cornerRadii = .init(
-        topLeading: 0,
-        bottomLeading: 0,
-        bottomTrailing: cornerRadius,
-        topTrailing: cornerRadius
-      )
-    }
-
-    return UnevenRoundedRectangle(cornerRadii: cornerRadii, style: .continuous)
+  // TAKT redesign: flat square card — the two cards sit on a 1px grid,
+  // the seam between them is the grid line (no rounded corners, no shadow).
+  private var cardShape: some Shape {
+    Rectangle()
   }
 
   var body: some View {
     VStack(alignment: .leading, spacing: 0) {
       VStack(alignment: .leading, spacing: 18 * scale) {
         Text(title)
-          .font(.custom("InstrumentSerif-Regular", size: 24 * scale))
-          .foregroundStyle(Color(hex: "B46531"))
+          .font(TaktFont.display(21).weight(.semibold))
+          .foregroundColor(TaktColor.standupAccent)
           .frame(maxWidth: .infinity, alignment: .leading)
 
         itemListEditor
@@ -104,26 +79,12 @@ struct DailyBulletCard: View {
       }
     }
     .frame(maxWidth: .infinity, minHeight: max(180, 394 * scale), alignment: .topLeading)
-    .background(
-      cardShape
-        .fill(
-          LinearGradient(
-            gradient: Gradient(stops: [
-              .init(color: Color.white.opacity(0.6), location: 0.011932),
-              .init(color: Color.white, location: 0.5104),
-              .init(color: Color.white.opacity(0.6), location: 0.98092),
-            ]),
-            startPoint: UnitPoint(x: 1, y: 0.45),
-            endPoint: UnitPoint(x: 0, y: 0.55)
-          )
-        )
-    )
+    .background(TaktColor.surface)
     .clipShape(cardShape)
     .overlay(
       cardShape
-        .stroke(Color(hex: "EBE6E3"), lineWidth: max(0.7, 1 * scale))
+        .stroke(TaktColor.borderGrid, lineWidth: 1)
     )
-    .shadow(color: Color.black.opacity(0.1), radius: 12 * scale, x: 0, y: 0)
     .onAppear {
       setupKeyMonitor()
     }
@@ -302,10 +263,10 @@ struct DailyDragHandleIcon: View {
       ForEach(0..<3, id: \.self) { _ in
         HStack(spacing: 2 * scale) {
           Circle()
-            .fill(Color(hex: "A5A5A5"))
+            .fill(TaktColor.textMuted)
             .frame(width: 2.5 * scale, height: 2.5 * scale)
           Circle()
-            .fill(Color(hex: "A5A5A5"))
+            .fill(TaktColor.textMuted)
             .frame(width: 2.5 * scale, height: 2.5 * scale)
         }
       }
@@ -322,8 +283,8 @@ struct DailyBlockersSection: View {
   var body: some View {
     VStack(alignment: .leading, spacing: 8 * scale) {
       TextField("Blockers", text: $title)
-        .font(.custom("Figtree-Medium", size: 14 * scale))
-        .foregroundStyle(Color(hex: "BD9479"))
+        .font(TaktFont.ui(14, .semibold))
+        .foregroundStyle(TaktColor.blockersLabel)
         .textFieldStyle(.plain)
 
       HStack(alignment: .center, spacing: 8 * scale) {
@@ -343,10 +304,10 @@ struct DailyBlockersSection: View {
     .padding(.trailing, 26 * scale)
     .padding(.top, 14 * scale)
     .frame(maxWidth: .infinity, minHeight: 94 * scale, alignment: .topLeading)
-    .background(Color(hex: "F7F6F5"))
+    .background(TaktColor.blockersSurface)
     .overlay(alignment: .top) {
       Rectangle()
-        .fill(Color(hex: "EBE6E3"))
+        .fill(TaktColor.blockersBorder)
         .frame(height: max(0.7, 1 * scale))
     }
   }

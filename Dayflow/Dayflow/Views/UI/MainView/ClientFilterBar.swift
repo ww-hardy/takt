@@ -16,19 +16,17 @@ struct ClientFilterBar: View {
     Group {
       if !clients.isEmpty {
         ScrollView(.horizontal, showsIndicators: false) {
-          HStack(spacing: 6) {
-            chip(
-              label: "Alle",
-              color: nil,
-              isSelected: selectedClientIds.isEmpty
-            ) {
-              selectedClientIds = []
-            }
+          HStack(spacing: 8) {
+            TaktChip(
+              title: "All clients",
+              isSelected: selectedClientIds.isEmpty,
+              action: { selectedClientIds = [] }
+            )
             ForEach(clients) { client in
-              chip(
-                label: client.name,
-                color: color(from: client.color),
-                isSelected: client.id.map { selectedClientIds.contains($0) } ?? false
+              TaktChip(
+                title: client.name,
+                isSelected: client.id.map { selectedClientIds.contains($0) } ?? false,
+                color: color(from: client.color)
               ) {
                 toggle(client)
               }
@@ -42,36 +40,6 @@ struct ClientFilterBar: View {
     .onReceive(NotificationCenter.default.publisher(for: .timelineDataUpdated)) { _ in
       reload()
     }
-  }
-
-  private func chip(
-    label: String,
-    color: Color?,
-    isSelected: Bool,
-    action: @escaping () -> Void
-  ) -> some View {
-    Button(action: action) {
-      HStack(spacing: 5) {
-        if let color {
-          Circle()
-            .fill(color)
-            .frame(width: 8, height: 8)
-        }
-        Text(label)
-          .font(Font.custom("Figtree", size: 12))
-      }
-      .padding(.horizontal, 10)
-      .padding(.vertical, 4)
-      .background(
-        isSelected ? Color.accentColor.opacity(0.15) : Color.secondary.opacity(0.08)
-      )
-      .overlay(
-        RoundedRectangle(cornerRadius: 6)
-          .stroke(isSelected ? Color.accentColor.opacity(0.6) : Color.clear, lineWidth: 1)
-      )
-      .cornerRadius(6)
-    }
-    .buttonStyle(PlainButtonStyle())
   }
 
   private func toggle(_ client: Client) {
