@@ -8,56 +8,61 @@ enum DailyRecapProvider: String, Codable, CaseIterable, Sendable {
   case openAICompatible
   case none
 
-  private static let storageKey = "dailyRecapProvider_v1"
   static let allCases: [DailyRecapProvider] = [
     .openAICompatible,
     .gemini,
     .chatgpt,
     .claude,
     .local,
-    .none,
   ]
 
+  /// The Daily view uses the same LLM provider as the rest of the application
+  /// (timeline/chat): the canonical `LLMProviderRoutingStore.primary`. There is no
+  /// separate persisted Daily provider selection anymore — that duplication was the
+  /// mismatch between Daily and the rest of the app (legacy `dailyRecapProvider_v1`).
   static func load(from defaults: UserDefaults = .standard) -> DailyRecapProvider {
-    if let rawValue = defaults.string(forKey: storageKey),
-      let provider = DailyRecapProvider(rawValue: rawValue)
-    {
-      return provider
-    }
-
-    let provider = migrateInitialSelection(from: defaults)
-    provider.save(to: defaults)
-    return provider
+    let providerID = (try? LLMProviderRoutingStore.load(from: defaults))?.primary
+    return DailyRecapProvider(canonical: providerID)
   }
 
-  func save(to defaults: UserDefaults = .standard) {
-    defaults.set(rawValue, forKey: Self.storageKey)
-  }
-
-  private static func migrateInitialSelection(from defaults: UserDefaults) -> DailyRecapProvider {
-    if defaults.bool(forKey: "isDailyUnlocked") {
-      // TAKT: kein Dayflow-Backend mehr; OpenAI-kompatibel als Default.
-      return .openAICompatible
-    }
-
-    guard let providerID = (try? LLMProviderRoutingStore.load(from: defaults))?.primary else {
-      return .none
-    }
-
+  /// Maps the canonical routing provider to the Daily recap provider. `dayflow` was
+  /// removed in TAKT; legacy routings fall back to the OpenAI-compatible path.
+  init(canonical providerID: LLMProviderID?) {
     switch providerID {
     case .gemini:
-      return .gemini
+      self = .gemini
     case .chatGPT:
-      return .chatgpt
+      self = .chatgpt
+    case .claude:
+      self = .claude
+    case .local:
+      self = .local
+    case .openAICompatible:
+      self = .openAICompatible
+    case .dayflow:
+      // TAKT: Dayflow-Backend entfernt — auf OpenAI-kompatibel umleiten.
+      self = .openAICompatible
+    case nil:
+      self = .none
+    }
+  }
+
+  /// The canonical routing provider ID for this Daily provider. `nil` for `.none`
+  /// because the routing store always has a primary provider.
+  var canonicalProviderID: LLMProviderID? {
+    switch self {
+    case .openAICompatible:
+      return .openAICompatible
+    case .gemini:
+      return .gemini
+    case .chatgpt:
+      return .chatGPT
     case .claude:
       return .claude
     case .local:
       return .local
-    case .openAICompatible:
-      return .openAICompatible
-    case .dayflow:
-      // TAKT: Dayflow-Backend entfernt — auf OpenAI-kompatibel umleiten.
-      return .openAICompatible
+    case .none:
+      return nil
     }
   }
 
