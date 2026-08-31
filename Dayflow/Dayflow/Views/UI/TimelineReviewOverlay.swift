@@ -216,7 +216,7 @@ struct TimelineReviewOverlay: View {
 
   private var reviewBottomContent: some View {
     VStack(spacing: 14) {
-      Text("Swipe on each card on your Timeline to review your day.")
+      Text("Wische über jede Karte in deiner Timeline, um deinen Tag zu bewerten.")
         .font(.custom("Figtree", size: 14).weight(.medium))
         .foregroundColor(Color(hex: "98806D"))
         .lineLimit(1)
@@ -233,11 +233,11 @@ struct TimelineReviewOverlay: View {
     let summary = ratingSummary
     return VStack(spacing: 30) {
       VStack(spacing: 12) {
-        Text("All caught up!")
+        Text("Alles erledigt!")
           .font(.custom("InstrumentSerif-Regular", size: 40))
           .foregroundColor(Color(hex: "333333"))
         Text(
-          "You've reviewed all your activities so far.\nThe Timeline right panel will be updated with your rating."
+          "Du hast alle deine Aktivitäten bewertet.\nDas rechte Timeline-Panel wird mit deiner Bewertung aktualisiert."
         )
         .font(.custom("Figtree", size: 16).weight(.medium))
         .foregroundColor(Color(hex: "333333"))
@@ -249,7 +249,7 @@ struct TimelineReviewOverlay: View {
       Button {
         dismissOverlay()
       } label: {
-        Text("Close")
+        Text("Schließen")
           .font(.custom("Figtree", size: 14).weight(.semibold))
           .foregroundColor(Color(hex: "333333"))
           .padding(.horizontal, 24)
@@ -276,10 +276,10 @@ struct TimelineReviewOverlay: View {
 
   private var emptyState: some View {
     VStack(spacing: 12) {
-      Text("Nothing to review yet")
+      Text("Noch nichts zu bewerten")
         .font(.custom("InstrumentSerif-Regular", size: 28))
         .foregroundColor(Color(hex: "333333"))
-      Text("Come back after a few timeline cards appear.")
+      Text("Komm zurück, sobald ein paar Timeline-Karten erscheinen.")
         .font(.custom("Figtree", size: 14).weight(.medium))
         .foregroundColor(Color(hex: "707070"))
     }

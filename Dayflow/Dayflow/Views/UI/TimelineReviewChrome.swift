@@ -179,7 +179,7 @@ struct TimelineReviewRatingRow: View {
     } label: {
       VStack(spacing: 6) {
         ZUndoIcon(size: 16)
-        Text("Undo")
+        Text("Rückgängig")
           .font(.custom("Figtree", size: 12).weight(.medium))
           .foregroundColor(Color(hex: "98806D"))
       }

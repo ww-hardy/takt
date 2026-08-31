@@ -115,6 +115,13 @@ struct PausePillView: View {
     .onChange(of: pauseManager.isPaused) { _, isPaused in
       handleExternalPauseChange(isPaused)
     }
+    // Lets the hosting header know whether the expanded status text is
+    // present, so it can center the unit instead of pinning it to the
+    // trailing edge (where the paused status would crowd the inspector).
+    .preference(
+      key: PauseStatusPresentedPreferenceKey.self,
+      value: isStatusPresented
+    )
   }
 
   // MARK: - Pill
