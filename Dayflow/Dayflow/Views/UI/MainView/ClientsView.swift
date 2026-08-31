@@ -21,6 +21,8 @@ struct ClientsView: View {
   @State private var taggingError: String?
 
   @State private var showAddClient = false
+  @State private var showEditClient = false
+  @State private var editingClient: Client?
   @State private var showAddProject = false
   @State private var exportStatus: String?
 
@@ -59,7 +61,12 @@ struct ClientsView: View {
       reloadSummary()
     }
     .sheet(isPresented: $showAddClient) {
-      AddClientSheet { reload() }
+      ClientEditorSheet { reload() }
+    }
+    .sheet(isPresented: $showEditClient) {
+      if let editingClient {
+        ClientEditorSheet(client: editingClient) { reload() }
+      }
     }
     .sheet(isPresented: $showAddProject) {
       if let selectedClientId {
@@ -139,6 +146,9 @@ struct ClientsView: View {
           ) {
             selectedClientId = client.id
             showAddProject = true
+          } onEdit: {
+            editingClient = client
+            showEditClient = true
           } onDelete: {
             if let id = client.id {
               StorageManager.shared.deleteClient(id: id)
@@ -405,6 +415,7 @@ private struct ClientRow: View {
   let projects: [Project]
   let isSelected: Bool
   let onAddProject: () -> Void
+  let onEdit: () -> Void
   let onDelete: () -> Void
 
   var body: some View {
@@ -428,6 +439,14 @@ private struct ClientRow: View {
             // handled by style; kept simple
           }
           .pointingHandCursor()
+        Button(action: onEdit) {
+          Image(systemName: "pencil")
+            .font(.system(size: 12))
+        }
+        .buttonStyle(.plain)
+        .foregroundColor(TaktColor.textTertiary)
+        .help("Kunde bearbeiten")
+        .pointingHandCursor()
         Button(role: .destructive) {
           onDelete()
         } label: {
@@ -480,7 +499,8 @@ private struct ClientRow: View {
   }
 }
 
-private struct AddClientSheet: View {
+private struct ClientEditorSheet: View {
+  let client: Client?
   let onSaved: () -> Void
   @Environment(\.dismiss) private var dismiss
 
@@ -489,9 +509,18 @@ private struct AddClientSheet: View {
   @State private var color = ClientsView.palette[0].1
   @State private var defaultBillable = false
 
+  init(client: Client? = nil, onSaved: @escaping () -> Void) {
+    self.client = client
+    self.onSaved = onSaved
+    _name = State(initialValue: client?.name ?? "")
+    _detail = State(initialValue: client?.detail ?? "")
+    _color = State(initialValue: client?.color ?? ClientsView.palette[0].1)
+    _defaultBillable = State(initialValue: client?.defaultBillable ?? false)
+  }
+
   var body: some View {
     VStack(alignment: .leading, spacing: 14) {
-      Text("Neuer Kunde")
+      Text(client == nil ? "Neuer Kunde" : "Kunde bearbeiten")
         .font(.title3)
         .fontWeight(.semibold)
       TextField("Name (z. B. ICF Switzerland)", text: $name)
@@ -518,8 +547,18 @@ private struct AddClientSheet: View {
         Button("Speichern") {
           let trimmed = name.trimmingCharacters(in: .whitespacesAndNewlines)
           guard !trimmed.isEmpty else { return }
-          StorageManager.shared.saveClient(
-            Client(name: trimmed, detail: detail, color: color, defaultBillable: defaultBillable))
+          if let client {
+            StorageManager.shared.updateClient(
+              Client(
+                id: client.id,
+                name: trimmed,
+                detail: detail,
+                color: color,
+                defaultBillable: defaultBillable))
+          } else {
+            StorageManager.shared.saveClient(
+              Client(name: trimmed, detail: detail, color: color, defaultBillable: defaultBillable))
+          }
           onSaved()
           dismiss()
         }
