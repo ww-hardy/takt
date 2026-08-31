@@ -7,7 +7,6 @@
 //  no marketing videos, no analytics gates. Replaces the Dayflow wizard.
 //
 
-import ApplicationServices
 import SwiftUI
 
 // MARK: - Flow state
@@ -139,6 +138,8 @@ struct TaktOnboardingView: View {
 
       if hasScreenCaptureAccess {
         permissionGranted
+        TaktButton(title: "Weiter", variant: .primary, action: advance)
+          .padding(.top, 8)
       } else {
         Button(action: requestScreenPermission) {
           permissionButtonLabel("Erlaubnis erteilen")
@@ -186,9 +187,16 @@ struct TaktOnboardingView: View {
   }
 
   private func requestScreenPermission() {
-    // Opens the system prompt; permission state is re-checked on next appear.
-    let options: NSDictionary = [kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String: true]
-    AXIsProcessTrustedWithOptions(options)
+    // Correct API for Screen Recording (TCC): CGRequestScreenCaptureAccess
+    // shows the system prompt and registers this app in System Settings →
+    // Privacy → Screen & System Audio Recording. (AXIsProcessTrustedWithOptions
+    // would request Assistive Access instead — wrong category.)
+    _ = CGRequestScreenCaptureAccess()
+    // Re-check immediately; if granted, advance. Otherwise the
+    // didBecomeActive handler picks it up when the user returns.
+    if CGPreflightScreenCaptureAccess() {
+      advance()
+    }
   }
 
   // MARK: - Step 2: AI provider (Nous / OpenAI-compatible)
