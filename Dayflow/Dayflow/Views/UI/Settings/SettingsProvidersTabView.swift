@@ -3,7 +3,6 @@ import SwiftUI
 
 struct SettingsProvidersTabView: View {
   @ObservedObject var viewModel: ProvidersSettingsViewModel
-  @ObservedObject private var authManager = DayflowAuthManager.shared
 
   var body: some View {
     VStack(alignment: .leading, spacing: SettingsStyle.sectionSpacing) {
@@ -275,57 +274,32 @@ struct SettingsProvidersTabView: View {
         .fixedSize(horizontal: false, vertical: true)
 
       HStack(spacing: 8) {
-        if viewModel.shouldShowDayflowUpgradeAction(for: provider.id) {
-          SettingsPrimaryButton(title: "Upgrade account", systemImage: "sparkles") {
-            viewModel.openDayflowUpgradeAccount(from: provider.id)
+        if !isConfigured {
+          SettingsSecondaryButton(title: "Setup") {
+            viewModel.beginProviderSetup(provider.id, role: .setupOnly)
           }
-        } else if provider.id == .dayflow {
-          if !isPrimary {
-            SettingsSecondaryButton(
-              title: "Set primary",
-              isDisabled: !viewModel.canModifyRouting
-            ) {
-              viewModel.setPrimaryOrSetup(provider.id)
-            }
-          }
+        }
 
-          if !isSecondary {
-            SettingsSecondaryButton(title: "Set secondary", isDisabled: !canSetSecondary) {
-              viewModel.setSecondaryOrSetup(provider.id)
-            }
-          } else {
-            SettingsSecondaryButton(title: "Unset secondary") {
-              viewModel.clearBackupProvider()
-            }
+        SettingsSecondaryButton(title: "Edit configuration") {
+          viewModel.editProviderConfiguration(provider.id)
+        }
+
+          if !isPrimary {
+          SettingsSecondaryButton(
+            title: "Set primary",
+            isDisabled: !viewModel.canModifyRouting
+          ) {
+            viewModel.setPrimaryOrSetup(provider.id)
+          }
+        }
+
+        if !isSecondary {
+          SettingsSecondaryButton(title: "Set secondary", isDisabled: !canSetSecondary) {
+            viewModel.setSecondaryOrSetup(provider.id)
           }
         } else {
-          if !isConfigured {
-            SettingsSecondaryButton(title: "Setup") {
-              viewModel.beginProviderSetup(provider.id, role: .setupOnly)
-            }
-          }
-
-          SettingsSecondaryButton(title: "Edit configuration") {
-            viewModel.editProviderConfiguration(provider.id)
-          }
-
-          if !isPrimary {
-            SettingsSecondaryButton(
-              title: "Set primary",
-              isDisabled: !viewModel.canModifyRouting
-            ) {
-              viewModel.setPrimaryOrSetup(provider.id)
-            }
-          }
-
-          if !isSecondary {
-            SettingsSecondaryButton(title: "Set secondary", isDisabled: !canSetSecondary) {
-              viewModel.setSecondaryOrSetup(provider.id)
-            }
-          } else {
-            SettingsSecondaryButton(title: "Unset secondary") {
-              viewModel.clearBackupProvider()
-            }
+          SettingsSecondaryButton(title: "Unset secondary") {
+            viewModel.clearBackupProvider()
           }
         }
       }

@@ -281,8 +281,7 @@ final class AnalyticsService {
         !override.isEmpty
       {
         // This override feeds the legacy Daily/PostHog auth path only.
-        // Dayflow account session tokens are intentionally ignored here; CardGen
-        // reads them through DayflowAuthManager instead.
+        // TAKT ignores Dayflow account session tokens entirely.
         if override.hasPrefix("dfs:") {
           print(
             "[AnalyticsService] backendAuthToken ignored_debug_override "

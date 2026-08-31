@@ -1028,31 +1028,17 @@ private struct ReleaseSurveyPayload: Encodable {
 }
 
 private enum ReleaseSurveyClient {
+  /// TAKT ist privacy-first: Survey-Antworten bleiben lokal auf diesem Mac
+  /// (UserDefaults) und werden nicht an ein Dayflow-Backend gesendet.
   static func submit(_ payload: ReleaseSurveyPayload) async throws {
-    guard let url = releaseSurveyURL() else {
-      throw URLError(.badURL)
+    let defaults = UserDefaults.standard
+    let storageKey = "takt.survey.\(payload.surveyKey)"
+    if let data = try? JSONEncoder().encode(payload) {
+      defaults.set(data, forKey: storageKey)
     }
-
-    var request = URLRequest(url: url)
-    request.httpMethod = "POST"
-    request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-    request.httpBody = try JSONEncoder().encode(payload)
-
-    let (_, response) = try await URLSession.shared.data(for: request)
-    guard let httpResponse = response as? HTTPURLResponse,
-      (200..<300).contains(httpResponse.statusCode)
-    else {
-      throw URLError(.badServerResponse)
+    if let responseID = payload.responseID.isEmpty ? nil : payload.responseID {
+      defaults.set(responseID, forKey: "takt.survey.responseID.\(payload.surveyKey)")
     }
-  }
-
-  private static func releaseSurveyURL() -> URL? {
-    guard let endpoint = resolvedEndpoint() else { return nil }
-    return URL(string: "\(endpoint)/v1/release-survey")
-  }
-
-  private static func resolvedEndpoint() -> String? {
-    DayflowBackendConfiguration.endpoint()
   }
 }
 

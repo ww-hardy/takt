@@ -21,7 +21,6 @@ enum SidebarIcon: CaseIterable {
   case daily
   case weekly
   case chat
-  case flow
   case agents
   case clients
   case journal
@@ -34,7 +33,6 @@ enum SidebarIcon: CaseIterable {
     case .daily: return "Tag"
     case .weekly: return "Woche"
     case .chat: return "Chat"
-    case .flow: return "Flow"
     case .agents: return "Agents"
     case .clients: return "Kunden"
     case .journal: return "Journal"
@@ -49,7 +47,6 @@ enum SidebarIcon: CaseIterable {
     case .daily: return "daily"
     case .weekly: return "weekly"
     case .chat: return "dashboard"
-    case .flow: return "flow"
     case .agents: return "agents"
     case .clients: return "clients"
     case .journal: return "journal"
@@ -62,7 +59,6 @@ enum SidebarIcon: CaseIterable {
 struct SidebarView: View {
   @Binding var selectedIcon: SidebarIcon
   @ObservedObject private var badgeManager = NotificationBadgeManager.shared
-  @ObservedObject private var authManager = DayflowAuthManager.shared
 
   /// Weekly tracked minutes + target, filled by MainView via environment/binding.
   var weeklyTrackedMinutes: Int = 0
@@ -74,13 +70,8 @@ struct SidebarView: View {
   private var visibleIcons: [SidebarIcon] {
     SidebarIcon.allCases.filter { icon in
       if icon == .journal || icon == .agents { return false }
-      if icon == .flow { return SidebarView.showsFlowTab(flowEnabled: authManager.flowEnabled) }
       return true
     }
-  }
-
-  static func showsFlowTab(flowEnabled: Bool) -> Bool {
-    flowEnabled
   }
 
   var body: some View {

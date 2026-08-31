@@ -103,7 +103,6 @@ struct SettingsView: View {
         .frame(width: proxy.size.width, height: proxy.size.height, alignment: .topLeading)
     }
     .onAppear {
-      DayflowAuthManager.shared.loadStoredSessionIfNeeded()
       providersViewModel.handleOnAppear()
       otherViewModel.refreshAnalyticsState()
       storageViewModel.refreshStorageIfNeeded(isStorageTab: selectedTab == .storage)
