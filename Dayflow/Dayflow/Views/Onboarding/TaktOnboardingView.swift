@@ -2,9 +2,10 @@
 //  TaktOnboardingView.swift
 //  Dayflow
 //
-//  TAKT: minimal 4-step onboarding (de-CH) — screen permission → AI provider
-//  (Nous / OpenAI-compatible) → first client → done. Square, token-based,
-//  no marketing videos, no analytics gates. Replaces the Dayflow wizard.
+//  TAKT: minimal 5-step onboarding (de-CH) — welcome (Wertwandler) → LLM
+//  provider (Nous / OpenAI-compatible) → first client → screen permission →
+//  done. Square, token-based, no marketing videos, no analytics gates.
+//  Replaces the Dayflow wizard.
 //
 
 import SwiftUI
@@ -12,9 +13,10 @@ import SwiftUI
 // MARK: - Flow state
 
 enum TaktOnboardingStep: Int, CaseIterable {
-  case screenPermission
+  case welcome
   case provider
   case firstClient
+  case screenPermission
   case completion
 }
 
@@ -76,12 +78,14 @@ struct TaktOnboardingView: View {
   @ViewBuilder
   private var stepContent: some View {
     switch step {
-    case .screenPermission:
-      screenPermissionStep
+    case .welcome:
+      welcomeStep
     case .provider:
       providerStep
     case .firstClient:
       firstClientStep
+    case .screenPermission:
+      screenPermissionStep
     case .completion:
       completionStep
     }
@@ -91,9 +95,9 @@ struct TaktOnboardingView: View {
 
   @ViewBuilder
   private var footer: some View {
-    if step != .screenPermission && step != .completion {
+    if step != .welcome && step != .completion {
       HStack {
-        if step == .provider || step == .firstClient {
+        if step == .provider || step == .firstClient || step == .screenPermission {
           Button(action: { goBack() }) {
             Text("Zurück")
               .font(TaktFont.ui(14))
@@ -107,7 +111,71 @@ struct TaktOnboardingView: View {
     }
   }
 
-  // MARK: - Step 1: Screen recording permission
+  // MARK: - Step 1: Welcome
+
+  private var welcomeStep: some View {
+    VStack(spacing: 28) {
+      Image("WertwandlerMark")
+        .resizable()
+        .scaledToFit()
+        .frame(width: 84, height: 84)
+
+      VStack(spacing: 10) {
+        Text("Willkommen bei TAKT")
+          .font(TaktFont.display(32).weight(.semibold))
+          .foregroundColor(TaktColor.ink)
+        Text(
+          "TAKT erfasst automatisch, was du am Mac arbeitest — ohne dass du "
+            + "etwas notierst. Am Ende des Tages zeigt dir die Timeline, wo deine "
+            + "Zeit wirklich geblieben ist."
+        )
+        .font(TaktFont.body)
+        .foregroundColor(TaktColor.textSecondary)
+        .multilineTextAlignment(.center)
+        .fixedSize(horizontal: false, vertical: true)
+        .frame(maxWidth: 470)
+      }
+
+      VStack(alignment: .leading, spacing: 12) {
+        featureRow(
+          "Aufzeichnung",
+          "Deine Bildschirm-Aktivität wird lokal erfasst und zu Karten zusammengefasst."
+        )
+        featureRow(
+          "Erkennung",
+          "TAKT erkennt selbst, für welchen Kunden du arbeitest — Kategorien und Projekte folgen daraus."
+        )
+        featureRow(
+          "KI-Chat",
+          "Frag deinen Tag ab: »Was habe ich heute für die Klinik Zürich gemacht?«"
+        )
+      }
+      .frame(maxWidth: 470, alignment: .leading)
+
+      TaktButton(title: "Los geht's", variant: .primary, action: advance)
+        .padding(.top, 8)
+    }
+  }
+
+  private func featureRow(_ title: String, _ subtitle: String) -> some View {
+    HStack(alignment: .top, spacing: 12) {
+      Rectangle()
+        .fill(TaktColor.accent)
+        .frame(width: 6, height: 6)
+        .padding(.top, 7)
+      VStack(alignment: .leading, spacing: 2) {
+        Text(title)
+          .font(TaktFont.ui(14, .semibold))
+          .foregroundColor(TaktColor.ink)
+        Text(subtitle)
+          .font(TaktFont.caption)
+          .foregroundColor(TaktColor.textSecondary)
+          .fixedSize(horizontal: false, vertical: true)
+      }
+    }
+  }
+
+  // MARK: - Step 4: Screen recording permission
 
   /// Overridable for UI tests / previews: gate the real TCC check.
   /// Set via `defaults write ch.wertwandler.takt TAKTForceScreenAccess -bool true`
@@ -132,8 +200,8 @@ struct TaktOnboardingView: View {
     VStack(spacing: 24) {
       titleBlock(
         "Bildschirm-Erlaubnis",
-        "TAKT erfasst, was du am Mac machst, und fasst es zu Aktivitätskarten zusammen. "
-          + "Dafür braucht die App Zugriff auf deinen Bildschirm."
+        "Ein letzter Schritt: TAKT erfasst, was du am Mac machst, und fasst es "
+          + "zu Aktivitätskarten zusammen. Dafür braucht die App Zugriff auf deinen Bildschirm."
       )
 
       if hasScreenCaptureAccess {
@@ -199,7 +267,7 @@ struct TaktOnboardingView: View {
     }
   }
 
-  // MARK: - Step 2: AI provider (Nous / OpenAI-compatible)
+  // MARK: - Step 2: LLM provider (Nous / OpenAI-compatible)
 
   @State private var baseURL = "https://inference-api.nousresearch.com/v1"
   @State private var modelID = "deepseek/deepseek-v4-flash"
@@ -215,7 +283,8 @@ struct TaktOnboardingView: View {
       titleBlock(
         "LLM-Anbieter",
         "Die KI erkennt später automatisch, für welchen Kunden du arbeitest. "
-          + "Standard ist Nous Portal (OpenAI-kompatibel) — passe Base-URL und Modell an, falls du etwas anderes nutzt."
+          + "Standard ist Nous Portal (OpenAI-kompatibel) — passe Base-URL, Modell "
+          + "und API-Schlüssel an, falls du etwas anderes nutzt."
       )
 
       VStack(alignment: .leading, spacing: 6) {
@@ -282,7 +351,8 @@ struct TaktOnboardingView: View {
           }
         )
         .disabled(baseURL.trimmingCharacters(in: .whitespaces).isEmpty
-          || modelID.trimmingCharacters(in: .whitespaces).isEmpty)
+          || modelID.trimmingCharacters(in: .whitespaces).isEmpty
+          || apiKey.trimmingCharacters(in: .whitespaces).isEmpty)
       }
     }
   }
@@ -331,6 +401,13 @@ struct TaktOnboardingView: View {
     if !trimmedKey.isEmpty {
       _ = KeychainManager.shared.store(trimmedKey, for: OpenAICompatiblePreferences.keychainProvider)
     }
+
+    // TAKT: Chat, Timeline und Daily-Recap folgen dem app-weiten Routing
+    // (LLMProviderRoutingStore.primary). Ohne diesen Eintrag bliebe der
+    // Provider aus dem Legacy-Default aktiv und der Chat wäre tot — der
+    // eingerichtete OpenAI-kompatible Anbieter wird daher hier primär.
+    try? LLMProviderRoutingStore.save(
+      LLMProviderRouting(primary: .openAICompatible))
   }
 
   // MARK: - Step 3: First client
@@ -396,7 +473,7 @@ struct TaktOnboardingView: View {
     )
   }
 
-  // MARK: - Step 4: Completion
+  // MARK: - Step 5: Completion
 
   private var completionStep: some View {
     VStack(spacing: 24) {
@@ -430,11 +507,13 @@ struct TaktOnboardingView: View {
   private func advance() {
     withAnimation(.easeInOut(duration: 0.18)) {
       switch step {
-      case .screenPermission:
+      case .welcome:
         step = .provider
       case .provider:
         step = .firstClient
       case .firstClient:
+        step = .screenPermission
+      case .screenPermission:
         step = .completion
       case .completion:
         break
@@ -446,9 +525,11 @@ struct TaktOnboardingView: View {
     withAnimation(.easeInOut(duration: 0.18)) {
       switch step {
       case .provider:
-        step = .screenPermission
+        step = .welcome
       case .firstClient:
         step = .provider
+      case .screenPermission:
+        step = .firstClient
       default:
         break
       }
@@ -456,6 +537,13 @@ struct TaktOnboardingView: View {
   }
 
   private func finish() {
+    // TAKT: Persistenz aktivieren und — sofern die Bildschirm-Erlaubnis
+    // erteilt ist — das Recording in dieser Session starten. Beim nächsten
+    // App-Start übernimmt AppDelegate (Auto-Start mit gespeicherter Präferenz).
+    AppState.shared.enablePersistence()
+    if CGPreflightScreenCaptureAccess() {
+      RecordingControl.start(reason: "onboarding_complete")
+    }
     didOnboard = true
   }
 

@@ -130,7 +130,7 @@ struct DayflowApp: App {
   var body: some Scene {
     Window("TAKT", id: "main") {
       ZStack {
-        // Main app UI or onboarding (TAKT: minimal 4-step wizard)
+        // Main app UI or onboarding (TAKT: minimal 5-step wizard)
         Group {
           if didOnboard {
             // Show UI after onboarding
