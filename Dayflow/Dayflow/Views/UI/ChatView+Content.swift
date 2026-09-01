@@ -46,41 +46,59 @@ extension ChatView {
       }
 
       // History toggle
-      Button(
-        action: {
-          showHistoryPanel.toggle()
-          if showHistoryPanel {
-            chatService.refreshConversationList()
-          }
-        }
+      headerIconButton(
+        systemName: showHistoryPanel ? "clock.arrow.circlepath.fill" : "clock.arrow.circlepath",
+        active: showHistoryPanel,
+        help: "Chat-Verlauf anzeigen"
       ) {
-        Image(systemName: "clock.arrow.circlepath")
-          .font(.system(size: 14))
-          .foregroundColor(showHistoryPanel ? Color(hex: "F96E00") : Color(hex: "999999"))
+        showHistoryPanel.toggle()
+        if showHistoryPanel {
+          chatService.refreshConversationList()
+        }
       }
-      .buttonStyle(.plain)
-      .help("Chat-Verlauf anzeigen")
-      .pointingHandCursor()
 
-      Button(
-        action: {
-          showMemoryPanel.toggle()
-          if showMemoryPanel {
-            syncMemoryFromStoreIfNeeded()
-            AnalyticsService.shared.capture("chat_memory_panel_opened")
-          }
-        }
+      // Memory / notes toggle
+      headerIconButton(
+        systemName: showMemoryPanel ? "brain.head.profile.fill" : "brain.head.profile",
+        active: showMemoryPanel,
+        help: "Notiz-Panel anzeigen"
       ) {
-        Image(systemName: showMemoryPanel ? "brain.head.profile.fill" : "brain.head.profile")
-          .font(.system(size: 14))
-          .foregroundColor(showMemoryPanel ? Color(hex: "F96E00") : Color(hex: "999999"))
+        showMemoryPanel.toggle()
+        if showMemoryPanel {
+          syncMemoryFromStoreIfNeeded()
+          AnalyticsService.shared.capture("chat_memory_panel_opened")
+        }
       }
-      .buttonStyle(.plain)
-      .help("Notiz-Panel anzeigen")
-      .pointingHandCursor()
     }
     .padding(.trailing, 12)
     .padding(.top, 8)
+  }
+
+  /// TAKT: Einheitlicher eckiger Icon-Button für die Chat-Header-Leiste —
+  /// gleiche Höhe wie der „Neuer Chat"-Button, 1px-Rahmen, konsistenter Abstand.
+  private func headerIconButton(
+    systemName: String,
+    active: Bool,
+    help: String,
+    action: @escaping () -> Void
+  ) -> some View {
+    Button(action: action) {
+      Image(systemName: systemName)
+        .font(.system(size: 13, weight: .medium))
+        .foregroundColor(active ? TaktColor.accent : TaktColor.textTertiary)
+        .frame(width: 26, height: 26)
+        .background(
+          RoundedRectangle(cornerRadius: TaktMetrics.radiusControl)
+            .fill(active ? TaktColor.accentSoft : TaktColor.surface)
+        )
+        .overlay(
+          RoundedRectangle(cornerRadius: TaktMetrics.radiusControl)
+            .stroke(active ? TaktColor.accent.opacity(0.35) : TaktColor.borderGrid, lineWidth: 1)
+        )
+    }
+    .buttonStyle(.plain)
+    .help(help)
+    .pointingHandCursor()
   }
 
   // MARK: - Messages area
