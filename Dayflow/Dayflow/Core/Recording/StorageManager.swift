@@ -202,7 +202,17 @@ final class StorageManager: StorageManaging, @unchecked Sendable {
     StoragePathMigrator.migrateIfNeeded()
 
     let appSupport = fileMgr.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
-    let baseDir = appSupport.appendingPathComponent("Dayflow", isDirectory: true)
+    // TAKT: Datenordner "wertwandler-takt" — Migration aus dem Dayflow-Erbe
+    // ("Dayflow", sandbox-Container via StoragePathMigrator) beim ersten Start.
+    let legacyBase = appSupport.appendingPathComponent("Dayflow", isDirectory: true)
+    let baseDir = StoragePaths.appSupportBase
+    if fileMgr.fileExists(atPath: legacyBase.path),
+       !fileMgr.fileExists(atPath: baseDir.appendingPathComponent("chunks.sqlite").path) {
+      try? fileMgr.createDirectory(
+        at: baseDir.deletingLastPathComponent(), withIntermediateDirectories: true)
+      try? fileMgr.moveItem(at: legacyBase, to: baseDir)
+      print("ℹ️ StorageManager: Datenordner auf \(baseDir.path) migriert")
+    }
     let recordingsDir = baseDir.appendingPathComponent("recordings", isDirectory: true)
     let backupDir = baseDir.appendingPathComponent("backups", isDirectory: true)
 

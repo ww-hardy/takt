@@ -8,8 +8,9 @@ final class TimelapseStorageManager {
   private let queue = DispatchQueue(label: "com.dayflow.timelapse.purge", qos: .utility)
 
   private init() {
-    let appSupport = fileMgr.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
-    let path = appSupport.appendingPathComponent("Dayflow/timelapses", isDirectory: true)
+    // TAKT: timelapses unter "wertwandler-takt"; Bestand wird vom
+    // StorageManager-Start (StoragePaths-Migration) verschoben.
+    let path = StoragePaths.appSupportBase.appendingPathComponent("timelapses", isDirectory: true)
     root = path
     try? fileMgr.createDirectory(at: root, withIntermediateDirectories: true)
   }

@@ -37,7 +37,8 @@ enum StoragePathMigrator {
       return
     }
 
-    let destinationBase = newSupport.appendingPathComponent("Dayflow", isDirectory: true)
+    // TAKT: Ziel ist der neue Datenordner "wertwandler-takt".
+    let destinationBase = StoragePaths.appSupportBase
 
     let normalizedLegacy = legacyBase.standardizedFileURL.path
     let normalizedDestination = destinationBase.standardizedFileURL.path
