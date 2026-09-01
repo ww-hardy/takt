@@ -89,14 +89,27 @@ struct ColorOrganizerRoot: View {
     flowMode == .detailsAndColors
   }
 
+  /// TAKT: Gedaempfte Wertwandler-Palette (Sättigung ~45-60%, mittlere
+  /// Helligkeit). Enthält Blau, Grün und Rot — aber gedaempft, passend zur
+  /// flachen, warmen TAKT-Optik. Die Palette ist fix und nicht mehr vom
+  /// Drag-Winkel des Farbrads abhängig.
+  private static let mutedPalette: [String] = [
+    "#7A8CC4",  // gedaempftes Blau
+    "#8FB8A8",  // gedaempftes Salbeigrün
+    "#C47B6B",  // gedaempftes Ziegelrot
+    "#D9A441",  // gedämpftes Ockergelb
+    "#9C86BD",  // gedaempftes Violett
+    "#C48BA0",  // gedaempftes Altrosa
+    "#6FA8A0",  // gedaempftes Petrol
+    "#B08D57",  // gedaempftes Bronze
+    "#A3A86B",  // gedaempftes Olivgrün
+    "#C4956A",  // gedaempftes Aprikosenbraun
+    "#7FA3B8",  // gedaempftes Stahlblau
+    "#B8A38F",  // gedaempftes Sand
+  ]
+
   private var spectrumColors: [String] {
-    (0..<8).map { i in
-      let angleOffset = Double(i) * (.pi * 2) / 8.0
-      let angle = currentAngle + angleOffset
-      let hue = angle * 180.0 / .pi
-      let lightness = 15 + 75 * normalizedRadius
-      return hslToHex(hue, 100, lightness)
-    }
+    Self.mutedPalette
   }
 
   var body: some View {
@@ -266,7 +279,8 @@ struct ColorOrganizerRoot: View {
             onAngleChange: { updatePaletteAngle($0) }
           )
         }
-        .frame(width: 224, height: 224)
+        .frame(maxWidth: 224, maxHeight: 224)
+        .aspectRatio(1, contentMode: .fit)
 
       }
 
@@ -280,7 +294,7 @@ struct ColorOrganizerRoot: View {
         .foregroundColor(Color(red: 0.3, green: 0.3, blue: 0.3))
 
         LazyVGrid(
-          columns: Array(repeating: GridItem(.flexible(), spacing: 8), count: 4), spacing: 8
+          columns: Array(repeating: GridItem(.flexible(), spacing: 8), count: 6), spacing: 8
         ) {
           ForEach(Array(spectrumColors.enumerated()), id: \.offset) { index, hex in
             ColorSwatch(
@@ -383,7 +397,7 @@ struct ColorOrganizerRoot: View {
         .frame(maxWidth: .infinity, alignment: .leading)
 
       HStack(spacing: 16) {
-        SetupSecondaryButton(title: "Back") {
+        SetupSecondaryButton(title: "Zurück") {
           if supportsDetailsStage {
             withAnimation(.easeInOut(duration: 0.25)) {
               isDraggingColor = false
@@ -459,7 +473,7 @@ struct ColorOrganizerRoot: View {
 
         HStack(spacing: 16) {
           if supportsDetailsStage == false, let onBack {
-            SetupSecondaryButton(title: "Back") {
+            SetupSecondaryButton(title: "Zurück") {
               commitPendingEditsIfNeeded()
               onBack()
             }
@@ -521,11 +535,12 @@ struct ColorOrganizerRoot: View {
     var body: some View {
       Button(action: isEnabled ? action : {}) {
         Text(title)
-          .font(Font.custom("Figtree", size: 16).weight(.semibold))
-          .foregroundColor(Color(red: 0.26, green: 0.26, blue: 0.26))
-          .padding(.horizontal, 59)
-          .padding(.vertical, 18)
-          .frame(width: 160, alignment: .center)
+          .font(TaktFont.ui(14, .semibold))
+          .foregroundColor(TaktColor.textPrimary)
+          .lineLimit(1)
+          .fixedSize(horizontal: true, vertical: false)
+          .padding(.horizontal, 18)
+          .frame(height: TaktMetrics.controlHeight + 6)
           .background(
             RoundedRectangle(cornerRadius: TaktMetrics.radiusControl)
               .fill(TaktColor.surface)
