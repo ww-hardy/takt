@@ -88,7 +88,7 @@ struct HowItWorksView: View {
 
         DayflowSurfaceButton(
           action: {
-            if let url = URL(string: "https://github.com/jerryzliu/Dayflow") {
+            if let url = URL(string: "https://github.com/ww-hardy/takt") {
               NSWorkspace.shared.open(url)
             }
           },

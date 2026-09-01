@@ -41,6 +41,14 @@ final class UpdaterManager: NSObject, ObservableObject {
   private override init() {
     super.init()
 
+    // TAKT: Ohne konfigurierte SUFeedURL gibt es keinen Update-Kanal —
+    // Sparkle startet nicht, es findet kein externer Update-Check statt.
+    guard Self.hasConfiguredFeedURL else {
+      print("[Sparkle] Kein SUFeedURL konfiguriert — Updates deaktiviert")
+      statusText = "Updates deaktiviert"
+      return
+    }
+
     // Print what Sparkle thinks the settings are *before* starting:
     print("[Sparkle] bundleId=\(Bundle.main.bundleIdentifier ?? "nil")")
     print(
@@ -62,7 +70,21 @@ final class UpdaterManager: NSObject, ObservableObject {
     }
   }
 
+  /// TAKT: Nur mit einer konfigurierten Feed-URL aktiv — sonst bleibt der
+  /// Updater dauerhaft aus (kein externer Call, kein SilentUserDriver).
+  private static var hasConfiguredFeedURL: Bool {
+    guard let feed = Bundle.main.object(forInfoDictionaryKey: "SUFeedURL") as? String else {
+      return false
+    }
+    return !feed.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+  }
+
   func checkForUpdates(showUI: Bool = false) {
+    guard Self.hasConfiguredFeedURL else {
+      isChecking = false
+      statusText = "Updates deaktiviert"
+      return
+    }
     isChecking = true
     statusText = "Checking…"
     track(

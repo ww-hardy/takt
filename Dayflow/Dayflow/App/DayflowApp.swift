@@ -230,12 +230,8 @@ struct DayflowApp: App {
         .keyboardShortcut("R", modifiers: [.command, .shift])
       }
 
-      // Add Sparkle's update menu item
+      // TAKT: Kein Sparkle-Update-Menü mehr — es gibt keinen eigenen Appcast.
       CommandGroup(after: .appInfo) {
-        Button("Check for Updates…") {
-          updaterManager.checkForUpdates(showUI: true)
-        }
-
         Button("View Release Notes") {
           // Activate the app and bring to foreground
           NSApp.activate(ignoringOtherApps: true)
