@@ -160,9 +160,12 @@ struct ColorOrganizerRoot: View {
       .background(
         Group {
           if presentationStyle == .sheet {
-            RoundedRectangle(cornerRadius: 20)
-              .fill(Color.white)
-              .shadow(color: Color.black.opacity(0.15), radius: 20, x: 0, y: 8)
+            RoundedRectangle(cornerRadius: TaktMetrics.radiusControl)
+              .fill(TaktColor.surface)
+              .overlay(
+                RoundedRectangle(cornerRadius: TaktMetrics.radiusControl)
+                  .stroke(TaktColor.borderStrong, lineWidth: TaktMetrics.hairline)
+              )
           }
         }
       )
