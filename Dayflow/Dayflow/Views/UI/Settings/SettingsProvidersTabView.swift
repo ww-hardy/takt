@@ -49,22 +49,22 @@ struct SettingsProvidersTabView: View {
 
   private var currentConfigurationSection: some View {
     SettingsSection(
-      title: "Current configuration",
-      subtitle: "Active provider and runtime details."
+      title: "Aktuelle Konfiguration",
+      subtitle: "Aktiver Anbieter und Laufzeit-Details."
     ) {
       VStack(alignment: .leading, spacing: 0) {
         summaryRows
 
         HStack(spacing: 8) {
           SettingsSecondaryButton(
-            title: "Edit configuration",
+            title: "Konfiguration bearbeiten",
             action: { viewModel.editProviderConfiguration(viewModel.primaryRoutingProviderId) }
           )
 
           if viewModel.currentProvider == .local {
             SettingsSecondaryButton(
               title: viewModel.usingRecommendedLocalModel
-                ? "Manage local model" : "Upgrade local model",
+                ? "Lokales Modell verwalten" : "Lokales Modell erweitern",
               action: { viewModel.isShowingLocalModelUpgradeSheet = true }
             )
           }
@@ -76,7 +76,7 @@ struct SettingsProvidersTabView: View {
 
   @ViewBuilder
   private var summaryRows: some View {
-    SettingsRow(label: "Primary provider") {
+    SettingsRow(label: "Primärer Anbieter") {
       HStack(spacing: 8) {
         SettingsMetadata(
           text: viewModel.providerDisplayName(viewModel.primaryRoutingProviderId))
@@ -85,14 +85,14 @@ struct SettingsProvidersTabView: View {
     }
 
     if let backupProvider = viewModel.secondaryRoutingProviderId {
-      SettingsRow(label: "Secondary provider") {
+      SettingsRow(label: "Sekundärer Anbieter") {
         HStack(spacing: 8) {
           SettingsMetadata(text: viewModel.providerDisplayName(backupProvider))
           SettingsBadge(text: "SECONDARY")
         }
       }
     } else {
-      SettingsRow(label: "Secondary provider") {
+      SettingsRow(label: "Sekundärer Anbieter") {
         SettingsMetadata(text: "Not configured")
       }
     }
@@ -100,23 +100,23 @@ struct SettingsProvidersTabView: View {
     switch viewModel.currentProvider {
     case .local:
       SettingsRow(label: "Engine") { SettingsMetadata(text: viewModel.localEngine.displayName) }
-      SettingsRow(label: "Model") {
+      SettingsRow(label: "Modell") {
         SettingsMetadata(
           text: viewModel.localModelId.isEmpty ? "Not configured" : viewModel.localModelId)
       }
-      SettingsRow(label: "Endpoint") { SettingsMetadata(text: viewModel.localBaseURL) }
+      SettingsRow(label: "Endpunkt") { SettingsMetadata(text: viewModel.localBaseURL) }
       let hasKey = !viewModel.localAPIKey.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-      SettingsRow(label: "API key", showsDivider: false) {
-        SettingsMetadata(text: hasKey ? "Stored in UserDefaults" : "Not set")
+      SettingsRow(label: "API-Schlüssel", showsDivider: false) {
+        SettingsMetadata(text: hasKey ? "In UserDefaults gespeichert" : "Nicht gesetzt")
       }
     case .gemini:
-      SettingsRow(label: "Model preference") {
+      SettingsRow(label: "Modellpräferenz") {
         SettingsMetadata(text: viewModel.selectedGeminiModel.displayName)
       }
-      SettingsRow(label: "API key", showsDivider: false) {
+      SettingsRow(label: "API-Schlüssel", showsDivider: false) {
         SettingsMetadata(
           text: KeychainManager.shared.retrieve(for: "gemini") != nil
-            ? "Stored safely in Keychain" : "Not set")
+            ? "Sicher im Schlüsselbund gespeichert" : "Nicht gesetzt")
       }
     case .chatGPT, .claude:
       SettingsRow(label: "CLI") {
@@ -127,19 +127,19 @@ struct SettingsProvidersTabView: View {
         SettingsMetadata(
           text: viewModel.openAICompatiblePreset == .openRouter ? "OpenRouter" : "Custom")
       }
-      SettingsRow(label: "Model") {
+      SettingsRow(label: "Modell") {
         SettingsMetadata(
           text: viewModel.openAICompatibleModelID.isEmpty
             ? "Not configured" : viewModel.openAICompatibleModelID)
       }
-      SettingsRow(label: "Endpoint") {
+      SettingsRow(label: "Endpunkt") {
         SettingsMetadata(text: viewModel.openAICompatibleBaseURL)
       }
       let hasKey = !viewModel.openAICompatibleAPIKey.trimmingCharacters(
         in: .whitespacesAndNewlines
       ).isEmpty
-      SettingsRow(label: "API key", showsDivider: false) {
-        SettingsMetadata(text: hasKey ? "Stored safely in Keychain" : "Not set")
+      SettingsRow(label: "API-Schlüssel", showsDivider: false) {
+        SettingsMetadata(text: hasKey ? "Sicher im Schlüsselbund gespeichert" : "Nicht gesetzt")
       }
     case .dayflow:
       SettingsRow(label: "Status", showsDivider: false) {
@@ -152,8 +152,8 @@ struct SettingsProvidersTabView: View {
 
   private var connectionHealthSection: some View {
     SettingsSection(
-      title: "Connection health",
-      subtitle: "Run a quick test for the primary provider."
+      title: "Verbindungsstatus",
+      subtitle: "Schnellen Test für den primären Anbieter ausführen."
     ) {
       VStack(alignment: .leading, spacing: 14) {
         Text(viewModel.connectionHealthLabel)
@@ -191,17 +191,17 @@ struct SettingsProvidersTabView: View {
         case .openAICompatible:
           VStack(alignment: .leading, spacing: 10) {
             Text(
-              "The setup test sends a small image to verify multimodal support and may incur a provider charge."
+              "Der Test sendet ein kleines Bild, um die Multimodal-Unterstützung zu prüfen, und kann beim Anbieter Kosten verursachen."
             )
             .font(.custom("Figtree", size: 12))
             .foregroundColor(SettingsStyle.secondary)
             .fixedSize(horizontal: false, vertical: true)
-            SettingsSecondaryButton(title: "Test connection") {
+            SettingsSecondaryButton(title: "Verbindung testen") {
               viewModel.editProviderConfiguration(.openAICompatible)
             }
           }
         case .dayflow:
-          Text("Hosted cards and transcription run through your TAKT account.")
+          Text("Gehostete Karten und Transkription laufen über dein TAKT-Konto.")
             .font(.custom("Figtree", size: 13))
             .foregroundColor(SettingsStyle.secondary)
         }
@@ -213,8 +213,8 @@ struct SettingsProvidersTabView: View {
 
   private var failoverRoutingSection: some View {
     SettingsSection(
-      title: "Failover routing",
-      subtitle: "Choose primary and secondary providers."
+      title: "Ausweich-Routing",
+      subtitle: "Wähle primären und sekundären Anbieter."
     ) {
       VStack(alignment: .leading, spacing: 0) {
         let providers = viewModel.routingProviders
@@ -280,13 +280,13 @@ struct SettingsProvidersTabView: View {
           }
         }
 
-        SettingsSecondaryButton(title: "Edit configuration") {
+        SettingsSecondaryButton(title: "Konfiguration bearbeiten") {
           viewModel.editProviderConfiguration(provider.id)
         }
 
           if !isPrimary {
           SettingsSecondaryButton(
-            title: "Set primary",
+            title: "Als primär setzen",
             isDisabled: !viewModel.canModifyRouting
           ) {
             viewModel.setPrimaryOrSetup(provider.id)
@@ -294,11 +294,11 @@ struct SettingsProvidersTabView: View {
         }
 
         if !isSecondary {
-          SettingsSecondaryButton(title: "Set secondary", isDisabled: !canSetSecondary) {
+          SettingsSecondaryButton(title: "Als sekundär setzen", isDisabled: !canSetSecondary) {
             viewModel.setSecondaryOrSetup(provider.id)
           }
         } else {
-          SettingsSecondaryButton(title: "Unset secondary") {
+          SettingsSecondaryButton(title: "Sekundär entfernen") {
             viewModel.clearBackupProvider()
           }
         }
@@ -316,7 +316,7 @@ struct SettingsProvidersTabView: View {
 
   private var geminiModelSection: some View {
     SettingsSection(
-      title: "Gemini model preference",
+      title: "Gemini-Modellpräferenz",
       subtitle: "Choose which Gemini model TAKT should prioritize."
     ) {
       VStack(alignment: .leading, spacing: 14) {
@@ -352,28 +352,28 @@ struct SettingsProvidersTabView: View {
     switch viewModel.currentProvider {
     case .gemini:
       promptSection(
-        title: "Gemini prompt customization",
+        title: "Gemini-Prompt-Anpassung",
         subtitle: "Override TAKT's defaults to tailor card generation.",
         intro:
-          "Overrides apply only when their toggle is on. Unchecked sections fall back to TAKT's defaults.",
+          "Überschreibungen gelten nur, wenn der Schalter aktiv ist. Nicht aktivierte Abschnitte fallen auf die TAKT-Standards zurück.",
         sections: [
           promptEditorConfig(
             heading: "Card titles",
-            description: "Shape how card titles read and tweak the example list.",
+            description: "Bestimme, wie Kartentitel klingen, und passe die Beispielliste an.",
             isEnabled: $viewModel.useCustomGeminiTitlePrompt,
             text: $viewModel.geminiTitlePromptText,
             defaultText: GeminiPromptDefaults.titleBlock
           ),
           promptEditorConfig(
             heading: "Card summaries",
-            description: "Control tone and style for the summary field.",
+            description: "Bestimme Ton und Stil des Zusammenfassungsfelds.",
             isEnabled: $viewModel.useCustomGeminiSummaryPrompt,
             text: $viewModel.geminiSummaryPromptText,
             defaultText: GeminiPromptDefaults.summaryBlock
           ),
           promptEditorConfig(
             heading: "Detailed summaries",
-            description: "Define the minute-by-minute breakdown format and examples.",
+            description: "Lege Format und Beispiele für die minutenweise Aufschlüsselung fest.",
             isEnabled: $viewModel.useCustomGeminiDetailedPrompt,
             text: $viewModel.geminiDetailedPromptText,
             defaultText: GeminiPromptDefaults.detailedSummaryBlock
@@ -383,8 +383,8 @@ struct SettingsProvidersTabView: View {
       )
     case .local:
       promptSection(
-        title: "Local prompt customization",
-        subtitle: "Adjust the prompts used for local timeline summaries.",
+        title: "Lokale Prompt-Anpassung",
+        subtitle: "Passe die Prompts für lokale Timeline-Zusammenfassungen an.",
         intro: "Customize the local model prompts for summary and title generation.",
         sections: [
           promptEditorConfig(
@@ -396,7 +396,7 @@ struct SettingsProvidersTabView: View {
           ),
           promptEditorConfig(
             heading: "Card titles",
-            description: "Adjust the tone and examples for local title generation.",
+            description: "Passe Ton und Beispiele für lokale Titelgenerierung an.",
             isEnabled: $viewModel.useCustomOllamaTitlePrompt,
             text: $viewModel.ollamaTitlePromptText,
             defaultText: OllamaPromptDefaults.titleBlock
@@ -428,25 +428,25 @@ struct SettingsProvidersTabView: View {
       title: "ChatGPT and Claude prompt customization",
       subtitle: "Keep independent card-generation prompts for each CLI provider.",
       intro:
-        "Overrides apply only when their toggle is on. Unchecked sections fall back to TAKT's defaults.",
+        "Überschreibungen gelten nur, wenn der Schalter aktiv ist. Nicht aktivierte Abschnitte fallen auf die TAKT-Standards zurück.",
       sections: [
         promptEditorConfig(
           heading: "Card titles",
-          description: "Shape how card titles read and tweak the example list.",
+          description: "Bestimme, wie Kartentitel klingen, und passe die Beispielliste an.",
           isEnabled: $viewModel.useCustomAgentTitlePrompt,
           text: $viewModel.agentTitlePromptText,
           defaultText: defaults.titleBlock
         ),
         promptEditorConfig(
           heading: "Card summaries",
-          description: "Control tone and style for the summary field.",
+          description: "Bestimme Ton und Stil des Zusammenfassungsfelds.",
           isEnabled: $viewModel.useCustomAgentSummaryPrompt,
           text: $viewModel.agentSummaryPromptText,
           defaultText: defaults.summaryBlock
         ),
         promptEditorConfig(
           heading: "Detailed summaries",
-          description: "Define the minute-by-minute breakdown format and examples.",
+          description: "Lege Format und Beispiele für die minutenweise Aufschlüsselung fest.",
           isEnabled: $viewModel.useCustomAgentDetailedPrompt,
           text: $viewModel.agentDetailedPromptText,
           defaultText: defaults.detailedSummaryBlock
@@ -590,11 +590,11 @@ private struct LocalModelUpgradeBanner: View {
           .background(Color(red: 0.12, green: 0.09, blue: 0.02))
           .clipShape(RoundedRectangle(cornerRadius: 8))
         VStack(alignment: .leading, spacing: 4) {
-          Text("Upgrade to \(preset.displayName)")
+          Text("Upgrade auf \(preset.displayName)")
             .font(.custom("Figtree", size: 16))
             .fontWeight(.semibold)
             .foregroundColor(.white)
-          Text("Upgrade to Qwen3VL for a big improvement in quality.")
+          Text("Upgrade auf Qwen3VL für eine deutliche Qualitätsverbesserung.")
             .font(.custom("Figtree", size: 13))
             .foregroundColor(.white.opacity(0.8))
         }
@@ -633,7 +633,7 @@ private struct LocalModelUpgradeBanner: View {
 
         Button(action: onUpgrade) {
           HStack(spacing: 6) {
-            Text("Upgrade now")
+            Text("Jetzt upgraden")
               .font(.custom("Figtree", size: 13))
               .fontWeight(.semibold)
             Image(systemName: "arrow.right")
@@ -707,11 +707,11 @@ struct LocalModelUpgradeSheet: View {
       VStack(alignment: .leading, spacing: 24) {
         HStack {
           VStack(alignment: .leading, spacing: 6) {
-            Text("Upgrade to \(preset.displayName)")
+            Text("Upgrade auf \(preset.displayName)")
               .font(.custom("Figtree", size: 22))
               .fontWeight(.semibold)
             Text(
-              "Follow the steps below, run a quick test, and TAKT will switch you over automatically."
+              "Folge den Schritten unten, führe einen kurzen Test aus, und TAKT wechselt automatisch."
             )
             .font(.custom("Figtree", size: 13))
             .foregroundColor(SettingsStyle.secondary)
@@ -740,7 +740,7 @@ struct LocalModelUpgradeSheet: View {
         }
 
         VStack(alignment: .leading, spacing: 12) {
-          Text("Which local runtime are you using?")
+          Text("Welche lokale Engine nutzt du?")
             .font(.custom("Figtree", size: 14))
             .foregroundColor(SettingsStyle.secondary)
           Picker("Engine", selection: $selectedEngine) {
@@ -773,7 +773,7 @@ struct LocalModelUpgradeSheet: View {
         )
 
         Text(
-          "Once the test succeeds, TAKT updates your settings to \(preset.displayName) automatically."
+          "Sobald der Test erfolgreich ist, aktualisiert TAKT deine Einstellungen automatisch auf \(preset.displayName)."
         )
         .font(.custom("Figtree", size: 12))
         .foregroundColor(SettingsStyle.secondary)

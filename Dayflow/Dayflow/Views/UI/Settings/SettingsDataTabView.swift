@@ -25,8 +25,8 @@ struct SettingsDataTabView: View {
       > timelineDisplayDate(from: viewModel.exportEndDate)
 
     return SettingsSection(
-      title: "Export your data",
-      subtitle: "Move your timeline into tools you already use."
+      title: "Daten exportieren",
+      subtitle: "Überführe deine Timeline in Tools, die du schon nutzt."
     ) {
       VStack(alignment: .leading, spacing: 14) {
         HStack(alignment: .center, spacing: 10) {
@@ -34,7 +34,7 @@ struct SettingsDataTabView: View {
             label: "From",
             date: viewModel.exportStartDate,
             isExpanded: activeExportDatePicker == .start,
-            accessibilityLabel: "Export start date",
+            accessibilityLabel: "Export-Startdatum",
             onTap: {
               withAnimation(.easeOut(duration: 0.2)) {
                 activeExportDatePicker = activeExportDatePicker == .start ? nil : .start
@@ -51,7 +51,7 @@ struct SettingsDataTabView: View {
             label: "To",
             date: viewModel.exportEndDate,
             isExpanded: activeExportDatePicker == .end,
-            accessibilityLabel: "Export end date",
+            accessibilityLabel: "Export-Enddatum",
             onTap: {
               withAnimation(.easeOut(duration: 0.2)) {
                 activeExportDatePicker = activeExportDatePicker == .end ? nil : .end
@@ -82,7 +82,7 @@ struct SettingsDataTabView: View {
 
         HStack(spacing: 12) {
           SettingsPrimaryButton(
-            title: viewModel.isExportingTimelineRange ? "Exporting…" : "Export as Markdown",
+            title: viewModel.isExportingTimelineRange ? "Exporting…" : "Als Markdown exportieren",
             systemImage: viewModel.isExportingTimelineRange ? nil : "square.and.arrow.down",
             isLoading: viewModel.isExportingTimelineRange,
             isDisabled: rangeInvalid,
@@ -90,7 +90,7 @@ struct SettingsDataTabView: View {
           )
 
           if rangeInvalid {
-            Text("Start must be on or before end.")
+            Text("Der Anfang muss vor oder am Ende liegen.")
               .font(.custom("Figtree", size: 12))
               .foregroundColor(SettingsStyle.destructive)
           }
@@ -118,7 +118,7 @@ struct SettingsDataTabView: View {
     let dayString = DateFormatter.yyyyMMdd.string(from: normalizedDate)
 
     return SettingsSection(
-      title: "Reprocess day",
+      title: "Tag neu verarbeiten",
       subtitle: "Re-run analysis for every batch on one timeline day."
     ) {
       VStack(alignment: .leading, spacing: 14) {
@@ -126,7 +126,7 @@ struct SettingsDataTabView: View {
           label: "Day",
           date: viewModel.reprocessDayDate,
           isExpanded: isReprocessDatePickerExpanded,
-          accessibilityLabel: "Reprocess day",
+          accessibilityLabel: "Tag neu verarbeiten",
           disabled: viewModel.isReprocessingDay,
           onTap: {
             withAnimation(.easeOut(duration: 0.2)) {
@@ -155,13 +155,13 @@ struct SettingsDataTabView: View {
 
         VStack(alignment: .leading, spacing: 4) {
           Text(
-            "Clears existing cards and observations for that day, then runs analysis again from the original recordings."
+            "Löscht vorhandene Karten und Beobachtungen dieses Tages und analysiert aus den ursprünglichen Aufnahmen neu."
           )
           .font(.custom("Figtree", size: 12))
           .foregroundColor(SettingsStyle.secondary)
           .fixedSize(horizontal: false, vertical: true)
 
-          Text("Heads up: this can consume a large number of API calls.")
+          Text("Hinweis: Das kann viele API-Aufrufe verbrauchen.")
             .font(.custom("Figtree", size: 12))
             .fontWeight(.semibold)
             .foregroundColor(SettingsStyle.text)
@@ -169,7 +169,7 @@ struct SettingsDataTabView: View {
 
         HStack(spacing: 12) {
           SettingsPrimaryButton(
-            title: viewModel.isReprocessingDay ? "Reprocessing…" : "Reprocess day",
+            title: viewModel.isReprocessingDay ? "Reprocessing…" : "Tag neu verarbeiten",
             systemImage: viewModel.isReprocessingDay ? nil : "arrow.clockwise",
             isLoading: viewModel.isReprocessingDay,
             action: { viewModel.showReprocessDayConfirm = true }
@@ -193,7 +193,7 @@ struct SettingsDataTabView: View {
         Button("Reprocess", role: .destructive) { viewModel.reprocessSelectedDay() }
       } message: {
         Text(
-          "This will delete existing timeline cards for \(dayString) and re-run analysis. It can consume many API calls."
+          "Das löscht vorhandene Timeline-Karten für \(dayString) und analysiert neu. Das kann viele API-Aufrufe verbrauchen."
         )
       }
     }

@@ -21,12 +21,12 @@ struct SettingsView: View {
 
     var title: String {
       switch self {
-      case .storage: return "Storage"
-      case .privacy: return "Privacy"
-      case .providers: return "Providers"
+      case .storage: return "Speicher"
+      case .privacy: return "Datenschutz"
+      case .providers: return "Anbieter"
       case .aiTools: return "MCP / CLI"
       case .data: return "Export"
-      case .other: return "Other"
+      case .other: return "Andere"
       }
     }
   }
@@ -168,7 +168,7 @@ struct SettingsView: View {
 
   private var sidebar: some View {
     VStack(alignment: .leading, spacing: 0) {
-      Text("Settings")
+      Text("Einstellungen")
         .font(.custom("InstrumentSerif-Regular", size: 22))
         .foregroundColor(.black.opacity(0.9))
         .padding(.leading, 10)
@@ -202,7 +202,7 @@ struct SettingsView: View {
         NotificationCenter.default.post(name: .showWhatsNew, object: nil)
       } label: {
         HStack(spacing: 4) {
-          Text("Release notes")
+          Text("Versionshinweise")
             .font(.custom("Figtree", size: 11))
             .fontWeight(.semibold)
           Image(systemName: "arrow.up.right")

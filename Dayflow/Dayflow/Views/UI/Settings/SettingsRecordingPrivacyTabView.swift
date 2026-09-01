@@ -12,8 +12,8 @@ struct SettingsRecordingPrivacyTabView: View {
 
   var body: some View {
     SettingsSection(
-      title: "Recording privacy",
-      subtitle: "Choose apps Dayflow should hide from screenshots."
+      title: "Aufnahme & Datenschutz",
+      subtitle: "Wähle Apps, die TAKT in Bildschirmaufnahmen verbergen soll."
     ) {
       VStack(alignment: .leading, spacing: 18) {
         searchField
@@ -35,7 +35,7 @@ struct SettingsRecordingPrivacyTabView: View {
         .font(.system(size: 13, weight: .semibold))
         .foregroundColor(SettingsStyle.meta)
 
-      TextField("Search installed apps", text: $viewModel.searchText)
+      TextField("Installierte Apps durchsuchen", text: $viewModel.searchText)
         .textFieldStyle(.plain)
         .font(.custom("Figtree", size: 13))
         .foregroundColor(SettingsStyle.text)
@@ -55,7 +55,7 @@ struct SettingsRecordingPrivacyTabView: View {
   private var installedAppsGrid: some View {
     VStack(alignment: .leading, spacing: 12) {
       HStack(alignment: .firstTextBaseline) {
-        Text("Installed apps")
+        Text("Installierte Apps")
           .font(.custom("Figtree", size: 13))
           .fontWeight(.semibold)
           .foregroundColor(SettingsStyle.text)
@@ -75,7 +75,7 @@ struct SettingsRecordingPrivacyTabView: View {
           .padding(.vertical, 20)
           .frame(maxWidth: .infinity, alignment: .center)
       } else if viewModel.filteredApplications.isEmpty {
-        Text("No apps match your search.")
+        Text("Keine Apps entsprechen deiner Suche.")
           .font(.custom("Figtree", size: 13))
           .foregroundColor(SettingsStyle.secondary)
           .padding(.vertical, 20)
@@ -118,7 +118,7 @@ struct SettingsRecordingPrivacyTabView: View {
         .frame(height: 1)
 
       HStack(alignment: .firstTextBaseline, spacing: 10) {
-        Text("Blocked apps")
+        Text("Blockierte Apps")
           .font(.custom("Figtree", size: 13))
           .fontWeight(.semibold)
           .foregroundColor(SettingsStyle.text)
@@ -137,7 +137,7 @@ struct SettingsRecordingPrivacyTabView: View {
       ScrollView(.horizontal, showsIndicators: false) {
         HStack(spacing: 12) {
           if viewModel.blockedApplications.isEmpty {
-            Text("Drag apps here to hide them from recording")
+            Text("Apps hierher ziehen, um sie von der Aufnahme auszuschließen")
               .font(.custom("Figtree", size: 13))
               .foregroundColor(SettingsStyle.meta)
               .frame(height: 58)

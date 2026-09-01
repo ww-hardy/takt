@@ -12,7 +12,7 @@ struct SettingsStorageTabView: View {
       guard let pending = viewModel.pendingLimit,
         StorageSettingsViewModel.storageOptions.indices.contains(pending.index)
       else {
-        return Alert(title: Text("Adjust storage limit"), dismissButton: .default(Text("OK")))
+        return Alert(title: Text("Speicherlimit anpassen"), dismissButton: .default(Text("OK")))
       }
 
       let option = StorageSettingsViewModel.storageOptions[pending.index]
@@ -44,18 +44,18 @@ struct SettingsStorageTabView: View {
     let recorderLabel = isRecording ? "Active" : (permissionGranted ? "Idle" : "Blocked")
 
     return SettingsSection(
-      title: "Recording status",
-      subtitle: "Ensure Dayflow can capture your screen."
+      title: "Aufnahmestatus",
+      subtitle: "Stelle sicher, dass TAKT deinen Bildschirm aufnehmen darf."
     ) {
       VStack(alignment: .leading, spacing: 0) {
-        SettingsRow(label: "Screen recording permission") {
+        SettingsRow(label: "Bildschirmaufnahme-Berechtigung") {
           SettingsStatusDot(
             state: permissionGranted ? .good : .bad,
             label: permissionGranted ? "Granted" : "Missing"
           )
         }
 
-        SettingsRow(label: "Recorder", showsDivider: false) {
+        SettingsRow(label: "Aufnahme", showsDivider: false) {
           SettingsStatusDot(
             state: recorderStatus,
             label: recorderLabel
@@ -64,7 +64,7 @@ struct SettingsStorageTabView: View {
 
         HStack(spacing: 14) {
           SettingsPrimaryButton(
-            title: viewModel.isRefreshingStorage ? "Checking…" : "Run status check",
+            title: viewModel.isRefreshingStorage ? "Prüfe…" : "Status prüfen",
             isLoading: viewModel.isRefreshingStorage,
             action: viewModel.runStorageStatusCheck
           )
@@ -82,8 +82,8 @@ struct SettingsStorageTabView: View {
 
   private var diskUsageSection: some View {
     SettingsSection(
-      title: "Disk usage",
-      subtitle: "Open folders or adjust per-type storage caps."
+      title: "Festplattenbelegung",
+      subtitle: "Ordner öffnen oder Speicherlimits pro Typ anpassen."
     ) {
       VStack(alignment: .leading, spacing: 0) {
         usageRow(

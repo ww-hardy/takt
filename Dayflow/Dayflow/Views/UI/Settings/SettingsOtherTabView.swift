@@ -16,14 +16,14 @@ struct SettingsOtherTabView: View {
 
   private var appPreferencesSection: some View {
     SettingsSection(
-      title: "App preferences",
-      subtitle: "General toggles and telemetry settings."
+      title: "App-Einstellungen",
+      subtitle: "Allgemeine Einstellungen und Telemetrie."
     ) {
       VStack(alignment: .leading, spacing: 0) {
         SettingsRow(
           label: "TAKT beim Anmelden starten",
           subtitle:
-            "Keeps the menu bar controller running right after you sign in so capture can resume instantly."
+            "Hält die Menüleisten-Steuerung nach dem Anmelden am Laufen, damit die Aufnahme sofort weiterlaufen kann."
         ) {
           SettingsToggle(
             isOn: Binding(
@@ -33,26 +33,26 @@ struct SettingsOtherTabView: View {
           )
         }
 
-        SettingsRow(label: "Share crash reports and anonymous usage data") {
+        SettingsRow(label: "Absturzberichte und anonyme Nutzungsdaten teilen") {
           SettingsToggle(isOn: $viewModel.analyticsEnabled)
         }
 
         SettingsRow(
-          label: "Show Dock icon",
+          label: "Dock-Symbol anzeigen",
           subtitle: "Wenn deaktiviert, läuft TAKT nur als Menüleisten-App."
         ) {
           SettingsToggle(isOn: $viewModel.showDockIcon)
         }
 
         SettingsRow(
-          label: "Show app/website icons in timeline",
-          subtitle: "When off, timeline cards won't show app or website icons."
+          label: "App-/Website-Symbole in der Timeline anzeigen",
+          subtitle: "Bei ausgeschaltetem Schalter zeigen Timeline-Karten keine App- oder Website-Symbole."
         ) {
           SettingsToggle(isOn: $viewModel.showTimelineAppIcons)
         }
 
         SettingsRow(
-          label: "Show daily goal popups",
+          label: "Tagesziel-Popups anzeigen",
           subtitle:
             "Wenn deaktiviert, öffnet TAKT nach 4 Uhr morgens nicht automatisch die Ziel-Einrichtung oder die gestrige Übersicht."
         ) {
@@ -60,9 +60,9 @@ struct SettingsOtherTabView: View {
         }
 
         SettingsRow(
-          label: "Save all timelapses to disk",
+          label: "Alle Zeitraffer auf Festplatte sichern",
           subtitle:
-            "New and reprocessed timeline cards will pre-generate timelapse videos and store them on disk instead of building them on demand. Uses more storage and background processing.",
+            "Neue und neu verarbeitete Timeline-Karten erzeugen Zeitraffer-Videos vor und speichern sie auf der Festplatte statt sie bei Bedarf zu erstellen. Benötigt mehr Speicher und Hintergrundverarbeitung.",
           showsDivider: false
         ) {
           SettingsToggle(isOn: $viewModel.saveAllTimelapsesToDisk)
@@ -75,9 +75,9 @@ struct SettingsOtherTabView: View {
 
   private var outputLanguageSection: some View {
     SettingsSection(
-      title: "Output language override",
+      title: "Ausgabesprache überschreiben",
       subtitle:
-        "The default language is English. You can specify any language here (examples: English, 简体中文, Español, 日本語, 한국어, Français)."
+        "Die Standardsprache ist Deutsch. Du kannst hier jede Sprache angeben (z. B. Deutsch, English, 简体中文, Español, 日本語, 한국어, Français)."
     ) {
       HStack(spacing: 10) {
         TextField("English", text: $viewModel.outputLanguageOverride)

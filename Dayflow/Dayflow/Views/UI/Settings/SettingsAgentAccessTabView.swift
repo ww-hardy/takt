@@ -23,7 +23,7 @@ struct SettingsAgentAccessTabView: View {
 
   private var clientsSection: some View {
     SettingsSection(
-      title: "Connect to AI tools",
+      title: "Mit KI-Tools verbinden",
       subtitle:
         "Lass Codex, Claude, Cursor und andere KI-Tools deine TAKT-Zeitleiste lesen. "
         + "Verbindungen werden in der Nutzerkonfiguration jedes Tools gespeichert, damit TAKT "
@@ -42,12 +42,12 @@ struct SettingsAgentAccessTabView: View {
         }
 
         SettingsRow(
-          label: "Other apps",
-          subtitle: "Paste this into any MCP client's configuration.",
+          label: "Andere Apps",
+          subtitle: "Füge dies in die Konfiguration eines beliebigen MCP-Clients ein.",
           showsDivider: false
         ) {
           SettingsSecondaryButton(
-            title: viewModel.copiedSnippet ? "Copied" : "Copy config",
+            title: viewModel.copiedSnippet ? "Copied" : "Konfiguration kopieren",
             systemImage: viewModel.copiedSnippet ? "checkmark" : "doc.on.doc"
           ) {
             viewModel.copySnippet()
@@ -61,7 +61,7 @@ struct SettingsAgentAccessTabView: View {
   private func clientControl(for row: AgentAccessViewModel.ClientRow) -> some View {
     switch row.state {
     case .notInstalled:
-      Text("Not found")
+      Text("Nicht gefunden")
         .font(.custom("Figtree", size: 12))
         .foregroundColor(SettingsStyle.meta)
     case .connected:
@@ -103,7 +103,7 @@ struct SettingsAgentAccessTabView: View {
         viewModel.connect(row.client)
       }
     case .openedInstaller:
-      Text("Finish in \(row.client.displayName)")
+      Text("Abschließen in \(row.client.displayName)")
         .font(.custom("Figtree", size: 12))
         .foregroundColor(SettingsStyle.secondary)
     }
@@ -111,7 +111,7 @@ struct SettingsAgentAccessTabView: View {
 
   private var editsSection: some View {
     SettingsSection(
-      title: "Allow edits",
+      title: "Bearbeitung erlauben",
       subtitle:
         "Off means AI tools can read your timeline but never change it. On lets them "
         + "rename activities, manage categories, and set day goals. Deleting anything "
@@ -119,7 +119,7 @@ struct SettingsAgentAccessTabView: View {
     ) {
       VStack(alignment: .leading, spacing: 0) {
         SettingsRow(
-          label: viewModel.editsEnabled ? "Edits are on" : "Edits are off",
+          label: viewModel.editsEnabled ? "Bearbeitung aktiv" : "Bearbeitung aus",
           subtitle: viewModel.editsEnabled
             ? "KI-Tools können über TAKT Änderungen vornehmen, während es läuft."
             : nil,
@@ -133,7 +133,7 @@ struct SettingsAgentAccessTabView: View {
 
   private var terminalSection: some View {
     SettingsSection(
-      title: "Terminal command",
+      title: "Terminal-Befehl",
       subtitle:
         "Adds a `dayflow` command so you can see your timeline from any terminal. "
         + "This isn't a separate package like an npm install: it links to the CLI already "
@@ -142,7 +142,7 @@ struct SettingsAgentAccessTabView: View {
     ) {
       VStack(alignment: .leading, spacing: 12) {
         SettingsRow(
-          label: viewModel.terminalInstalled ? "Installed" : "Not installed",
+          label: viewModel.terminalInstalled ? "Installed" : "Nicht installiert",
           subtitle: viewModel.terminalInstalled ? "Try: dayflow timeline" : nil,
           showsDivider: false
         ) {
@@ -218,7 +218,7 @@ private struct SettingsCommandBlock: View {
       }
       .buttonStyle(.plain)
       .pointingHandCursor()
-      .accessibilityLabel(copied ? "Terminal command copied" : "Copy terminal command")
+      .accessibilityLabel(copied ? "Terminal-Befehl kopiert" : "Terminal-Befehl kopieren")
       .padding(.trailing, 6)
     }
   }
@@ -249,9 +249,9 @@ final class AgentAccessViewModel: ObservableObject {
       case .connected:
         return client == .codex
           ? "Restart Codex to pick up the connection."
-          : "Restart it to pick up the connection."
+          : "Starte es neu, um die Verbindung zu übernehmen."
       case .failed(let message): return message
-      case .openedInstaller: return "Approve the install dialog it just showed."
+      case .openedInstaller: return "Bestätige den Installationsdialog, der gerade erschienen ist."
       default: return nil
       }
     }
