@@ -408,8 +408,8 @@ struct CanvasTimelineDataView: View {
           height: projectionHeight,
           yPosition: calculateYPosition(for: projection.start) + 1,
           gradient: recordingStatusGradient,
-          gradientOpacity: 0.70,
-          baseColor: Color(hex: "D9C6BA"),
+          gradientOpacity: 0.0,
+          baseColor: TaktColor.accent.opacity(0.88),
           strokeColor: Color.white.opacity(0.52),
           strokeWidth: 0.75,
           shadowColor: .black.opacity(0.10),
@@ -531,13 +531,39 @@ struct CanvasTimelineDataView: View {
     )
   }
 
+  /// TAKT: Verspielte Statusleiste — das Wertwandler-Strichmaennchen
+  /// "traegt" die naechste Karte herbei (bob-Animation), statt eines
+  /// technischen Spinners. Text wird zufaellig aus einem kleinen Satz
+  /// von Spruechen gewaehlt, damit es lebendig bleibt.
+  @State private var doodleFlipped = false
+  @State private var doodlePhase = 0
+
+  private static let generatingMessages = [
+    "Deine nächste Karte entsteht …",
+    "Das Strichmännchen sammelt deine Aktivitäten …",
+    "Momentchen — TAKT ordnet deinen Tag …",
+    "Eine neue Karte ist unterwegs …",
+  ]
+
   private var generatingStatusText: some View {
     HStack(spacing: 8) {
-      TimelineThinkingSpinner(
-        config: timelineSpinnerConfig,
-        visualScale: 0.5
-      )
-      Text("Generating your next card")
+      Image("DoodleRunner")
+        .resizable()
+        .scaledToFit()
+        .frame(height: 26)
+        .scaleEffect(x: doodleFlipped ? -1 : 1, y: 1)
+        .offset(y: doodlePhase % 2 == 0 ? 0 : -2)
+        .onAppear {
+          withAnimation(.easeInOut(duration: 0.55).repeatForever(autoreverses: true)) {
+            doodlePhase = 1
+          }
+          withAnimation(.easeInOut(duration: 3.2).repeatForever(autoreverses: true)) {
+            doodleFlipped = true
+          }
+        }
+        .allowsHitTesting(false)
+
+      Text(Self.generatingMessages.randomElement() ?? Self.generatingMessages[0])
     }
     .font(
       Font.custom("Figtree", size: 12)
@@ -548,6 +574,7 @@ struct CanvasTimelineDataView: View {
     .foregroundColor(.white)
     .lineLimit(1)
     .truncationMode(.tail)
+    .shadow(color: .black.opacity(0.18), radius: 1.5, x: 0, y: 1)
   }
 
   private var pausedStatusText: some View {
