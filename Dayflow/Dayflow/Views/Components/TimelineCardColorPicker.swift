@@ -245,8 +245,7 @@ struct ColorOrganizerRoot: View {
         ZStack {
           DotPattern(width: 10, height: 10)
             .frame(width: 224, height: 224)
-            .clipShape(RoundedRectangle(cornerRadius: 16))
-            .shadow(color: Color.black.opacity(0.05), radius: 8, x: 0, y: 4)
+            .clipShape(RoundedRectangle(cornerRadius: TaktMetrics.radiusControl))
 
           ColorPickerView(
             size: 224,
