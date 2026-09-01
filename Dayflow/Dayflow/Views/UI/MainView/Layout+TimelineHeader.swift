@@ -14,17 +14,8 @@ private struct TimelineHeaderTrailingWidthPreferenceKey: PreferenceKey {
   }
 }
 
-/// Reports whether the PausePill's expanded status text is currently
-/// presented. The timeline header uses this to center the pill unit while
-/// paused (so the wide status + resume unit doesn't crowd the inspector
-/// edge) and keep it trailing-pinned in its compact states.
-struct PauseStatusPresentedPreferenceKey: PreferenceKey {
-  static var defaultValue = false
-
-  static func reduce(value: inout Bool, nextValue: () -> Bool) {
-    value = value || nextValue()
-  }
-}
+/// (Entfernt: frueher meldete die PausePill hier, ob der Status-Text
+/// praesent ist, um die Einheit zu zentrieren — reverted.)
 
 extension View {
   fileprivate func trackTimelineHeaderTrailingWidth() -> some View {
@@ -134,10 +125,8 @@ extension MainView {
     .frame(height: 36)
     // An overlay gives the trailing control an explicit containing width.
     // This keeps the pill right-pinned rather than letting the GeometryReader
-    // and the trailing sibling negotiate a narrower ZStack width. While the
-    // expanded pause status is presented, the unit is horizontally centered
-    // instead (Dynamic-Island style) so it never crowds the inspector edge.
-    .overlay(alignment: pauseStatusPresented ? .top : .topTrailing) {
+    // and the trailing sibling negotiate a narrower ZStack width.
+    .overlay(alignment: .topTrailing) {
       timelineTrailingControls
         // The inspector header begins 2pt below the timeline pane's 24pt
         // inset; the 32pt pill therefore aligns with its 26pt top padding.
@@ -147,9 +136,6 @@ extension MainView {
     .padding(.horizontal, 10)
     .onPreferenceChange(TimelineHeaderTrailingWidthPreferenceKey.self) { width in
       timelineHeaderTrailingWidth = width
-    }
-    .onPreferenceChange(PauseStatusPresentedPreferenceKey.self) { presented in
-      pauseStatusPresented = presented
     }
   }
 

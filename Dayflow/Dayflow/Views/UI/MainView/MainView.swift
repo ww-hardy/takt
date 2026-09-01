@@ -70,7 +70,6 @@ struct MainView: View {
   @State var copyTimelineTask: Task<Void, Never>? = nil
   @State var deleteTimelineTask: Task<Void, Never>? = nil
   @State var timelineHeaderTrailingWidth: CGFloat = 120
-  @State var pauseStatusPresented = false
   @State var weeklyTrackedMinutes: Double = 0
   @State var cardsToReviewCount: Int = 0
   @State var hasAnyTimelineReviewRating = false

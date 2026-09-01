@@ -115,13 +115,6 @@ struct PausePillView: View {
     .onChange(of: pauseManager.isPaused) { _, isPaused in
       handleExternalPauseChange(isPaused)
     }
-    // Lets the hosting header know whether the expanded status text is
-    // present, so it can center the unit instead of pinning it to the
-    // trailing edge (where the paused status would crowd the inspector).
-    .preference(
-      key: PauseStatusPresentedPreferenceKey.self,
-      value: isStatusPresented
-    )
   }
 
   // MARK: - Pill
@@ -327,7 +320,7 @@ struct PausePillView: View {
     exitChips()
 
     withAnimation(.spring(duration: 0.5, bounce: 0.2)) {
-      pillWidth = 84
+      pillWidth = 96
     }
 
     // Pause content exits (scale down + blur out)
@@ -399,7 +392,7 @@ struct PausePillView: View {
 
   private func setResumePillState(showStatusText: Bool) {
     phase = .paused
-    pillWidth = 84
+    pillWidth = 96
     pauseOpacity = 0
     pauseScale = 0.7
     pauseBlur = 5
@@ -426,7 +419,7 @@ struct PausePillView: View {
     exitChips()
 
     withAnimation(.spring(duration: 0.5, bounce: 0.2)) {
-      pillWidth = 84
+      pillWidth = 96
     }
 
     withAnimation(.spring(duration: 0.2, bounce: 0)) {
