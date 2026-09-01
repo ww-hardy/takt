@@ -1,3 +1,4 @@
+import AppKit
 import SwiftUI
 
 private enum SidebarMetrics {
@@ -88,6 +89,7 @@ struct SidebarView: View {
       navItems
       Spacer(minLength: 0)
       weekBlock
+      wertwandlerFooter
     }
     .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
     .padding(.vertical, 26)
@@ -193,6 +195,34 @@ struct SidebarView: View {
         .foregroundColor(TaktColor.textTertiary)
     }
     .padding(.horizontal, SidebarMetrics.itemPaddingH)
+  }
+
+  /// TAKT: Dezenter Wertwandler-Footer in der Sidebar-Rail — analog zu
+  /// flowcheck.ch (dunkler Footer, „Powered by Wertwandler"). WW-Marke in
+  /// heller Variante für dunklen Grund; öffnet wertwandler.ch bei Klick.
+  private var wertwandlerFooter: some View {
+    Button(action: {
+      if let url = URL(string: "https://wertwandler.ch") {
+        NSWorkspace.shared.open(url)
+      }
+    }) {
+      HStack(spacing: 7) {
+        Image("WertwandlerMark")
+          .resizable()
+          .scaledToFit()
+          .frame(width: 15, height: 15)
+        Text("Bereitgestellt von Wertwandler")
+          .font(TaktFont.ui(10, .medium))
+          .foregroundColor(TaktColor.textMuted)
+          .lineLimit(1)
+      }
+      .padding(.horizontal, SidebarMetrics.itemPaddingH)
+      .padding(.top, 14)
+      .contentShape(Rectangle())
+    }
+    .buttonStyle(.plain)
+    .pointingHandCursor()
+    .help("wertwandler.ch")
   }
 
   private var weeklyProgress: CGFloat {
