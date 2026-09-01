@@ -18,6 +18,11 @@ struct TaktWeeklyView: View {
   @State private var dashboardSnapshot: WeeklyDashboardSnapshot
   @State private var isLoading = true
   @State private var weeklyLoadGeneration = 0
+  // TAKT Option 4: adaptive Heatmap — gemessene Spaltenbreite steuert
+  // die Bucket-Aufloesung (5/15/30 min), entprellt bei Resize.
+  @State private var heatmapColumnWidth: CGFloat = 0
+  @State private var heatmapBucketMinutes: Double = 5.0
+  @State private var heatmapResizeTask: Task<Void, Never>?
 
   init() {
     let initialWeekRange = WeeklyDateRange.containing(Date())
@@ -165,17 +170,79 @@ struct TaktWeeklyView: View {
       .padding(.top, 24)
       .padding(.bottom, 24)
     }
+    .background(
+      GeometryReader { proxy in
+        Color.clear.preference(
+          key: HeatmapColumnWidthPreferenceKey.self,
+          value: proxy.size.width
+        )
+      }
+    )
+    .onPreferenceChange(HeatmapColumnWidthPreferenceKey.self) { width in
+      handleHeatmapWidthChange(width)
+    }
+  }
+
+  private func handleHeatmapWidthChange(_ width: CGFloat) {
+    heatmapColumnWidth = width
+    let targetBucket: Double
+    switch width {
+    case ..<520: targetBucket = 30
+    case ..<900: targetBucket = 15
+    default: targetBucket = 5
+    }
+    guard targetBucket != heatmapBucketMinutes else { return }
+
+    heatmapResizeTask?.cancel()
+    heatmapResizeTask = Task {
+      // Entprellt: 250 ms warten, dann Snapshot mit neuer Aufloesung bauen.
+      try? await Task.sleep(nanoseconds: 250_000_000)
+      guard !Task.isCancelled else { return }
+      await MainActor.run {
+        heatmapBucketMinutes = targetBucket
+        rebuildHeatmapOnly(bucketMinutes: targetBucket)
+      }
+    }
+  }
+
+  /// Baut nur die Heatmap mit neuer Bucket-Aufloesung neu — Donut, Overview,
+  /// Treemap etc. bleiben unveraendert.
+  private func rebuildHeatmapOnly(bucketMinutes: Double) {
+    let range = weekRange
+    let categories = categoryStore.categories
+    weeklyLoadGeneration += 1
+    let generation = weeklyLoadGeneration
+    isLoading = true
+    Task.detached(priority: .userInitiated) {
+      let cards = StorageManager.shared.fetchTimelineCardsByTimeRange(
+        from: range.weekStart,
+        to: range.weekEnd
+      )
+      let heatmap = WeeklyDashboardBuilder.buildHeatmap(
+        fromCards: cards,
+        categories: categories,
+        weekRange: range,
+        bucketMinutes: bucketMinutes
+      )
+      await MainActor.run {
+        guard generation == weeklyLoadGeneration else { return }
+        dashboardSnapshot.heatmap = heatmap
+        isLoading = false
+      }
+    }
   }
 
   private var focusHeatmapBlock: some View {
     VStack(alignment: .leading, spacing: 12) {
       Text("FOKUS-HEATMAP")
         .taktLabel()
+      // TAKT Option 4: width == nil -> adaptive Karte, Zellen skalieren
+      // mit der Spaltenbreite; Bucket-Aufloesung folgt der Breite.
       WeeklyFocusHeatmapSection(
         snapshot: dashboardSnapshot.heatmap,
-        width: WeeklyFocusHeatmapSection.exportWidth(for: dashboardSnapshot.heatmap),
+        width: nil,
         cellGap: 1,
-        usesScrollContainers: true
+        usesScrollContainers: false
       )
     }
   }
@@ -406,5 +473,12 @@ struct TaktWeeklyView: View {
       return m > 0 ? "\(h)h \(m)m" : "\(h)h"
     }
     return "\(m)m"
+  }
+}
+
+struct HeatmapColumnWidthPreferenceKey: PreferenceKey {
+  static var defaultValue: CGFloat = 0
+  static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+    value = max(value, nextValue())
   }
 }

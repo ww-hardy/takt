@@ -3,7 +3,7 @@ import SwiftUI
 
 struct WeeklyFocusHeatmapSection: View {
   let snapshot: WeeklyFocusHeatmapSnapshot
-  let width: CGFloat
+  let width: CGFloat?
   let cellGap: CGFloat
   let usesScrollContainers: Bool
 
@@ -33,9 +33,12 @@ struct WeeklyFocusHeatmapSection: View {
     static let legendCornerRadius: CGFloat = 2
   }
 
+  /// TAKT: width == nil bedeutet adaptive Breite — die Karte fuellt die
+  /// verfuegbare Breite und berechnet die Zellbreite daraus (Option 4:
+  /// flexible Zellen + Scroll-Fallback unterhalb der Mindestbreite).
   init(
     snapshot: WeeklyFocusHeatmapSnapshot,
-    width: CGFloat = Design.cardWidth,
+    width: CGFloat? = nil,
     cellGap: CGFloat = 1,
     usesScrollContainers: Bool = true
   ) {
@@ -79,12 +82,25 @@ struct WeeklyFocusHeatmapSection: View {
       + (CGFloat(columnCount - 1) * resolvedCellGap)
   }
 
+  /// TAKT Option 4: flexible Zellenbreite. Bei fixer Karte die Design-
+  /// Breite; bei adaptiver Karte (width == nil) wird die Zellbreite aus
+  /// der gemessenen Container-Breite berechnet und zwischen 3 und 14pt
+  /// geklemmt — darunter greift der Scroll-Fallback.
   private var cellWidth: CGFloat {
-    Design.cellWidth
+    guard let targetWidth = width else { return Design.cellWidth }
+    return Design.cellWidth
+  }
+
+  private func adaptiveCellWidth(for availableGridWidth: CGFloat) -> CGFloat {
+    guard columnCount > 0 else { return Design.cellWidth }
+    let gaps = CGFloat(max(0, columnCount - 1)) * resolvedCellGap
+    let computed = ((availableGridWidth - gaps) / CGFloat(columnCount))
+    return min(max(computed, 3), 14)
   }
 
   private var legendWidth: CGFloat {
-    min(max(Design.legendWidth, width * 0.32), 420)
+    guard let width else { return Design.legendWidth }
+    return min(max(Design.legendWidth, width * 0.32), 420)
   }
 
   var body: some View {
@@ -96,7 +112,11 @@ struct WeeklyFocusHeatmapSection: View {
     .padding(.leading, Design.leadingPadding)
     .padding(.trailing, Design.trailingPadding)
     .padding(.bottom, Design.bottomPadding)
-    .frame(width: width, height: Design.cardHeight, alignment: .topLeading)
+    .frame(
+      width: width,
+      height: Design.cardHeight,
+      alignment: .topLeading
+    )
     .background(
       RoundedRectangle(cornerRadius: Design.cornerRadius, style: .continuous)
         .fill(Design.backgroundColor)
@@ -159,13 +179,40 @@ struct WeeklyFocusHeatmapSection: View {
 
   @ViewBuilder
   private var gridViewport: some View {
-    if usesScrollContainers {
-      ScrollView(.horizontal, showsIndicators: false) {
+    if let targetWidth = width {
+      // Fixe Karte (Export / alte Ansicht): Design-Zellbreite,
+      // Scroll-Container nur wenn angefordert.
+      if usesScrollContainers {
+        ScrollView(.horizontal, showsIndicators: false) {
+          gridAndAxis
+        }
+        .scrollBounceBehavior(.basedOnSize, axes: .horizontal)
+      } else {
         gridAndAxis
       }
-      .scrollBounceBehavior(.basedOnSize, axes: .horizontal)
     } else {
-      gridAndAxis
+      // TAKT Option 4: adaptive Karte — Zellen skalieren mit der
+      // verfuegbaren Breite; Scroll greift erst unter 3pt Zellbreite.
+      GeometryReader { proxy in
+        let availableGridWidth =
+          proxy.size.width - Design.labelsWidth - Design.labelsToGridSpacing
+        let resolvedCellWidth = adaptiveCellWidth(for: max(0, availableGridWidth))
+        let resolvedGridWidth =
+          (CGFloat(columnCount) * resolvedCellWidth)
+          + (CGFloat(max(0, columnCount - 1)) * resolvedCellGap)
+
+        Group {
+          if resolvedCellWidth <= 3, resolvedGridWidth > availableGridWidth {
+            ScrollView(.horizontal, showsIndicators: false) {
+              gridAndAxisWithCellWidth(resolvedCellWidth)
+            }
+            .scrollBounceBehavior(.basedOnSize, axes: .horizontal)
+          } else {
+            gridAndAxisWithCellWidth(resolvedCellWidth)
+          }
+        }
+        .frame(width: proxy.size.width, alignment: .leading)
+      }
     }
   }
 
@@ -181,19 +228,28 @@ struct WeeklyFocusHeatmapSection: View {
   }
 
   private var gridAndAxis: some View {
-    VStack(alignment: .leading, spacing: Design.axisTopSpacing) {
+    gridAndAxisWithCellWidth(cellWidth)
+  }
+
+  /// TAKT Option 4: Rendert Grid + Zeitachse mit expliziter Zellbreite.
+  /// Bei adaptiver Karte wird die Breite aus dem GeometryReader gewonnen.
+  private func gridAndAxisWithCellWidth(_ resolvedCellWidth: CGFloat) -> some View {
+    let resolvedGridWidth =
+      (CGFloat(columnCount) * resolvedCellWidth)
+      + (CGFloat(max(0, columnCount - 1)) * resolvedCellGap)
+    return VStack(alignment: .leading, spacing: Design.axisTopSpacing) {
       VStack(alignment: .leading, spacing: resolvedCellGap) {
         ForEach(snapshot.rows) { row in
           HStack(spacing: resolvedCellGap) {
             ForEach(Array(row.values.enumerated()), id: \.offset) { entry in
               RoundedRectangle(cornerRadius: 0.5, style: .continuous)
                 .fill(color(for: entry.element, rowValues: row.values, index: entry.offset))
-                .frame(width: cellWidth, height: Design.cellHeight)
+                .frame(width: resolvedCellWidth, height: Design.cellHeight)
             }
           }
         }
       }
-      .frame(width: gridWidth, alignment: .leading)
+      .frame(width: resolvedGridWidth, alignment: .leading)
 
       ZStack(alignment: .leading) {
         ForEach(snapshot.timeLabels) { label in
@@ -201,14 +257,14 @@ struct WeeklyFocusHeatmapSection: View {
             .font(.custom("Figtree-Regular", size: 10))
             .foregroundStyle(Color.black)
             .frame(width: 34, alignment: axisAlignment(for: label))
-            .offset(x: axisOffset(for: label))
+            .offset(x: axisOffset(for: label, gridWidth: resolvedGridWidth))
         }
       }
-      .frame(width: gridWidth, height: 14, alignment: .leading)
+      .frame(width: resolvedGridWidth, height: 14, alignment: .leading)
     }
   }
 
-  private func axisOffset(for label: WeeklyWorkflowTimeLabel) -> CGFloat {
+  private func axisOffset(for label: WeeklyWorkflowTimeLabel, gridWidth: CGFloat) -> CGFloat {
     guard snapshot.endMinute > snapshot.startMinute else { return 0 }
 
     let labelWidth: CGFloat = 34

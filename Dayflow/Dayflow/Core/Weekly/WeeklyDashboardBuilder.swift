@@ -44,7 +44,7 @@ enum WeeklyDashboardBuilder {
     )
   }
 
-  private static func cardFacts(
+  static func cardFacts(
     from cards: [TimelineCard],
     categories: [String: TimelineCategory],
     weekRange: WeeklyDateRange
@@ -476,7 +476,7 @@ enum WeeklyDashboardBuilder {
     return (adjustedStart, adjustedEnd)
   }
 
-  private static func normalizedKey(_ value: String) -> String {
+  static func normalizedKey(_ value: String) -> String {
     let folded =
       value
       .trimmingCharacters(in: .whitespacesAndNewlines)

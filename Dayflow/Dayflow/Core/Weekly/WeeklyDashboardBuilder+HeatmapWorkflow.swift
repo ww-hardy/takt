@@ -6,13 +6,31 @@
 import Foundation
 
 extension WeeklyDashboardBuilder {
+  /// TAKT Option 4: Komfort-Einstieg fuer den adaptiven Heatmap-Rebuild —
+  /// Karten -> Facts -> Heatmap mit frei waehlbarer Bucket-Aufloesung.
+  static func buildHeatmap(
+    fromCards cards: [TimelineCard],
+    categories: [TimelineCategory],
+    weekRange: WeeklyDateRange,
+    bucketMinutes: Double
+  ) -> WeeklyFocusHeatmapSnapshot {
+    let categoryLookup = firstCategoryLookup(
+      from: categories.sorted { $0.order < $1.order },
+      normalizedKey: normalizedKey
+    )
+    let facts = cardFacts(from: cards, categories: categoryLookup, weekRange: weekRange)
+    return buildHeatmap(from: facts, weekRange: weekRange, bucketMinutes: bucketMinutes)
+  }
+
+  /// TAKT: Adaptive Aufloesung — die Bucket-Groesse waehlt die View je nach
+  /// verfuegbarer Breite (5 min fein bis 30 min Kompakt); Default bleibt 5.
   static func buildHeatmap(
     from facts: [WeeklyCardFact],
-    weekRange: WeeklyDateRange
+    weekRange: WeeklyDateRange,
+    bucketMinutes: Double = 5.0
   ) -> WeeklyFocusHeatmapSnapshot {
     let visibleFacts = facts.filter { !$0.isSystem && !$0.isIdle }
     let visibleWindow = weeklyActivityWindow(from: visibleFacts)
-    let bucketMinutes = 5.0
     let bucketCount = max(1, Int(ceil((visibleWindow.end - visibleWindow.start) / bucketMinutes)))
     let descriptors = heatmapDayDescriptors(for: weekRange)
     let rows = descriptors.map { descriptor in

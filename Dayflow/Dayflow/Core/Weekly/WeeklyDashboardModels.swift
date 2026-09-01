@@ -11,7 +11,7 @@ struct WeeklyDashboardSnapshot {
   let treemap: WeeklyTreemapSnapshot
   let sankey: WeeklySankeySnapshot
   let workflow: WeeklyWorkflowSnapshot
-  let heatmap: WeeklyFocusHeatmapSnapshot
+  var heatmap: WeeklyFocusHeatmapSnapshot
   let contextCharts: WeeklyContextChartsSnapshot
   let applicationInteractions: WeeklyApplicationInteractionsSnapshot
 }
