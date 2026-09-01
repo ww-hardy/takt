@@ -656,11 +656,11 @@ struct WhatsNewView: View {
   }
 
   /// TAKT: Statische Karte — kein X/Twitter-Webview-Embed, kein externes
-  /// widgets.js-Script. Der Link öffnet den Tweet bei Klick im Browser.
-  @ViewBuilder
-  private func socialPreviewSection(_ preview: ReleaseNoteSocialPreview) -> some View {
-    socialPreviewCard(preview)
-  }
+    /// Twitter-Widget-Script. Der Link öffnet den Tweet bei Klick im Browser.
+    @ViewBuilder
+    private func socialPreviewSection(_ preview: ReleaseNoteSocialPreview) -> some View {
+      socialPreviewCard(preview)
+    }
 
   private func socialPreviewCard(_ preview: ReleaseNoteSocialPreview) -> some View {
     VStack(alignment: .leading, spacing: 14) {
