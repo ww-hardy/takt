@@ -310,29 +310,19 @@ struct ColorOrganizerRoot: View {
       HStack(spacing: 8) {
         Image(systemName: "plus")
           .font(.system(size: 10, weight: .bold))
-          .foregroundColor(Color(red: 0.49, green: 0.33, blue: 0.16))
+          .foregroundColor(TaktColor.standupAccent)
 
         Text("Neue Kategorie erstellen")
           .font(Font.custom("Figtree", size: 14).weight(.bold))
-          .foregroundColor(Color(red: 0.49, green: 0.33, blue: 0.16))
+          .foregroundColor(TaktColor.standupAccent)
       }
       .padding(.horizontal, 14)
       .padding(.vertical, 8)
-      .background(
-        LinearGradient(
-          gradient: Gradient(stops: [
-            .init(color: Color(red: 1, green: 0.94, blue: 0.79), location: 0),
-            .init(color: Color(red: 1, green: 0.72, blue: 0.43), location: 1),
-          ]),
-          startPoint: .leading,
-          endPoint: .trailing
-        )
-      )
-      .cornerRadius(6)
+      .background(TaktColor.surface)
+      .clipShape(RoundedRectangle(cornerRadius: TaktMetrics.radiusControl))
       .overlay(
-        RoundedRectangle(cornerRadius: 6)
-          .inset(by: 0.5)
-          .stroke(Color(red: 0.95, green: 0.71, blue: 0.56), lineWidth: 1)
+        RoundedRectangle(cornerRadius: TaktMetrics.radiusControl)
+          .stroke(TaktColor.borderStrong, lineWidth: TaktMetrics.hairline)
       )
       .opacity(canAddMoreCategories ? 1 : 0.45)
     }
@@ -340,10 +330,6 @@ struct ColorOrganizerRoot: View {
     .disabled(!canAddMoreCategories)
     .scaleEffect(isAddButtonHovered ? 1.02 : 1.0)
     .animation(.easeOut(duration: 0.18), value: isAddButtonHovered)
-    .shadow(
-      color: Color.black.opacity(isAddButtonHovered ? 0.18 : 0.1),
-      radius: isAddButtonHovered ? 6 : 3, x: 0, y: isAddButtonHovered ? 3 : 1
-    )
     .onHover { hovering in
       if canAddMoreCategories {
         isAddButtonHovered = hovering
@@ -359,12 +345,12 @@ struct ColorOrganizerRoot: View {
 
     return VStack(alignment: .leading, spacing: 16) {
       ZStack(alignment: .top) {
-        RoundedRectangle(cornerRadius: 16)
-          .fill(Color.white.opacity(0.2))
+        RoundedRectangle(cornerRadius: TaktMetrics.radiusControl)
+          .fill(TaktColor.surface)
           .frame(maxWidth: .infinity, minHeight: containerHeight, maxHeight: containerHeight)
 
-        RoundedRectangle(cornerRadius: 16)
-          .stroke(Color(red: 0.94, green: 0.91, blue: 0.87), lineWidth: 1)
+        RoundedRectangle(cornerRadius: TaktMetrics.radiusControl)
+          .stroke(TaktColor.borderGrid, lineWidth: TaktMetrics.hairline)
           .frame(maxWidth: .infinity, minHeight: containerHeight, maxHeight: containerHeight)
 
         ScrollView(showsIndicators: false) {
@@ -424,12 +410,12 @@ struct ColorOrganizerRoot: View {
     return ScrollViewReader { proxy in
       VStack(alignment: .leading, spacing: 24) {
         ZStack(alignment: .top) {
-          RoundedRectangle(cornerRadius: 16)
-            .fill(Color.white.opacity(0.2))
+          RoundedRectangle(cornerRadius: TaktMetrics.radiusControl)
+            .fill(TaktColor.surface)
             .frame(maxWidth: .infinity, minHeight: containerHeight, maxHeight: containerHeight)
 
-          RoundedRectangle(cornerRadius: 16)
-            .stroke(Color(red: 0.94, green: 0.91, blue: 0.87), lineWidth: 1)
+          RoundedRectangle(cornerRadius: TaktMetrics.radiusControl)
+            .stroke(TaktColor.borderGrid, lineWidth: TaktMetrics.hairline)
             .frame(maxWidth: .infinity, minHeight: containerHeight, maxHeight: containerHeight)
 
           ScrollView(showsIndicators: false) {
@@ -500,8 +486,8 @@ struct ColorOrganizerRoot: View {
       .frame(maxWidth: .infinity, alignment: .leading)
       .padding()
       .background(
-        RoundedRectangle(cornerRadius: 8)
-          .stroke(Color(red: 0.89, green: 0.89, blue: 0.89), lineWidth: 0.5)
+        RoundedRectangle(cornerRadius: TaktMetrics.radiusControl)
+          .stroke(TaktColor.borderGrid, lineWidth: TaktMetrics.hairline)
       )
   }
 
@@ -539,11 +525,11 @@ struct ColorOrganizerRoot: View {
           .padding(.vertical, 18)
           .frame(width: 160, alignment: .center)
           .background(
-            RoundedRectangle(cornerRadius: 12)
-              .fill(Color.white.opacity(0.85))
+            RoundedRectangle(cornerRadius: TaktMetrics.radiusControl)
+              .fill(TaktColor.surface)
               .overlay(
-                RoundedRectangle(cornerRadius: 12)
-                  .stroke(Color(red: 0.88, green: 0.88, blue: 0.88), lineWidth: 1)
+                RoundedRectangle(cornerRadius: TaktMetrics.radiusControl)
+                  .stroke(TaktColor.borderStrong, lineWidth: TaktMetrics.hairline)
               )
           )
           .opacity(isEnabled ? 1.0 : 0.4)
