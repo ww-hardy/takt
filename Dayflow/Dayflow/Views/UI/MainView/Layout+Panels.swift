@@ -87,9 +87,6 @@ extension MainView {
       case .journal:
         JournalView()
           .padding(15)
-      case .bug:
-        BugReportView()
-          .padding(15)
       case .timeline:
         GeometryReader { geo in
           timelinePanel(geo: geo)

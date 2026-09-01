@@ -24,7 +24,6 @@ enum SidebarIcon: CaseIterable {
   case agents
   case clients
   case journal
-  case bug
   case settings
 
   var displayName: String {
@@ -36,7 +35,6 @@ enum SidebarIcon: CaseIterable {
     case .agents: return "Agents"
     case .clients: return "Kunden"
     case .journal: return "Journal"
-    case .bug: return "Bericht"
     case .settings: return "Einstellungen"
     }
   }
@@ -50,7 +48,6 @@ enum SidebarIcon: CaseIterable {
     case .agents: return "agents"
     case .clients: return "clients"
     case .journal: return "journal"
-    case .bug: return "bug_report"
     case .settings: return "settings"
     }
   }
