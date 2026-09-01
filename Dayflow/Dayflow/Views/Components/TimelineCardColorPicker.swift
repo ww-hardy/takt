@@ -406,7 +406,7 @@ struct ColorOrganizerRoot: View {
           }
         }
 
-        SetupContinueButton(title: completionButtonTitle ?? "Next", isEnabled: !categories.isEmpty)
+        SetupContinueButton(title: completionButtonTitle ?? "Weiter", isEnabled: !categories.isEmpty)
         {
           trackColorsCompletion()
           categoryStore.persist()
@@ -479,7 +479,7 @@ struct ColorOrganizerRoot: View {
 
           addCategoryButton
           Spacer()
-          SetupContinueButton(title: "Next", isEnabled: !categories.isEmpty) {
+          SetupContinueButton(title: "Weiter", isEnabled: !categories.isEmpty) {
             commitPendingEditsIfNeeded()
             trackDetailsCompletion()
             categoryStore.persist()
@@ -583,7 +583,7 @@ struct ColorOrganizerRoot: View {
 
       showFirstTimeHints = false
 
-      let baseName = "New category"
+      let baseName = "Neue Kategorie"
       var candidate = baseName
       var suffix = 2
       let existingNames = Set(categories.map { $0.name.lowercased() })

@@ -50,29 +50,25 @@ struct TabFilterBar: View {
     let isIdle: Bool
 
     var body: some View {
-      HStack(spacing: 10) {
+      HStack(spacing: 8) {
         Circle()
           .fill(Color(hex: category.colorHex))
-          .frame(width: 10, height: 10)
+          .frame(width: 8, height: 8)
 
         Text(category.name)
-          .font(
-            Font.custom("Figtree", size: 13)
-              .weight(.medium)
-          )
-          .foregroundColor(Color(red: 0.2, green: 0.2, blue: 0.2))
+          .font(TaktFont.ui(12, .medium))
+          .foregroundColor(TaktColor.textPrimary)
           .lineLimit(1)
           .fixedSize()
       }
-      .padding(.horizontal, 8)
+      .padding(.horizontal, 10)
       .padding(.vertical, 5)
-      .frame(height: 26)
-      .background(.white.opacity(0.76))
-      .cornerRadius(6)
+      .frame(height: TaktMetrics.chipHeight)
+      .background(TaktColor.surface)
+      .clipShape(RoundedRectangle(cornerRadius: TaktMetrics.radiusControl))
       .overlay(
-        RoundedRectangle(cornerRadius: 6)
-          .inset(by: 0.25)
-          .stroke(Color(red: 0.88, green: 0.88, blue: 0.88), lineWidth: 0.5)
+        RoundedRectangle(cornerRadius: TaktMetrics.radiusControl)
+          .stroke(TaktColor.borderStrong, lineWidth: TaktMetrics.hairline)
       )
     }
   }

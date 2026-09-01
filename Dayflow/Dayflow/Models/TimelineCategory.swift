@@ -510,6 +510,80 @@ private enum OnboardingCategoryPreset: String {
 }
 
 enum CategoryPersistence {
+  /// TAKT: Einmalige Migration — uebersetzt Kategorienamen und -details,
+  /// die vor der Lokalisierung (alte englische Presets) gespeichert wurden.
+  static let legacyEnglishNameMap: [String: (name: String, details: String)] = [
+    "Specs & Planning": (
+      "Specs & Planung",
+      "PRDs, Roadmaps, Backlog-Pflege, Sprint-Planung und Tickets"
+    ),
+    "Research & Analysis": (
+      "Research & Analyse",
+      "User Research, Metrik-Review, Wettbewerbsanalyse und A/B-Tests"
+    ),
+    "Communication": (
+      "Kommunikation",
+      "Standups, Stakeholder-Syncs, Design-Reviews und Engineering-Check-ins"
+    ),
+    "Distraction": (
+      "Ablenkung",
+      "Unfokussiertes Surfen und passiver Konsum: Social-Media-Feeds, zufällige Videos, zielloses Scrollen, Unterhaltung ohne klares Ziel und Gaming"
+    ),
+    "Personal": (
+      "Persönlich",
+      "Absichtliche Nicht-Arbeits-Aktivitäten mit Zweck: Nachrichten mit Freunden und Familie, Finanzen verwalten, Reisen buchen, Besorgungen, Alltag und Hobbys"
+    ),
+    "Engineering / Product": (
+      "Engineering / Produkt",
+      "Coden, Design-Arbeit, Features ausliefern und Hands-on-Building"
+    ),
+    "Research & Strategy": (
+      "Research & Strategie",
+      "Wettbewerbsrecherche, Positionierung, Long-form-Denken und Investor-Vorbereitung"
+    ),
+    "Data & Insights": (
+      "Daten & Insights",
+      "Dashboards, Retentionsdaten, Funnels und Finanzkennzahlen"
+    ),
+    "Design": (
+      "Design",
+      "Prototyping, UI-Komponenten, User Flows, visuelles Design und Handoff-Specs"
+    ),
+    "Learning": (
+      "Lernen",
+      "Vorlesungen, Lesen, Folien wiederholen, Karteikarten und Kursmaterial"
+    ),
+    "Assignments": (
+      "Aufgaben",
+      "Papiere, Übungsserien, Coding-Projekte und Laborberichte"
+    ),
+    "Analysis & Modeling": (
+      "Analyse & Modellierung",
+      "Notebooks, statistische Analysen, ML-Training und Datenexploration"
+    ),
+    "Data Engineering": (
+      "Data Engineering",
+      "SQL-Abfragen, Pipelines, Datenbereinigung und ETL-Skripte"
+    ),
+    "Research": (
+      "Forschung",
+      "Papiere und Doku lesen, neue Methoden und Tools erkunden"
+    ),
+    "Work": (
+      "Arbeit",
+      "Fokussierte Arbeitsaufgaben und berufliche Pflichten, die in keine spezifischere Kategorie passen"
+    ),
+  ]
+
+  /// Wendet die Legacy-Uebersetzung auf eine Kategorie an (falls Name bekannt).
+  static func localized(_ category: TimelineCategory) -> TimelineCategory {
+    guard let mapping = legacyEnglishNameMap[category.name] else { return category }
+    var updated = category
+    updated.name = mapping.name
+    updated.details = mapping.details
+    return updated
+  }
+
   static func loadPersistedCategories() -> [TimelineCategory] {
     guard let data = UserDefaults.standard.data(forKey: CategoryStore.StoreKeys.categories) else {
       return []
@@ -517,7 +591,8 @@ enum CategoryPersistence {
     let decoder = JSONDecoder()
     decoder.dateDecodingStrategy = .iso8601
     if let categories = try? decoder.decode([TimelineCategory].self, from: data) {
-      return ensureIdleCategoryPresent(in: categories)
+      let migrated = categories.map { localized($0) }
+      return ensureIdleCategoryPresent(in: migrated)
     }
     struct LegacyColorCategory: Codable {
       let id: Int64
@@ -541,7 +616,8 @@ enum CategoryPersistence {
           isNew: item.isNew ?? false
         )
       }
-      return ensureIdleCategoryPresent(in: converted)
+      let migrated = converted.map { localized($0) }
+      return ensureIdleCategoryPresent(in: migrated)
     }
     return []
   }
