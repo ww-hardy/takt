@@ -17,15 +17,16 @@ enum DashboardChatProvider: String, Codable, CaseIterable {
   case gemini
   case codex
   case claude
+  case openAICompatible
 
   static func fromStoredValue(_ value: String?) -> DashboardChatProvider {
-    guard let value else { return .gemini }
-    return DashboardChatProvider(rawValue: value) ?? .gemini
+    guard let value else { return fromRoutingStore() }
+    return DashboardChatProvider(rawValue: value) ?? fromRoutingStore()
   }
 
-  /// TAKT: Der Chat nutzt denselben Provider wie der Rest der App.
-  /// Der Standard-Provider aus dem LLMProviderRoutingStore wird auf den
-  /// Chat-Provider gemappt; eine separate Chat-Provider-Auswahl gibt es
+  /// TAKT: Der Chat nutzt denselben LLM-Anbieter wie der Rest der App.
+  /// Der Standard-Anbieter aus dem LLMProviderRoutingStore wird direkt auf
+  /// den Chat-Provider gemappt; eine separate Chat-Provider-Auswahl gibt es
   /// nicht mehr (die Gemini/Codex/Claude-Pills wurden entfernt).
   static func fromRoutingStore() -> DashboardChatProvider {
     let primary = (try? LLMProviderRoutingStore.load())?.primary
@@ -36,10 +37,12 @@ enum DashboardChatProvider: String, Codable, CaseIterable {
       return .codex
     case .claude:
       return .claude
-    case .openAICompatible, .local, .dayflow, nil:
-      // OpenAI-kompatibel (z. B. Nous Portal) und Lokal laufen ueber die
+    case .openAICompatible:
+      return .openAICompatible
+    case .local, .dayflow, nil:
+      // OpenAI-kompatibel (z. B. Nous Portal) laeuft ueber die
       // OpenAI-kompatible Chat-Route; fuer den Chat-Provider ist Gemini
-      // der Fallback, wenn kein CLI-Provider aktiv ist.
+      // der Fallback, wenn kein anderer Anbieter aktiv ist.
       return .gemini
     }
   }
@@ -52,11 +55,18 @@ enum DashboardChatProvider: String, Codable, CaseIterable {
       return "ChatGPT (Codex)"
     case .claude:
       return "Claude"
+    case .openAICompatible:
+      return "OpenAI-kompatibel"
     }
   }
 
   var analyticsProvider: String {
-    rawValue
+    switch self {
+    case .openAICompatible:
+      return OpenAICompatiblePreferences.keychainProvider
+    default:
+      return rawValue
+    }
   }
 
   var runtimeLabel: String {
@@ -65,6 +75,8 @@ enum DashboardChatProvider: String, Codable, CaseIterable {
       return "gemini_function_calling"
     case .codex, .claude:
       return "chat_cli"
+    case .openAICompatible:
+      return "openai_compatible_chat"
     }
   }
 }

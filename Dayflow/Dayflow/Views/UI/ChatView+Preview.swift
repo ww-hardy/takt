@@ -12,5 +12,5 @@ import SwiftUI
 #Preview("Thinking Indicator") {
   ThinkingIndicator()
     .padding()
-    .background(Color(hex: "FFFAF5"))
+    .background(TaktColor.surface)
 }

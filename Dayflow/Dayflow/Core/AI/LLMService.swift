@@ -167,6 +167,14 @@ final class LLMService: LLMServicing {
     return OllamaProvider(openAICompatible: runtimeConfiguration)
   }
 
+  private func makeOpenAICompatibleChatProvider() -> OpenAICompatibleChatProvider? {
+    guard let provider = OpenAICompatibleChatProvider.makeStandard() else {
+      print("❌ [LLMService] OpenAI-compatible chat provider unavailable: incomplete configuration")
+      return nil
+    }
+    return provider
+  }
+
   private func providerLabel(for providerID: LLMProviderID) -> String {
     providerID.providerLabel
   }
@@ -1251,18 +1259,36 @@ final class LLMService: LLMServicing {
       guard let gemini = makeGeminiProvider() else {
         return AsyncThrowingStream { continuation in
           continuation.yield(
-            .error("Gemini is not configured. Add your Gemini API key in Settings > Providers."))
+            .error(
+              "Gemini ist nicht konfiguriert. Bitte unter »LLM-Anbieter« in den Einstellungen einen Gemini-API-Key hinterlegen."))
           continuation.finish(
             throwing: NSError(
               domain: "LLMService",
               code: 1101,
               userInfo: [
                 NSLocalizedDescriptionKey:
-                  "Gemini is not configured. Add your Gemini API key in Settings > Providers."
+                  "Gemini ist nicht konfiguriert. Bitte unter »LLM-Anbieter« in den Einstellungen einen Gemini-API-Key hinterlegen."
               ]))
         }
       }
       return gemini.generateDashboardChatStreaming(
+        systemInstruction: request.systemInstruction ?? "",
+        history: request.history
+      )
+    case .openAICompatible:
+      guard let provider = makeOpenAICompatibleChatProvider() else {
+        return AsyncThrowingStream { continuation in
+          let message =
+            "Der Chat ist nicht konfiguriert. Bitte unter »LLM-Anbieter« in den Einstellungen einen LLM-Anbieter einrichten."
+          continuation.yield(.error(message))
+          continuation.finish(
+            throwing: NSError(
+              domain: "LLMService",
+              code: 1103,
+              userInfo: [NSLocalizedDescriptionKey: message]))
+        }
+      }
+      return provider.generateDashboardChatStreaming(
         systemInstruction: request.systemInstruction ?? "",
         history: request.history
       )

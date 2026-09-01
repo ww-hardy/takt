@@ -159,6 +159,7 @@ private struct ChatHistoryRow: View {
     case .gemini: providerLabel = "Gemini"
     case .codex: providerLabel = "Codex"
     case .claude: providerLabel = "Claude"
+    case .openAICompatible: providerLabel = "OpenAI-kompatibel"
     }
     return "\(time) · \(providerLabel)"
   }
@@ -195,11 +196,11 @@ private struct ChatHistoryRow: View {
       .padding(.vertical, 6)
       .frame(maxWidth: .infinity, alignment: .leading)
       .background(
-        RoundedRectangle(cornerRadius: 8, style: .continuous)
+        RoundedRectangle(cornerRadius: TaktMetrics.radiusControl)
           .fill(
             isCurrent
-              ? Color(hex: "FFF4E9")
-              : (isHovered ? Color(hex: "FAF7F2") : Color.clear))
+              ? TaktColor.accentSoft
+              : (isHovered ? TaktColor.surfaceSunken : Color.clear))
       )
     }
     .buttonStyle(.plain)

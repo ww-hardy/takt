@@ -27,8 +27,8 @@ struct MessageBubble: View {
         .textSelection(.enabled)
         .padding(.horizontal, 14)
         .padding(.vertical, 10)
-        .background(Color(hex: "F98D3D"))
-        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+        .background(TaktColor.accent)
+        .clipShape(RoundedRectangle(cornerRadius: TaktMetrics.radiusControl))
     }
   }
 
@@ -50,14 +50,14 @@ struct MessageBubble: View {
       }
       .padding(.horizontal, 14)
       .padding(.vertical, 10)
-      .background(Color.white)
-      .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+      .background(TaktColor.surface)
+      .clipShape(RoundedRectangle(cornerRadius: TaktMetrics.radiusControl))
       .overlay(
-        RoundedRectangle(cornerRadius: 16, style: .continuous)
-          .stroke(Color(hex: "E8E8E8"), lineWidth: 1)
+        RoundedRectangle(cornerRadius: TaktMetrics.radiusControl)
+          .stroke(TaktColor.borderGrid, lineWidth: TaktMetrics.hairline)
       )
       .contextMenu {
-        Button("Copy") {
+        Button("Kopieren") {
           copyAssistantMessageToPasteboard()
         }
       }
@@ -184,7 +184,7 @@ struct AssistantMessageFeedbackRow: View {
     HStack(spacing: 8) {
       AssistantMessageIconButton(
         systemName: "doc.on.doc",
-        accessibilityLabel: "Copy answer",
+        accessibilityLabel: "Antwort kopieren",
         action: onCopy
       )
 
@@ -193,9 +193,9 @@ struct AssistantMessageFeedbackRow: View {
       }
 
       if showsThanks {
-        Text("Thanks")
+        Text("Danke")
           .font(.custom("Figtree", size: 11).weight(.semibold))
-          .foregroundColor(Color(hex: "9A7C60"))
+          .foregroundColor(TaktColor.textTertiary)
           .transition(thanksTransition)
       }
     }

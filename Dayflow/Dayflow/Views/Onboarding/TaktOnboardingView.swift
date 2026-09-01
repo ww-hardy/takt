@@ -213,7 +213,7 @@ struct TaktOnboardingView: View {
   private var providerStep: some View {
     VStack(alignment: .leading, spacing: 20) {
       titleBlock(
-        "KI-Anbieter",
+        "LLM-Anbieter",
         "Die KI erkennt später automatisch, für welchen Kunden du arbeitest. "
           + "Standard ist Nous Portal (OpenAI-kompatibel) — passe Base-URL und Modell an, falls du etwas anderes nutzt."
       )

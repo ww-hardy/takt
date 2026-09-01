@@ -23,7 +23,7 @@ struct SettingsView: View {
       switch self {
       case .storage: return "Speicher"
       case .privacy: return "Datenschutz"
-      case .providers: return "Anbieter"
+      case .providers: return "LLM-Anbieter"
       case .aiTools: return "MCP / CLI"
       case .data: return "Export"
       case .other: return "Andere"

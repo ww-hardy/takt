@@ -340,26 +340,25 @@ struct JumpToLatestPill: View {
         Image(systemName: "arrow.down")
           .font(.system(size: 11, weight: .semibold))
         if isStreaming {
-          Text("New reply")
+          Text("Neue Antwort")
             .font(.custom("Figtree", size: 11).weight(.semibold))
         }
       }
-      .foregroundColor(Color(hex: "F96E00"))
+      .foregroundColor(TaktColor.accent)
       .padding(.horizontal, isStreaming ? 12 : 9)
       .padding(.vertical, 8)
       .background(
-        Capsule()
-          .fill(Color.white)
-          .shadow(color: Color.black.opacity(isHovered ? 0.16 : 0.1), radius: 8, x: 0, y: 3)
+        RoundedRectangle(cornerRadius: TaktMetrics.radiusControl)
+          .fill(TaktColor.surface)
       )
       .overlay(
-        Capsule()
-          .stroke(Color(hex: "F96E00").opacity(0.25), lineWidth: 1)
+        RoundedRectangle(cornerRadius: TaktMetrics.radiusControl)
+          .stroke(TaktColor.accent.opacity(0.35), lineWidth: 1)
       )
     }
     .buttonStyle(.plain)
     .pointingHandCursor()
     .onHover { isHovered = $0 }
-    .accessibilityLabel(Text("Jump to latest message"))
+    .accessibilityLabel(Text("Zur neuesten Nachricht springen"))
   }
 }

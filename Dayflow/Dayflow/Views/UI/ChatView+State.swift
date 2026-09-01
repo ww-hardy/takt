@@ -3,8 +3,10 @@ import Charts
 import SwiftUI
 
 extension ChatView {
+  /// TAKT: Der Chat nutzt ausschliesslich den Standard-LLM-Anbieter aus den
+  /// Einstellungen — es gibt keine Chat-Provider-Auswahl mehr.
   var selectedProvider: DashboardChatProvider {
-    DashboardChatProvider.fromStoredValue(selectedProviderRaw)
+    DashboardChatProvider.fromRoutingStore()
   }
 
   var isUnlocked: Bool {
@@ -12,7 +14,7 @@ extension ChatView {
   }
 
   var anyRuntimeAvailable: Bool {
-    geminiConfigured || codexDetected || claudeDetected
+    geminiConfigured || codexDetected || claudeDetected || openAICompatibleConfigured
   }
 
   var hasChatMinimumAccess: Bool {

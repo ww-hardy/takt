@@ -173,7 +173,7 @@ final class ChatService: ObservableObject {
     // Build a provider-specific request. Gemini gets structured history;
     // CLI providers keep the existing prompt/session flow.
     let request: DashboardChatRequest
-    let usesSessionResume = provider != .gemini
+    let usesSessionResume = provider != .gemini && provider != .openAICompatible
     let isResume = usesSessionResume && currentSessionId != nil
 
     request = buildChatRequest(provider: provider, isResume: isResume)
@@ -436,13 +436,13 @@ final class ChatService: ObservableObject {
     -> DashboardChatRequest
   {
     switch provider {
-    case .gemini:
+    case .gemini, .openAICompatible:
       currentSessionId = nil
       return DashboardChatRequest(
         provider: provider,
         prompt: "",
         sessionId: nil,
-        systemInstruction: buildGeminiSystemInstruction(),
+        systemInstruction: buildDashboardSystemInstruction(),
         history: conversationHistory
       )
     case .codex:
@@ -513,6 +513,13 @@ final class ChatService: ObservableObject {
   }
 
   private func buildGeminiSystemInstruction() -> String {
+    buildDashboardSystemInstruction()
+  }
+
+  /// TAKT: Provider-neutrale System-Instruktion fuer den Dashboard-Chat.
+  /// Wird von Gemini und OpenAI-kompatiblen Anbietern gemeinsam genutzt
+  /// (die Tool-Beschreibungen sind anbieterunabhaengig).
+  private func buildDashboardSystemInstruction() -> String {
     var instruction = ChatPromptBuilder.geminiSystemPrompt()
     let memoryBlob = DashboardChatMemoryStore.load()
     if !memoryBlob.isEmpty {
@@ -530,22 +537,31 @@ final class ChatService: ObservableObject {
   private func debugDescription(for request: DashboardChatRequest, isResume: Bool) -> String {
     switch request.provider {
     case .gemini:
-      var lines: [String] = ["[Gemini Dashboard Chat]"]
-      if let systemInstruction = request.systemInstruction, !systemInstruction.isEmpty {
-        lines.append("System Instruction:")
-        lines.append(systemInstruction)
-      }
-      lines.append("Contents:")
-      for turn in request.history {
-        lines.append("\(turn.role.promptLabel): \(turn.content)")
-      }
-      return lines.joined(separator: "\n\n")
+      return dashboardDebugDescription(header: "[Gemini Dashboard Chat]", request: request)
+    case .openAICompatible:
+      return dashboardDebugDescription(
+        header: "[OpenAI-Compatible Dashboard Chat]", request: request)
     case .codex, .claude:
       if isResume, let sessionId = request.sessionId {
         return "[Resuming session \(sessionId)] \(request.prompt)"
       }
       return request.prompt
     }
+  }
+
+  private func dashboardDebugDescription(
+    header: String, request: DashboardChatRequest
+  ) -> String {
+    var lines: [String] = [header]
+    if let systemInstruction = request.systemInstruction, !systemInstruction.isEmpty {
+      lines.append("System Instruction:")
+      lines.append(systemInstruction)
+    }
+    lines.append("Contents:")
+    for turn in request.history {
+      lines.append("\(turn.role.promptLabel): \(turn.content)")
+    }
+    return lines.joined(separator: "\n\n")
   }
 
   private func appendRecentSuggestions(_ suggestions: [String]) {

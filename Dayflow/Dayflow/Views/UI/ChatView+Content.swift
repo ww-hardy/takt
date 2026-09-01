@@ -14,13 +14,7 @@ extension ChatView {
       // Input area
       inputArea
     }
-    .background(
-      LinearGradient(
-        colors: [Color(hex: "FFFAF5"), Color(hex: "FFF6EC")],
-        startPoint: .top,
-        endPoint: .bottom
-      )
-    )
+    .background(TaktColor.surface)
   }
 
   // MARK: - Header buttons
@@ -33,21 +27,21 @@ extension ChatView {
       if !chatService.messages.isEmpty {
         Button(action: { resetConversation() }) {
           Text("Neuer Chat")
-            .font(.custom("Figtree", size: 12).weight(.semibold))
-            .foregroundColor(Color(hex: "F96E00"))
+            .font(TaktFont.ui(12, .semibold))
+            .foregroundColor(TaktColor.accent)
             .padding(.horizontal, 10)
             .padding(.vertical, 6)
             .background(
-              RoundedRectangle(cornerRadius: 8, style: .continuous)
-                .fill(Color(hex: "FFF4E9"))
+              RoundedRectangle(cornerRadius: TaktMetrics.radiusControl)
+                .fill(TaktColor.accentSoft)
             )
             .overlay(
-              RoundedRectangle(cornerRadius: 8, style: .continuous)
-                .stroke(Color(hex: "F96E00").opacity(0.25), lineWidth: 1)
+              RoundedRectangle(cornerRadius: TaktMetrics.radiusControl)
+                .stroke(TaktColor.accent.opacity(0.25), lineWidth: 1)
             )
         }
         .buttonStyle(.plain)
-        .help("Start a new chat (this one is saved in history)")
+        .help("Neuen Chat starten (der aktuelle wird im Verlauf gespeichert)")
         .pointingHandCursor()
       }
 
@@ -259,23 +253,23 @@ extension ChatView {
       }
       .padding(.horizontal, 12)
       .padding(.vertical, 8)
-      .background(Color(hex: "F5F5F5"))
+      .background(TaktColor.surfaceSunken)
 
       Divider()
 
       VStack(alignment: .leading, spacing: 8) {
         Text("Wird automatisch aus den Antworten des Assistenten aktualisiert. Du kannst es manuell bearbeiten.")
           .font(.custom("Figtree", size: 11))
-          .foregroundColor(Color(hex: "8A8A8A"))
+          .foregroundColor(TaktColor.textMuted)
 
         TextEditor(text: $memoryDraft)
           .font(.custom("Figtree", size: 12))
           .padding(8)
-          .background(Color(hex: "FFFCF8"))
-          .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+          .background(TaktColor.surface)
+          .clipShape(RoundedRectangle(cornerRadius: TaktMetrics.radiusControl))
           .overlay(
-            RoundedRectangle(cornerRadius: 8, style: .continuous)
-              .stroke(Color(hex: "E7DDD1"), lineWidth: 1)
+            RoundedRectangle(cornerRadius: TaktMetrics.radiusControl)
+              .stroke(TaktColor.borderGrid, lineWidth: 1)
           )
           .onChange(of: memoryDraft) { _, newValue in
             guard newValue.count > DashboardChatMemoryStore.maxCharacters else { return }
@@ -283,9 +277,9 @@ extension ChatView {
           }
 
         HStack {
-                  Text("Zuletzt aktualisiert: \\(memoryUpdatedLabel)")
+                  Text("Zuletzt aktualisiert: \(memoryUpdatedLabel)")
                     .font(.custom("Figtree", size: 10))
-                    .foregroundColor(Color(hex: "999999"))
+                    .foregroundColor(TaktColor.textTertiary)
                   Spacer()
                 }
 
@@ -293,14 +287,14 @@ extension ChatView {
                   Button("Speichern") { saveMemoryDraft() }
                     .buttonStyle(.plain)
                     .font(.custom("Figtree", size: 11).weight(.bold))
-                    .foregroundColor(isMemoryDirty ? Color(hex: "F96E00") : Color(hex: "999999"))
+                    .foregroundColor(isMemoryDirty ? TaktColor.accent : TaktColor.textTertiary)
                     .disabled(!isMemoryDirty)
                     .pointingHandCursor()
 
                   Button("Neu laden") { reloadMemoryDraft() }
                     .buttonStyle(.plain)
                     .font(.custom("Figtree", size: 11).weight(.bold))
-                    .foregroundColor(isMemoryDirty ? Color(hex: "555555") : Color(hex: "AAAAAA"))
+                    .foregroundColor(isMemoryDirty ? TaktColor.textSecondary : TaktColor.textMuted)
                     .disabled(!isMemoryDirty)
                     .pointingHandCursor()
 
@@ -317,10 +311,10 @@ extension ChatView {
       .padding(12)
     }
     .frame(width: 360)
-    .background(Color.white)
+    .background(TaktColor.surface)
     .overlay(
       Rectangle()
-        .fill(Color(hex: "E0E0E0"))
+        .fill(TaktColor.borderGrid)
         .frame(width: 1),
       alignment: .leading
     )
@@ -331,58 +325,45 @@ extension ChatView {
   var welcomeView: some View {
     VStack(spacing: 0) {
       ZStack {
-        RoundedRectangle(cornerRadius: 24, style: .continuous)
-          .fill(
-            LinearGradient(
-              colors: [Color.white.opacity(0.86), Color(hex: "FFF8EF").opacity(0.95)],
-              startPoint: .topLeading,
-              endPoint: .bottomTrailing
-            )
-          )
+        RoundedRectangle(cornerRadius: TaktMetrics.radiusControl)
+          .fill(TaktColor.surface)
           .overlay(
-            RoundedRectangle(cornerRadius: 24, style: .continuous)
-              .stroke(Color(hex: "F5DFC7"), lineWidth: 1)
+            RoundedRectangle(cornerRadius: TaktMetrics.radiusControl)
+              .stroke(TaktColor.borderGrid, lineWidth: 1)
           )
-          .shadow(color: Color(hex: "E7B98E").opacity(0.24), radius: 20, x: 0, y: 10)
 
         VStack(spacing: 16) {
           HStack(alignment: .center, spacing: 12) {
             ZStack {
-              Circle()
-                .fill(
-                  LinearGradient(
-                    colors: [Color(hex: "FFE5CD"), Color(hex: "FFCF9D")],
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
-                  )
-                )
+              RoundedRectangle(cornerRadius: TaktMetrics.radiusControl)
+                .fill(TaktColor.accentSoft)
               Image(systemName: "bubble.left.and.bubble.right.fill")
                 .font(.system(size: 18, weight: .semibold))
-                .foregroundColor(Color(hex: "C9670D"))
+                .foregroundColor(TaktColor.accent)
             }
             .frame(width: 42, height: 42)
 
             VStack(alignment: .leading, spacing: 2) {
               Text("Frage zu deinen TAKT-Daten")
-                .font(.custom("InstrumentSerif-Regular", size: 30))
-                .foregroundColor(Color(hex: "2F2A24"))
+                .font(.custom("Figtree-SemiBold", size: 24))
+                .foregroundColor(TaktColor.textPrimary)
 
               Text("Stelle Fragen, analysiere deine Timeline und erzeuge Diagramme.")
                 .font(.custom("Figtree", size: 13).weight(.semibold))
-                .foregroundColor(Color(hex: "7D6B5B"))
+                .foregroundColor(TaktColor.textSecondary)
 
-              Text("I remember your response preferences, so feel free to teach me your style.")
+              Text("Ich merke mir deine Antwort-Präferenzen — bring mir gerne deinen Stil bei.")
                 .font(.custom("Figtree", size: 12))
-                .foregroundColor(Color(hex: "8A7765"))
+                .foregroundColor(TaktColor.textTertiary)
             }
 
             Spacer(minLength: 0)
           }
 
           VStack(alignment: .leading, spacing: 10) {
-            Text("Try one of these")
+            Text("Frag mich zum Beispiel")
               .font(.custom("Figtree", size: 12).weight(.bold))
-              .foregroundColor(Color(hex: "8A7765"))
+              .foregroundColor(TaktColor.textSecondary)
 
             ForEach(Array(welcomePrompts.enumerated()), id: \.offset) { index, prompt in
               WelcomeSuggestionRow(prompt: prompt) {
@@ -423,9 +404,9 @@ extension ChatView {
 
       // Header: "Unlock Beta" with BETA badge
       HStack(alignment: .top, spacing: 4) {
-        Text("Unlock Beta")
-          .font(.custom("InstrumentSerif-Italic", size: 38))
-          .foregroundColor(Color(hex: "593D2A"))
+        Text("Chat freischalten")
+          .font(.custom("Figtree-SemiBold", size: 30))
+          .foregroundColor(TaktColor.textPrimary)
 
         Text("BETA")
           .font(.custom("Figtree-Bold", size: 11))
@@ -433,8 +414,8 @@ extension ChatView {
           .padding(.horizontal, 8)
           .padding(.vertical, 4)
           .background(
-            RoundedRectangle(cornerRadius: 6)
-              .fill(Color(hex: "F98D3D"))
+            RoundedRectangle(cornerRadius: 4)
+              .fill(TaktColor.accent)
           )
           .rotationEffect(.degrees(-12))
           .offset(x: -4, y: -4)
@@ -446,13 +427,13 @@ extension ChatView {
           "Der Chat lässt dich Fragen zu deiner TAKT-Aktivität stellen und liefert Zusammenfassungen, Vergleiche und Einblicke."
         )
         .font(.custom("Figtree-Regular", size: 14))
-        .foregroundColor(Color(hex: "593D2A").opacity(0.85))
+        .foregroundColor(TaktColor.textSecondary)
         .multilineTextAlignment(.center)
         .frame(maxWidth: 600)
 
-        Text("Please send feedback if you see any bugs or weird behavior!")
+        Text("Bitte melde Fehler oder unerwartetes Verhalten!")
           .font(.custom("Figtree-SemiBold", size: 14))
-          .foregroundColor(Color(hex: "593D2A"))
+          .foregroundColor(TaktColor.textPrimary)
           .multilineTextAlignment(.center)
       }
 
@@ -468,38 +449,38 @@ extension ChatView {
           .font(.system(size: 32))
           .foregroundColor(
             hasChatMinimumAccess && anyRuntimeAvailable
-              ? Color(hex: "34C759") : Color(hex: "F98D3D")
+              ? TaktColor.positive : TaktColor.accent
           )
           .contentTransition(.symbolEffect(.replace))
           .animation(.easeOut(duration: 0.2), value: anyRuntimeAvailable)
           .animation(.easeOut(duration: 0.2), value: hasChatMinimumAccess)
 
           if !hasChatMinimumAccess {
-            Text("10 hours of timeline data required")
+            Text("10 Stunden Zeitverlaufsdaten erforderlich")
               .font(.custom("Figtree-SemiBold", size: 15))
-              .foregroundColor(Color(hex: "593D2A"))
+              .foregroundColor(TaktColor.textPrimary)
 
             Text(
               "Der Chat wird freigeschaltet, sobald TAKT genug Aktivität analysiert hat. \(chatAccessProgressText)"
             )
             .font(.custom("Figtree-Regular", size: 13))
-            .foregroundColor(Color(hex: "593D2A").opacity(0.8))
+            .foregroundColor(TaktColor.textSecondary)
             .multilineTextAlignment(.center)
           } else if anyRuntimeAvailable {
-            Text("Gemini key or CLI runtime detected")
+            Text("LLM-Anbieter konfiguriert")
               .font(.custom("Figtree-SemiBold", size: 15))
-              .foregroundColor(Color(hex: "34C759"))
+              .foregroundColor(TaktColor.positive)
               .transition(.opacity.combined(with: .scale(scale: 0.95)))
           } else {
-            Text("Gemini API key or CLI required")
+            Text("LLM-Anbieter erforderlich")
               .font(.custom("Figtree-SemiBold", size: 15))
-              .foregroundColor(Color(hex: "593D2A"))
+              .foregroundColor(TaktColor.textPrimary)
 
             Text(
-              "Unlock chat by either adding a Gemini API key in Settings or installing Codex/Claude CLI."
+              "Richte deinen LLM-Anbieter unter Einstellungen → LLM-Anbieter ein."
             )
             .font(.custom("Figtree-Regular", size: 13))
-            .foregroundColor(Color(hex: "593D2A").opacity(0.8))
+            .foregroundColor(TaktColor.textSecondary)
             .multilineTextAlignment(.center)
           }
         }
@@ -519,38 +500,24 @@ extension ChatView {
             .font(.custom("Figtree-SemiBold", size: 15))
             .foregroundColor(
               hasChatMinimumAccess && anyRuntimeAvailable
-                ? Color(hex: "593D2A")
-                : Color(hex: "999999")
+                ? TaktColor.textPrimary
+                : TaktColor.textMuted
             )
             .padding(.horizontal, 28)
             .padding(.vertical, 12)
             .background(
-              Capsule()
+              RoundedRectangle(cornerRadius: TaktMetrics.radiusControl)
                 .fill(
                   hasChatMinimumAccess && anyRuntimeAvailable
-                    ? LinearGradient(
-                      colors: [
-                        Color(hex: "FFF4E9"),
-                        Color(hex: "FFE8D4"),
-                      ],
-                      startPoint: .top,
-                      endPoint: .bottom
-                    )
-                    : LinearGradient(
-                      colors: [
-                        Color(hex: "F0F0F0"),
-                        Color(hex: "E8E8E8"),
-                      ],
-                      startPoint: .top,
-                      endPoint: .bottom
-                    )
+                    ? TaktColor.accentSoft
+                    : TaktColor.surfaceSunken
                 )
                 .overlay(
-                  Capsule()
+                  RoundedRectangle(cornerRadius: TaktMetrics.radiusControl)
                     .stroke(
                       hasChatMinimumAccess && anyRuntimeAvailable
-                        ? Color(hex: "E8C9A8")
-                        : Color(hex: "D0D0D0"),
+                        ? TaktColor.accent.opacity(0.4)
+                        : TaktColor.borderGrid,
                       lineWidth: 1
                     )
                 )
@@ -561,23 +528,26 @@ extension ChatView {
       }
       .padding(20)
       .background(
-        RoundedRectangle(cornerRadius: 20, style: .continuous)
-          .fill(Color.white)
-          .shadow(color: Color.black.opacity(0.08), radius: 20, x: 0, y: 8)
+        RoundedRectangle(cornerRadius: TaktMetrics.radiusControl)
+          .fill(TaktColor.surface)
+          .overlay(
+            RoundedRectangle(cornerRadius: TaktMetrics.radiusControl)
+              .stroke(TaktColor.borderGrid, lineWidth: 1)
+          )
       )
       .frame(maxWidth: 420)
 
       // Privacy Note (at bottom)
       VStack(spacing: 4) {
-        Text("Privacy Note")
+        Text("Datenschutz-Hinweis")
           .font(.custom("Figtree-SemiBold", size: 12))
-          .foregroundColor(Color(hex: "593D2A").opacity(0.6))
+          .foregroundColor(TaktColor.textTertiary)
 
         Text(
-          "During the beta, your questions are logged to help improve the product. Responses are not logged, so your privacy is maintained."
+          "Während der Beta werden deine Fragen protokolliert, um das Produkt zu verbessern. Antworten werden nicht protokolliert — deine Privatsphäre bleibt gewahrt."
         )
         .font(.custom("Figtree-Regular", size: 12))
-        .foregroundColor(Color(hex: "593D2A").opacity(0.5))
+        .foregroundColor(TaktColor.textMuted)
         .multilineTextAlignment(.center)
         .frame(maxWidth: 600)
       }
@@ -588,19 +558,19 @@ extension ChatView {
     .padding(.horizontal)
     .padding(.vertical, 12)
     .frame(maxWidth: .infinity, maxHeight: .infinity)
-    .background(Color(hex: "FFFAF5"))
+    .background(TaktColor.surface)
   }
 
   var chatUnlockButtonTitle: String {
     if !hasChatMinimumAccess {
-      return "Keep recording to unlock"
+      return "Nimm weiter auf, um freizuschalten"
     }
 
     if !anyRuntimeAvailable {
-      return "Configure a runtime to continue"
+      return "LLM-Anbieter konfigurieren"
     }
 
-    return "Unlock Beta"
+    return "Chat freischalten"
   }
 
   // MARK: - Input Area
@@ -623,29 +593,26 @@ extension ChatView {
 
       // Bottom toolbar
       HStack(spacing: 8) {
-        // Provider toggle
-        providerToggle
-
         Spacer()
 
         if chatService.isProcessing {
           HStack(spacing: 6) {
             ProgressView()
               .scaleEffect(0.55)
-              .tint(Color(hex: "C18043"))
-            Text("Answering")
-              .font(.custom("Figtree", size: 11).weight(.bold))
-              .foregroundColor(Color(hex: "9B7753"))
+              .tint(TaktColor.accent)
+            Text("Antwortet…")
+              .font(TaktFont.ui(11, .semibold))
+              .foregroundColor(TaktColor.textTertiary)
           }
           .padding(.horizontal, 9)
           .padding(.vertical, 5)
           .background(
-            Capsule()
-              .fill(Color(hex: "FFF3E6"))
+            RoundedRectangle(cornerRadius: TaktMetrics.radiusControl)
+              .fill(TaktColor.accentSoft)
           )
           .overlay(
-            Capsule()
-              .stroke(Color(hex: "F0CBA7"), lineWidth: 1)
+            RoundedRectangle(cornerRadius: TaktMetrics.radiusControl)
+              .stroke(TaktColor.accent.opacity(0.35), lineWidth: 1)
           )
         }
 
@@ -664,29 +631,9 @@ extension ChatView {
           }
           .frame(width: 32, height: 32)
           .background(
-            canSubmitCurrentInput
-              ? LinearGradient(
-                colors: [Color(hex: "FAA457"), Color(hex: "F96E00")],
-                startPoint: .top,
-                endPoint: .bottom
-              )
-              : LinearGradient(
-                colors: [Color(hex: "DDDDDD"), Color(hex: "CECECE")],
-                startPoint: .top,
-                endPoint: .bottom
-              )
+            canSubmitCurrentInput ? TaktColor.accent : TaktColor.borderGrid
           )
-          .clipShape(Circle())
-          .overlay(
-            Circle()
-              .stroke(Color.white.opacity(0.55), lineWidth: 0.8)
-          )
-          .shadow(
-            color: canSubmitCurrentInput ? Color(hex: "D37E2D").opacity(0.35) : Color.clear,
-            radius: 8,
-            x: 0,
-            y: 3
-          )
+          .clipShape(RoundedRectangle(cornerRadius: TaktMetrics.radiusControl))
         }
         .buttonStyle(PressScaleButtonStyle(isEnabled: canSubmitCurrentInput))
         .disabled(!canSubmitCurrentInput)
@@ -696,58 +643,19 @@ extension ChatView {
       .frame(minHeight: 48)
     }
     .background(
-      RoundedRectangle(cornerRadius: 16, style: .continuous)
-        .fill(
-          LinearGradient(
-            colors: [Color.white, Color(hex: "FFF8F0")],
-            startPoint: .top,
-            endPoint: .bottom
-          )
-        )
+      RoundedRectangle(cornerRadius: TaktMetrics.radiusControl)
+        .fill(TaktColor.surface)
     )
     .overlay(
-      RoundedRectangle(cornerRadius: 16, style: .continuous)
-        .stroke(composerBorderColor, lineWidth: isInputFocused ? 1.2 : 1)
+      RoundedRectangle(cornerRadius: TaktMetrics.radiusControl)
+        .stroke(composerBorderColor, lineWidth: isInputFocused ? 1.2 : TaktMetrics.hairline)
     )
-    .overlay(
-      RoundedRectangle(cornerRadius: 16, style: .continuous)
-        .inset(by: 0.6)
-        .stroke(Color.white.opacity(0.65), lineWidth: 0.8)
-    )
-    .shadow(color: Color(hex: "D99A5A").opacity(0.14), radius: 14, x: 0, y: 6)
-    .animation(.easeOut(duration: 0.16), value: isInputFocused)
+    .animation(TaktMotion.stateChange, value: isInputFocused)
     .padding(.horizontal, 16)
     .padding(.vertical, 12)
   }
 
-  var providerToggle: some View {
-    HStack(spacing: 6) {
-      Image(systemName: "sparkles")
-        .font(.system(size: 11, weight: .semibold))
-        .foregroundColor(Color(hex: "999999"))
-
-      Text(standardChatProvider.displayLabel)
-        .font(.custom("Figtree", size: 11).weight(.semibold))
-        .foregroundColor(Color(hex: "666666"))
-
-      Text("· Standard")
-        .font(.custom("Figtree", size: 11))
-        .foregroundColor(Color(hex: "999999"))
-    }
-    .padding(.horizontal, 10)
-    .padding(.vertical, 5)
-    .background(
-      RoundedRectangle(cornerRadius: 6, style: .continuous)
-        .fill(Color(hex: "F5F5F5"))
-    )
-    .overlay(
-      RoundedRectangle(cornerRadius: 6, style: .continuous)
-        .stroke(Color(hex: "E4D6C8"), lineWidth: 1)
-    )
-    .help(providerToggleHelpText)
-  }
-
-  /// TAKT: Chat nutzt den Standard-Provider aus den Einstellungen.
+  /// TAKT: Der Chat nutzt den Standard-LLM-Anbieter aus den Einstellungen.
   var standardChatProvider: DashboardChatProvider {
     DashboardChatProvider.fromRoutingStore()
   }

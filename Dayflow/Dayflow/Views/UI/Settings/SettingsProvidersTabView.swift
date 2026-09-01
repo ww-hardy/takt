@@ -50,7 +50,7 @@ struct SettingsProvidersTabView: View {
   private var currentConfigurationSection: some View {
     SettingsSection(
       title: "Aktuelle Konfiguration",
-      subtitle: "Aktiver Anbieter und Laufzeit-Details."
+      subtitle: "Aktiver LLM-Anbieter und Laufzeit-Details."
     ) {
       VStack(alignment: .leading, spacing: 0) {
         summaryRows
@@ -76,7 +76,7 @@ struct SettingsProvidersTabView: View {
 
   @ViewBuilder
   private var summaryRows: some View {
-    SettingsRow(label: "Primärer Anbieter") {
+    SettingsRow(label: "Primärer LLM-Anbieter") {
       HStack(spacing: 8) {
         SettingsMetadata(
           text: viewModel.providerDisplayName(viewModel.primaryRoutingProviderId))
@@ -85,15 +85,15 @@ struct SettingsProvidersTabView: View {
     }
 
     if let backupProvider = viewModel.secondaryRoutingProviderId {
-      SettingsRow(label: "Sekundärer Anbieter") {
+      SettingsRow(label: "Sekundärer LLM-Anbieter") {
         HStack(spacing: 8) {
           SettingsMetadata(text: viewModel.providerDisplayName(backupProvider))
           SettingsBadge(text: "SECONDARY")
         }
       }
     } else {
-      SettingsRow(label: "Sekundärer Anbieter") {
-        SettingsMetadata(text: "Not configured")
+      SettingsRow(label: "Sekundärer LLM-Anbieter") {
+        SettingsMetadata(text: "Nicht konfiguriert")
       }
     }
 
@@ -153,7 +153,7 @@ struct SettingsProvidersTabView: View {
   private var connectionHealthSection: some View {
     SettingsSection(
       title: "Verbindungsstatus",
-      subtitle: "Schnellen Test für den primären Anbieter ausführen."
+      subtitle: "Schnellen Test für den primären LLM-Anbieter ausführen."
     ) {
       VStack(alignment: .leading, spacing: 14) {
         Text(viewModel.connectionHealthLabel)
@@ -191,7 +191,7 @@ struct SettingsProvidersTabView: View {
         case .openAICompatible:
           VStack(alignment: .leading, spacing: 10) {
             Text(
-              "Der Test sendet ein kleines Bild, um die Multimodal-Unterstützung zu prüfen, und kann beim Anbieter Kosten verursachen."
+              "Der Test sendet ein kleines Bild, um die Multimodal-Unterstützung zu prüfen, und kann beim LLM-Anbieter Kosten verursachen."
             )
             .font(.custom("Figtree", size: 12))
             .foregroundColor(SettingsStyle.secondary)
@@ -214,7 +214,7 @@ struct SettingsProvidersTabView: View {
   private var failoverRoutingSection: some View {
     SettingsSection(
       title: "Ausweich-Routing",
-      subtitle: "Wähle primären und sekundären Anbieter."
+      subtitle: "Wähle primären und sekundären LLM-Anbieter."
     ) {
       VStack(alignment: .leading, spacing: 0) {
         let providers = viewModel.routingProviders

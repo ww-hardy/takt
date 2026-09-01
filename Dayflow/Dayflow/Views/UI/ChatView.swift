@@ -29,16 +29,14 @@ struct ChatView: View {
   @State var isInputFocused = false
   @State var composerFocusToken = 0
   @Namespace var bottomID
-  @AppStorage("dashboardChatProvider") var selectedProviderRaw: String = "gemini"
   @AppStorage("hasChatBetaAccepted") var hasBetaAccepted: Bool = false
   @State var geminiConfigured = false
   @State var codexDetected = false
   @State var claudeDetected = false
+  @State var openAICompatibleConfigured = false
   @State var completedAccessBatchCount = 0
   @State var cliDetectionTask: Task<Void, Never>?
   @State var didCheckCLI = false
-  @State var showToolSwitchConfirm = false
-  @State var pendingProviderSelection: DashboardChatProvider?
   @State var conversationId: UUID?
   @State var didAnimateWelcome = false
   @State var showMemoryPanel = false
@@ -123,16 +121,6 @@ struct ChatView: View {
     }
     .onChange(of: chatService.messages.count) { _, _ in
       syncMemoryFromStoreIfNeeded()
-    }
-    .alert("Provider wechseln?", isPresented: $showToolSwitchConfirm) {
-      Button("Wechseln und zurücksetzen", role: .destructive) {
-        confirmProviderSwitch()
-      }
-      Button("Abbrechen", role: .cancel) {
-        pendingProviderSelection = nil
-      }
-    } message: {
-      Text("Der Wechsel zu \\(pendingProviderLabel) löscht den Kontext dieses Chats.")
     }
     .environment(\.colorScheme, .light)
   }

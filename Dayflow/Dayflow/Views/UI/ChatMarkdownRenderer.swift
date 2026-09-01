@@ -178,11 +178,11 @@ private struct ChatCodeBlockView: View {
           .padding(.bottom, 10)
       }
     }
-    .background(Color(hex: "FAF7F2"))
-    .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+    .background(TaktColor.surfaceSunken)
+    .clipShape(RoundedRectangle(cornerRadius: TaktMetrics.radiusControl))
     .overlay(
-      RoundedRectangle(cornerRadius: 12, style: .continuous)
-        .stroke(Color(hex: "E7DDD2"), lineWidth: 1)
+      RoundedRectangle(cornerRadius: TaktMetrics.radiusControl)
+        .stroke(TaktColor.borderGrid, lineWidth: 1)
     )
     .markdownMargin(top: 4, bottom: 8)
   }

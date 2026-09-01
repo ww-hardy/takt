@@ -19,34 +19,34 @@ struct WelcomeSuggestionRow: View {
       HStack(spacing: 10) {
         Image(systemName: prompt.icon)
           .font(.system(size: 11, weight: .bold))
-          .foregroundColor(Color(hex: "C9670D"))
+          .foregroundColor(TaktColor.accent)
           .frame(width: 24, height: 24)
           .background(
-            Circle()
-              .fill(Color(hex: "FFF0E1"))
+            RoundedRectangle(cornerRadius: TaktMetrics.radiusControl)
+              .fill(TaktColor.accentSoft)
           )
 
         Text(prompt.text)
           .font(.custom("Figtree", size: 13).weight(.semibold))
-          .foregroundColor(Color(hex: "5C432F"))
+          .foregroundColor(TaktColor.textPrimary)
           .frame(maxWidth: .infinity, alignment: .leading)
           .multilineTextAlignment(.leading)
           .lineLimit(2)
 
         Image(systemName: "arrow.up.right")
           .font(.system(size: 9, weight: .bold))
-          .foregroundColor(Color(hex: "D58A3D"))
+          .foregroundColor(TaktColor.accent)
           .padding(.trailing, 2)
       }
       .padding(.horizontal, 14)
       .padding(.vertical, 10)
       .background(
-        RoundedRectangle(cornerRadius: 14, style: .continuous)
-          .fill(isHovered ? Color.white.opacity(0.88) : Color.white.opacity(0.7))
+        RoundedRectangle(cornerRadius: TaktMetrics.radiusControl)
+          .fill(isHovered ? TaktColor.surfaceSunken : TaktColor.surface)
       )
       .overlay(
-        RoundedRectangle(cornerRadius: 14, style: .continuous)
-          .stroke(Color(hex: "EED7BF"), lineWidth: 1)
+        RoundedRectangle(cornerRadius: TaktMetrics.radiusControl)
+          .stroke(TaktColor.borderGrid, lineWidth: 1)
       )
       .scaleEffect(reduceMotion ? 1 : (isHovered ? 1.01 : 1))
       .offset(y: reduceMotion ? 0 : (isHovered ? -1 : 0))
@@ -77,16 +77,16 @@ struct SuggestionChip: View {
     Button(action: action) {
       Text(text)
         .font(.custom("Figtree", size: 12).weight(.medium))
-        .foregroundColor(Color(hex: "F96E00"))
+        .foregroundColor(TaktColor.accent)
         .padding(.horizontal, 14)
         .padding(.vertical, 8)
         .background(
-          RoundedRectangle(cornerRadius: 20, style: .continuous)
-            .fill(Color(hex: "FFF4E9"))
+          RoundedRectangle(cornerRadius: TaktMetrics.radiusControl)
+            .fill(isHovered ? TaktColor.accentSoft : TaktColor.surface)
         )
         .overlay(
-          RoundedRectangle(cornerRadius: 20, style: .continuous)
-            .stroke(Color(hex: "F96E00").opacity(0.3), lineWidth: 1)
+          RoundedRectangle(cornerRadius: TaktMetrics.radiusControl)
+            .stroke(TaktColor.accent.opacity(0.35), lineWidth: 1)
         )
         .scaleEffect(isHovered ? 1.02 : 1.0)
     }

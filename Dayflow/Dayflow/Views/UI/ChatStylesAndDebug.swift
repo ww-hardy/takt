@@ -41,18 +41,18 @@ struct ProviderTogglePill: View {
   let action: () -> Void
 
   var backgroundColor: Color {
-    if !isEnabled { return Color(hex: "F2F2F2") }
-    return isSelected ? Color(hex: "FFF4E9") : Color.white
+    if !isEnabled { return TaktColor.surfaceSunken }
+    return isSelected ? TaktColor.accentSoft : TaktColor.surface
   }
 
   var borderColor: Color {
-    if !isEnabled { return Color(hex: "E0E0E0") }
-    return isSelected ? Color(hex: "F96E00").opacity(0.25) : Color(hex: "E0E0E0")
+    if !isEnabled { return TaktColor.borderGrid }
+    return isSelected ? TaktColor.accent.opacity(0.35) : TaktColor.borderGrid
   }
 
   var textColor: Color {
-    if !isEnabled { return Color(hex: "B0B0B0") }
-    return isSelected ? Color(hex: "F96E00") : Color(hex: "666666")
+    if !isEnabled { return TaktColor.textMuted }
+    return isSelected ? TaktColor.accent : TaktColor.textSecondary
   }
 
   var body: some View {
@@ -196,16 +196,13 @@ struct ThinkingIndicator: View {
     .padding(.horizontal, 14)
     .padding(.vertical, 10)
     .background(
-      LinearGradient(
-        colors: [Color(hex: "FFF4E9"), Color(hex: "FFECD8")],
-        startPoint: .topLeading,
-        endPoint: .bottomTrailing
-      )
+      RoundedRectangle(cornerRadius: TaktMetrics.radiusControl)
+        .fill(TaktColor.accentSoft)
     )
-    .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+    .clipShape(RoundedRectangle(cornerRadius: TaktMetrics.radiusControl))
     .overlay(
-      RoundedRectangle(cornerRadius: 16, style: .continuous)
-        .stroke(Color(hex: "F96E00").opacity(0.2), lineWidth: 1)
+      RoundedRectangle(cornerRadius: TaktMetrics.radiusControl)
+        .stroke(TaktColor.accent.opacity(0.2), lineWidth: 1)
     )
     .onAppear {
       startAnimation()

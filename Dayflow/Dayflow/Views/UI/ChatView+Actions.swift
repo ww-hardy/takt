@@ -57,6 +57,8 @@ extension ChatView {
 
   /// Open a saved conversation from the history panel. The transcript restores
   /// at the last user message (see ChatScrollModel.applyOpeningPositionIfNeeded).
+  /// TAKT: Der Chat nutzt immer den Standard-LLM-Anbieter — die historische
+  /// Provider-Wiederherstellung pro Konversation entfaellt.
   func openConversation(_ record: ChatConversationRecord) {
     guard !chatService.isProcessing else { return }
     guard record.id != chatService.currentConversationID else { return }
@@ -65,12 +67,6 @@ extension ChatView {
     chatService.loadConversation(record)
     conversationId = record.id
     resetChatFeedbackState()
-
-    // Continue the thread with the provider it was started on, when available.
-    let provider = DashboardChatProvider.fromStoredValue(record.provider)
-    if provider != selectedProvider, isProviderAvailable(provider) {
-      applySelectedProvider(provider)
-    }
 
     AnalyticsService.shared.capture(
       "chat_conversation_reopened",
@@ -314,55 +310,22 @@ extension ChatView {
       codexDetected = detection.0
       claudeDetected = detection.1
       geminiConfigured = isGeminiConfigured()
-      normalizeSelectedProviderIfNeeded()
+      openAICompatibleConfigured = isOpenAICompatibleConfigured()
     }
   }
 
-  func handleProviderSelection(_ provider: DashboardChatProvider) {
-    guard provider != selectedProvider else { return }
-    guard isProviderAvailable(provider) else { return }
-    guard !chatService.isProcessing else { return }
-
-    if chatService.messages.isEmpty {
-      resetConversation()
-      applySelectedProvider(provider)
-      return
-    }
-
-    pendingProviderSelection = provider
-    showToolSwitchConfirm = true
-  }
-
-  func confirmProviderSwitch() {
-    guard let pendingProviderSelection else { return }
-    resetConversation()
-    applySelectedProvider(pendingProviderSelection)
-    self.pendingProviderSelection = nil
-  }
-
-  func applySelectedProvider(_ provider: DashboardChatProvider) {
-    selectedProviderRaw = provider.rawValue
-  }
-
+  /// TAKT: Es gibt keine Chat-Provider-Auswahl mehr — der Chat nutzt immer
+  /// den Standard-LLM-Anbieter aus den Einstellungen.
   func isProviderAvailable(_ provider: DashboardChatProvider) -> Bool {
     switch provider {
     case .gemini:
       return geminiConfigured
+    case .openAICompatible:
+      return openAICompatibleConfigured
     case .codex:
       return codexDetected
     case .claude:
       return claudeDetected
-    }
-  }
-
-  func normalizeSelectedProviderIfNeeded() {
-    guard !isProviderAvailable(selectedProvider) else { return }
-    if geminiConfigured {
-      applySelectedProvider(.gemini)
-    } else if codexDetected {
-      applySelectedProvider(.codex)
-    } else if claudeDetected {
-      applySelectedProvider(.claude)
     }
   }
 
@@ -373,23 +336,20 @@ extension ChatView {
     return !key.isEmpty
   }
 
-  var pendingProviderLabel: String {
-    switch pendingProviderSelection {
-    case .gemini:
-      return "Gemini"
-    case .claude:
-      return "Claude"
-    case .codex:
-      return "ChatGPT (Codex)"
-    case .none:
-      return "Standard-Provider"
+  func isOpenAICompatibleConfigured() -> Bool {
+    guard let configuration = OpenAICompatiblePreferences.load(), configuration.isComplete else {
+      return false
     }
+    let key =
+      KeychainManager.shared.retrieve(for: OpenAICompatiblePreferences.keychainProvider)?
+      .trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+    return !key.isEmpty
   }
 
   var providerToggleHelpText: String {
     if selectedProviderAvailable {
-      return "Chat nutzt den Standard-Provider aus den Einstellungen"
+      return "Der Chat nutzt den LLM-Anbieter aus den Einstellungen"
     }
-    return "Standard-Provider in den Einstellungen konfigurieren"
+    return "Bitte unter »LLM-Anbieter« in den Einstellungen einen Anbieter konfigurieren"
   }
 }

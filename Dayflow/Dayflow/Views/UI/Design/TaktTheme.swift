@@ -38,6 +38,7 @@ enum TaktColor {
   // Semantic
   static let positive = Color(hex: "2E7D32")
   static let negative = Color(hex: "C62828")
+  static let negativeSoft = Color(hex: "FBEBE9")
 
   // Category colors (data-driven accents; fixed set trimmed)
   static let meetings = Color(hex: "37474F")

@@ -16,7 +16,7 @@ struct WorkStatusCard: View {
         if status.stage == .error, let message = status.errorMessage, !message.isEmpty {
           Text(message)
             .font(.custom("Figtree", size: 12).weight(.semibold))
-            .foregroundColor(Color(hex: "C62828"))
+            .foregroundColor(TaktColor.negative)
         }
 
         if !status.tools.isEmpty {
@@ -30,12 +30,12 @@ struct WorkStatusCard: View {
         if status.hasDetails {
           Button(action: { showDetails.toggle() }) {
             HStack(spacing: 4) {
-              Text(showDetails ? "Hide details" : "Show details")
+              Text(showDetails ? "Details ausblenden" : "Details anzeigen")
               Image(systemName: showDetails ? "chevron.up" : "chevron.down")
                 .font(.system(size: 9, weight: .semibold))
             }
             .font(.custom("Figtree", size: 11).weight(.semibold))
-            .foregroundColor(Color(hex: "8B5E3C"))
+            .foregroundColor(TaktColor.textSecondary)
           }
           .buttonStyle(DayflowPressScaleButtonStyle(pressedScale: 0.97))
           .pointingHandCursor()
@@ -45,20 +45,20 @@ struct WorkStatusCard: View {
         {
           Text(status.thinkingText.trimmingCharacters(in: .whitespacesAndNewlines))
             .font(.system(size: 10, design: .monospaced))
-            .foregroundColor(Color(hex: "666666"))
+            .foregroundColor(TaktColor.textSecondary)
             .textSelection(.enabled)
             .padding(8)
-            .background(Color(hex: "FFFFFF").opacity(0.6))
-            .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+            .background(TaktColor.surfaceSunken)
+            .clipShape(RoundedRectangle(cornerRadius: TaktMetrics.radiusControl))
         }
       }
       .frame(maxWidth: .infinity, alignment: .leading)
       .padding(.horizontal, 14)
       .padding(.vertical, 12)
       .background(backgroundColor)
-      .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+      .clipShape(RoundedRectangle(cornerRadius: TaktMetrics.radiusControl))
       .overlay(
-        RoundedRectangle(cornerRadius: 16, style: .continuous)
+        RoundedRectangle(cornerRadius: TaktMetrics.radiusControl)
           .stroke(borderColor, lineWidth: 1)
       )
 
@@ -89,13 +89,13 @@ struct WorkStatusCard: View {
   var headerTitle: String {
     switch status.stage {
     case .thinking:
-      return "Thinking"
+      return "Denkt nach"
     case .runningTools:
-      return "Running tools"
+      return "Führt Tools aus"
     case .answering:
-      return "Answering"
+      return "Antwortet"
     case .error:
-      return "Something went wrong"
+      return "Etwas ist schiefgelaufen"
     }
   }
 
@@ -124,27 +124,27 @@ struct WorkStatusCard: View {
   var accentColor: Color {
     switch status.stage {
     case .error:
-      return Color(hex: "C62828")
+      return TaktColor.negative
     default:
-      return Color(hex: "F96E00")
+      return TaktColor.accent
     }
   }
 
   var backgroundColor: Color {
     switch status.stage {
     case .error:
-      return Color(hex: "FFEBEE")
+      return TaktColor.negativeSoft
     default:
-      return Color(hex: "FFF4E9")
+      return TaktColor.accentSoft
     }
   }
 
   var borderColor: Color {
     switch status.stage {
     case .error:
-      return Color(hex: "FFCDD2")
+      return TaktColor.negative.opacity(0.3)
     default:
-      return Color(hex: "F96E00").opacity(0.2)
+      return TaktColor.accent.opacity(0.2)
     }
   }
 }
