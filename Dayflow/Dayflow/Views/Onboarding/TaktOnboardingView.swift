@@ -24,7 +24,7 @@ enum TaktOnboardingStep: Int, CaseIterable {
 
 struct TaktOnboardingView: View {
   @AppStorage("didOnboard") private var didOnboard = false
-  @State private var step: TaktOnboardingStep = .screenPermission
+  @State private var step: TaktOnboardingStep = .welcome
 
   var body: some View {
     ZStack {
