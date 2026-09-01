@@ -616,8 +616,10 @@ private enum Grad {
   static let idle = TaktColor.surface
   static let menu = TaktColor.surfaceSunken
   static let paused = TaktColor.accent
+  // TAKT: Auswahl-Highlight dunkel (dunkelorange statt hellem Creme),
+  // damit der gewaehlte Chip klar vom hellen Pill-Grund abgesetzt ist.
   static let chip = TaktColor.surface
-  static let chipHover = TaktColor.accentSoft
+  static let chipHover = TaktColor.accentPressed
 }
 
 // MARK: - Shine Colors (inset glow per state)
