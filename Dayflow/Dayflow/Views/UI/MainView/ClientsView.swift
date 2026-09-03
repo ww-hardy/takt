@@ -19,6 +19,8 @@ struct ClientsView: View {
   @State private var isTagging = false
   @State private var taggingStatus: String?
   @State private var taggingError: String?
+  @State private var uncertainCards: [CardTaggingService.UncertainCard] = []
+  @State private var showReviewSheet = false
 
   @State private var showAddClient = false
   @State private var editingClient: Client?
@@ -69,6 +71,14 @@ struct ClientsView: View {
       if let selectedClientId {
         AddProjectSheet(clientId: selectedClientId) { reload() }
       }
+    }
+    .sheet(isPresented: $showReviewSheet) {
+      ReviewUncertainCardsView(
+        uncertainCards: uncertainCards,
+        clients: clients,
+        projects: projects,
+        onComplete: { reload() }
+      )
     }
     .alert("KI-Erkennung fehlgeschlagen", isPresented: Binding(
       get: { taggingError != nil },
@@ -335,6 +345,11 @@ struct ClientsView: View {
         taggingStatus =
           "\(outcome.taggedCount) Karte(n) erkannt"
           + (outcome.skippedCount > 0 ? " · \(outcome.skippedCount) übersprungen" : "")
+          + (outcome.uncertainCards.count > 0 ? " · \(outcome.uncertainCards.count) unklar" : "")
+        if !outcome.uncertainCards.isEmpty {
+          uncertainCards = outcome.uncertainCards
+          showReviewSheet = true
+        }
       } catch {
         taggingError = error.localizedDescription
       }

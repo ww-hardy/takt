@@ -43,6 +43,19 @@ struct CardTaggingService {
   struct TaggingOutcome {
     let taggedCount: Int
     let skippedCount: Int
+    let uncertainCards: [UncertainCard]
+  }
+
+  /// A card the AI could not confidently assign, presented to the user for review.
+  struct UncertainCard: Identifiable, Sendable {
+    let id: Int64
+    let title: String
+    let summary: String
+    let category: String
+    let startTimestamp: String
+    let endTimestamp: String
+    let aiConfidence: Double
+    let aiSuggestion: String?
   }
 
   /// Cards that can be offered to the automatic tagging pass.
@@ -62,7 +75,8 @@ struct CardTaggingService {
       let source = card.tagSource?.trimmingCharacters(in: .whitespacesAndNewlines)
         .lowercased()
       guard source != "manual", source != "corrected",
-        source != "skip", source != "duplicate", source != "duplikat"
+        source != "skip", source != "duplicate", source != "duplikat",
+        source != "pending"
       else {
         return false
       }
@@ -115,10 +129,12 @@ struct CardTaggingService {
   // MARK: - Main entry point
 
   /// Classifies the given cards in a single text pass and persists AI tags.
+  /// Cards the AI cannot confidently assign are marked `pending` and returned
+  /// for user review via `uncertainCards`.
   func tagCards(_ cards: [TimelineCard]) async throws -> TaggingOutcome {
     let candidates = Self.taggingCandidates(from: cards)
     guard !candidates.isEmpty else {
-      return TaggingOutcome(taggedCount: 0, skippedCount: 0)
+      return TaggingOutcome(taggedCount: 0, skippedCount: 0, uncertainCards: [])
     }
     guard let config = OpenAICompatiblePreferences.load(), config.isComplete, isConfigured else {
       throw TaggingError.notConfigured
@@ -135,13 +151,19 @@ struct CardTaggingService {
     let payloads = try parsePayloads(text)
 
     let clientIds = Set(clients.compactMap(\.id))
+    let clientNames = Dictionary(uniqueKeysWithValues: clients.compactMap { c in
+      c.id.map { ($0, c.name) }
+    })
     var projectsByClient: [Int64: Set<Int64>] = [:]
     for project in projects {
       guard let pid = project.id, let cid = project.clientId else { continue }
       projectsByClient[cid, default: []].insert(pid)
     }
 
+    let confidenceThreshold = 0.65
     var tagged = 0
+    var uncertain: [UncertainCard] = []
+
     for payload in payloads {
       guard let card = candidates.first(where: { $0.recordId == payload.card_id }),
         let cardId = card.recordId
@@ -166,19 +188,58 @@ struct CardTaggingService {
       let rawTask = payload.task?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
       let confidence = min(max(payload.confidence ?? 0.5, 0), 1)
 
-      StorageManager.shared.updateTimelineCardTagging(
-        cardId: cardId,
-        clientId: clientId,
-        projectId: projectId,
-        task: rawTask.isEmpty ? nil : rawTask,
-        billable: payload.billable,
-        tagSource: "ai",
-        tagConfidence: confidence
-      )
-      tagged += 1
+      // If AI assigned a valid client → persist as 'ai'
+      if let cid = clientId {
+        StorageManager.shared.updateTimelineCardTagging(
+          cardId: cardId,
+          clientId: cid,
+          projectId: projectId,
+          task: rawTask.isEmpty ? nil : rawTask,
+          billable: payload.billable,
+          tagSource: "ai",
+          tagConfidence: confidence
+        )
+        tagged += 1
+      } else {
+        // AI could not assign → mark as 'pending' so it stops appearing as open
+        StorageManager.shared.updateTimelineCardTagging(
+          cardId: cardId,
+          clientId: nil,
+          projectId: nil,
+          task: rawTask.isEmpty ? nil : rawTask,
+          billable: payload.billable,
+          tagSource: "pending",
+          tagConfidence: confidence
+        )
+
+        // Build suggestion text for the review dialog
+        let suggestion: String?
+        if let suggestedName = payload.client_id.flatMap({ clientNames[$0] }) {
+          suggestion = "Ähnelt: \(suggestedName)"
+        } else if confidence < confidenceThreshold {
+          suggestion = "Unsicher — keine klare Zuordnung möglich"
+        } else {
+          suggestion = nil
+        }
+
+        uncertain.append(UncertainCard(
+          id: cardId,
+          title: card.title,
+          summary: card.summary.isEmpty ? card.detailedSummary : card.summary,
+          category: card.category,
+          startTimestamp: card.startTimestamp,
+          endTimestamp: card.endTimestamp,
+          aiConfidence: confidence,
+          aiSuggestion: suggestion
+        ))
+      }
     }
 
-    return TaggingOutcome(taggedCount: tagged, skippedCount: candidates.count - tagged)
+    return TaggingOutcome(
+      taggedCount: tagged,
+      skippedCount: candidates.count - tagged - uncertain.count,
+      uncertainCards: uncertain
+    )
   }
 
   // MARK: - Prompt building
