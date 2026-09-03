@@ -11,10 +11,10 @@
       <pubDate>Wed, 03 Sep 2026 18:00:00 +0200</pubDate>
       <sparkle:version>120</sparkle:version>
       <sparkle:shortVersionString>2.1.1</sparkle:shortVersionString>
-      <sparkle:edSignature>cSz/h4dFL7wqPjbCieQM4BhqttXHXVzqWJG34ZsShXUB6m2d+fXrwCAmQ1N/rwpW6jKyOh3rQwa6uRmeMuQjBQ==</sparkle:edSignature>
+      <sparkle:edSignature>bFcATbLROQHTRkm02lMwj4ohMhFtgXlOgeR+j13AX2fgF10E7Z6WdQb6f3q/XH3RQH/iY2ylcsaKaJtUqsQGDw==</sparkle:edSignature>
       <enclosure
-        url="https://github.com/ww-hardy/takt/releases/download/v2.1.1/TAKT-2.1.1.dmg"
-        length="48542376"
+        url="https://github.com/ww-hardy/takt/releases/download/v2.1.1/TAKT-2.1.1-sparkle.dmg"
+        length="48532043"
         type="application/octet-stream" />
       <sparkle:minimumSystemVersion>13.0</sparkle:minimumSystemVersion>
     </item>
