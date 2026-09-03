@@ -1,139 +1,102 @@
-<div align="center">
-  <img src="docs/images/dayflow_header.png" alt="Dayflow" width="380">
+# TAKT
 
-  <p><strong>A private, automatic work journal for Mac.</strong></p>
+**Wertwandler Zeit-Tracking** — automatische Tätigkeits- und Kundenerkennung für Beratung, Coaching und Projektleitung.
 
-  <p>
-    Dayflow understands the work you do on your Mac and turns it into a clear timeline of your day.
-    Built from the ground up for privacy, it’s open source, local-first, and can run entirely with local AI.
-  </p>
+TAKT erfasst Bildschirmaktivitäten lokal, fasst sie zu Timeline-Karten zusammen und nutzt einen konfigurierbaren LLM-Dienst (OpenAI-kompatibel, lokal via Ollama/LM Studio oder Cloud), um Arbeiten automatisch Kunden, Projekten und Kategorien zuzuordnen.
 
-  <p>
-    <a href="https://trendshift.io/repositories/17458" target="_blank" rel="noreferrer">
-      <img src="https://trendshift.io/api/badge/repositories/17458" alt="JerryZLiu/Dayflow | Trendshift" width="250" height="55">
-    </a>
-  </p>
+## Funktionen
 
-  <p>
-    <a href="https://dayflow.so/api/download?source=github_readme_top">
-      <img src="docs/images/download_dayflow_button.png" alt="Download Dayflow for Mac" width="352">
-    </a>
-  </p>
-</div>
+- **Automatische Zeiterfassung** — Screenshots im konfigurierbaren Intervall, lokal gespeichert, per LLM zu Aktivitätskarten zusammengefasst
+- **KI-Kundenerkennung** — Ordnet Aktivitäten anhand von Kundenbeschreibungen automatisch zu; unsichere Zuordnungen werden dem Nutzer zur Bestätigung vorgelegt
+- **Multi-Client** — Mehrere Kunden mit Projekten, abrechenbar/nicht-abrechenbar, CSV-/Markdown-Export
+- **Tagesberichte** — Zusammenfassung des Arbeitstags nach 5 Stunden analysierter Timeline-Daten
+- **KI-Chat** — Direkter Dialog mit dem konfigurierten LLM über erfasste Aktivitäten
+- **Lokale Kontrolle** — Alle Daten bleiben auf dem Mac; keine Telemetrie ohne Opt-in
+- **Onboarding** — Geführter 5-Schritt-Setup: Welcome → LLM-Anbieter (Cloud oder lokal) → Erster Kunde → Bildschirm-Berechtigung → Start
 
-## Automatic Timeline
+## Systemanforderungen
 
-Dayflow turns raw screen activity into a chronological timeline of what you actually did, so you can reconstruct the day without timers or manual notes.
+- macOS 13.0+
+- Apple Silicon (M1+) oder Intel
+- Bildschirm-Aufnahmeberechtigung (TCC Screen Recording)
+- LLM-Dienst: OpenAI-kompatibler API-Endpoint oder lokale Installation (Ollama / LM Studio)
 
-<p align="center">
-  <img src="docs/images/hero_animation_1080p.gif" alt="Dayflow automatic timeline view" width="900">
-</p>
+## Installation
 
-## Daily Standup
+1. [Neueste DMG herunterladen](https://github.com/ww-hardy/takt/releases)
+2. DMG öffnen, TAKT.app in `Programme` ziehen
+3. Beim ersten Start: Bildschirm-Aufnahmeberechtigung erteilen und LLM-Anbieter konfigurieren
 
-See a GitHub-style activity grid of your day, plus yesterday's highlights, today's priorities, and blockers, so you can walk into standup with the update already written.
+Updates erfolgen automatisch über Sparkle (Applenotarisiert, Ed25519-signiert).
 
-<p align="center">
-  <img src="docs/images/daily.png" alt="Dayflow daily workflow and standup view" width="900">
-</p>
+## LLM-Anbieter
 
-## Weekly Review
+TAKT unterstützt im Onboarding:
 
-See your week at a glance: when you were focused, where time went, which apps dominated, and what pulled you off track.
+| Anbieter | Beschreibung |
+|----------|-------------|
+| **OpenAI-kompatibel** | Jeder Dienst mit `/v1/chat/completions`-Endpoint (Nous Portal, OpenRouter, OpenAI, Anthropic etc.) |
+| **Lokal** | Ollama oder LM Studio auf localhost; vollständig offline |
 
-<p align="center">
-  <img src="docs/images/weekly.png" alt="Dayflow weekly analytics view" width="900">
-</p>
+Konfiguriert wird: Base URL, Modell-ID und API-Key (nur bei Cloud). Der Chat nutzt denselben Provider wie die Erkennung.
 
-## Chat With Your Work Journal
+## Architektur
 
-Ask questions about your day/week/year and get answers grounded in your timeline instead of digging through notes, screenshots, or memory.
+TAKT ist ein Fork von [Dayflow](https://github.com/dayflow) mit eigener Wertwandler-Designsprache, deutscher UI und erweiterter Kunden-/Projektlogik.
 
-<p align="center">
-  <img src="docs/images/chat.gif" alt="Dayflow chat feature answering questions about your workday" width="900">
-</p>
+| Schicht | Technologie |
+|---------|------------|
+| UI | SwiftUI, TaktTheme-Designsystem, TaktFont-Typografie |
+| Recording | ScreenCaptureKit, DispatchSourceTimer, `~/Library/Application Support/wertwandler-takt/` |
+| Storage | SQLite (WAL-Modus), `chunks.sqlite` |
+| LLM | `LLMProviderRoutingStore` → OpenAI-kompatibel / lokal; `CardTaggingService` für Kunden-Zuordnung |
+| Updates | Sparkle 2 (Ed25519-signiert, GitHub-Appcast, SilentUserDriver) |
+| Signing | Apple Developer ID, Hardened Runtime, Notarized |
 
-## What Dayflow Does
-
-Dayflow runs quietly on your Mac and builds a useful record of your day from your screen activity.
-
-| Feature | How it works | Why it's useful |
-| --- | --- | --- |
-| Automatic timeline | Dayflow captures lightweight screen chunks, analyzes them with your chosen AI provider, and turns the day into activity cards. | You get an accurate work journal without starting timers or writing notes. |
-| Context-aware summaries | It looks at what you were actually doing on screen, not just which app was active. | Cursor, Chrome, YouTube, or Slack become meaningful work context instead of vague app usage. |
-| Daily standup | Dayflow pulls yesterday's highlights, today's tasks, and blockers from your timeline. | You can write updates in minutes and stop relying on memory. |
-| Chat with your work journal | Ask natural-language questions about your timeline and recent activity. | You can recover details, explain where time went, and turn raw activity into useful answers. |
-| Weekly review | It aggregates your timeline into focus patterns, categories, app usage, and interaction graphs. | You can see where the week actually went and spot the habits that helped or hurt. |
-| Distraction tracking | Dayflow identifies distracting sessions and shows them alongside focused work. | You can catch drift early without manually labeling every break. |
-| Timeline export | Export your timeline as Markdown for any date range. | Useful for status updates, client notes, personal reviews, or saving a searchable record. |
-| Local-first storage | Recordings, timeline data, and the app database stay on your Mac by default. | You stay in control of sensitive screen history and can delete it whenever you want. |
-| AI provider choice | Use local models, Gemini, ChatGPT, or Claude depending on your privacy and quality needs. | You can trade off privacy, cost, speed, and summary quality instead of being locked into one backend. |
-| Automatic cleanup | Configure storage limits and let Dayflow purge old recordings automatically. | You get the value of a work journal without filling your disk forever. |
-
-## Why People Use It
-
-Most time trackers tell you which app was open. Dayflow tries to understand what you were doing.
-
-Cursor for two hours could mean shipping a feature, debugging auth, reviewing a PR, or getting lost in setup. Dayflow gives you the context, not just the window title.
-
-## Privacy
-
-Dayflow is local-first and open source.
-
-Your recordings, timeline, and database live on your Mac at:
-
-```text
-~/Library/Application Support/Dayflow/
-```
-
-You choose how AI analysis runs:
-
-- Local models through Ollama or LM Studio
-- Gemini with your own API key
-- ChatGPT or Claude through their local CLI tools
-
-If you choose a cloud provider, activity data needed for analysis is sent to that provider. If you choose local models, analysis stays on your machine.
-
-## Install
-
-### Download
-
-Download the latest `Dayflow.dmg` from GitHub Releases:
-
-<p>
-  <a href="https://dayflow.so/api/download?source=github_readme_install">
-    <img src="docs/images/download_dayflow_button.png" alt="Download Dayflow for Mac" width="352">
-  </a>
-</p>
-
-Open the DMG, drag Dayflow into Applications, then grant macOS Screen & System Audio Recording permission when prompted.
-
-### Homebrew
+## Build
 
 ```bash
-brew install --cask dayflow
+# Debug
+xcodebuild -project Dayflow/Dayflow.xcodeproj -scheme TAKT -configuration Debug build
+
+# Release
+xcodebuild -project Dayflow/Dayflow.xcodeproj -scheme TAKT -configuration Release build
+
+# DMG (signiert + notarisiert)
+codesign --force --deep --options runtime --sign "Developer ID Application: ..." TAKT.app
+hdiutil create -volname TAKT -srcfolder staging -format UDZO TAKT.dmg
+xcrun notarytool submit TAKT.dmg --keychain-profile AC_PASSWORD --wait
+xcrun stapler staple TAKT.dmg
 ```
 
-## Requirements
+## Update-Release-Workflow
 
-- macOS 14+
-- Screen & System Audio Recording permission
-- Optional: Gemini API key, Ollama, LM Studio, Codex CLI, or Claude Code depending on your preferred AI provider
+1. Release-Build: `xcodebuild -scheme TAKT -configuration Release build`
+2. Developer-ID signieren + DMG erstellen + notarisieren
+3. DMG mit Sparkle signieren: `sign_update --ed-key-file <key> TAKT-x.x.x.dmg`
+4. `appcast.xml` aktualisieren (Signatur, Größe, URL eintragen)
+5. Commit + Push
+6. GitHub Release mit DMG als Asset erstellen
 
-## Build From Source
+## Datenpfade
 
-```bash
-git clone https://github.com/JerryZLiu/Dayflow.git
-cd Dayflow
-open Dayflow/Dayflow.xcodeproj
-```
+| Pfad | Inhalt |
+|------|--------|
+| `~/Library/Application Support/wertwandler-takt/` | Timeline-Daten, Screenshots, Recordings, Backups |
+| `~/Library/Preferences/ch.wertwandler.takt.plist` | UserDefaults |
+| `~/Library/Caches/ch.wertwandler.takt/` | Cache |
+| Keychain (`ch.wertwandler.takt.apikeys.*`) | LLM-API-Keys |
 
-Select the Dayflow scheme in Xcode and run it.
+## Lizenz
 
-## Contributing
+Proprietär — © Wertwandler. Alle Rechte vorbehalten.
 
-Issues and pull requests are welcome. If you are planning a larger change, open an issue first so the scope is clear.
+## Kontakt
 
-## License
+- **Website:** [wertwandler.ch](https://wertwandler.ch)
+- **Support:** support@wertwandler.ch
+- **GitHub:** [ww-hardy/takt](https://github.com/ww-hardy/takt)
 
-Dayflow is licensed under the MIT License.
+---
+
+Powered by Wertwandler

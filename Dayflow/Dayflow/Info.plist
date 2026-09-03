@@ -34,5 +34,15 @@
 		<string>Nunito-VariableFont_wght.ttf</string>
 		<string>Nunito-Italic-VariableFont_wght.ttf</string>
 	</array>
+	<key>SUFeedURL</key>
+	<string>https://raw.githubusercontent.com/ww-hardy/takt/main/appcast.xml</string>
+	<key>SUPublicEDKey</key>
+	<string>lYoqGzXsasfzfuVLvUheB7U2Bsf1W4U9kyK2dKAsozM=</string>
+	<key>SUAllowsAutomaticUpdates</key>
+	<true/>
+	<key>SUEnableAutomaticChecks</key>
+	<true/>
+	<key>SUScheduledCheckInterval</key>
+	<integer>86400</integer>
 </dict>
 </plist>

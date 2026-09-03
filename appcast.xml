@@ -1,0 +1,23 @@
+<?xml version="1.0" standalone="yes"?>
+<rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle">
+  <channel>
+    <title>TAKT</title>
+    <link>https://github.com/ww-hardy/takt/releases</link>
+    <description>Wertwandler Zeit-Tracking — automatische Tätigkeits- und Kundenerkennung</description>
+    <language>de</language>
+
+    <item>
+      <title>Version 2.1.1</title>
+      <pubDate>Wed, 03 Sep 2026 18:00:00 +0200</pubDate>
+      <sparkle:version>120</sparkle:version>
+      <sparkle:shortVersionString>2.1.1</sparkle:shortVersionString>
+      <sparkle:edSignature>cSz/h4dFL7wqPjbCieQM4BhqttXHXVzqWJG34ZsShXUB6m2d+fXrwCAmQ1N/rwpW6jKyOh3rQwa6uRmeMuQjBQ==</sparkle:edSignature>
+      <enclosure
+        url="https://github.com/ww-hardy/takt/releases/download/v2.1.1/TAKT-2.1.1.dmg"
+        length="48542376"
+        type="application/octet-stream" />
+      <sparkle:minimumSystemVersion>13.0</sparkle:minimumSystemVersion>
+    </item>
+
+  </channel>
+</rss>
