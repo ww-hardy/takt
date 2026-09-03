@@ -20,31 +20,45 @@ struct DailyAccessIntroView: View {
   }
 
   var body: some View {
-    VStack(spacing: 18) {
+    VStack(spacing: 16) {
       DailyAccessHeaderView()
 
       Text(betaNoticeCopy)
-        .font(.custom("Figtree-Regular", size: 15))
-        .foregroundColor(Color(red: 0.35, green: 0.22, blue: 0.12).opacity(0.8))
+        .font(TaktFont.ui(14))
+        .foregroundColor(TaktColor.textSecondary)
         .multilineTextAlignment(.center)
-        .frame(maxWidth: 480)
-        .padding(.horizontal, 24)
+        .frame(maxWidth: 600)
 
-      Text("Der Tagesbericht wird nach 5 Stunden analysierter Timeline-Daten freigeschaltet. \\(progressText)")
-        .font(.custom("Figtree-SemiBold", size: 13))
-        .foregroundColor(Color(red: 0.35, green: 0.22, blue: 0.12).opacity(0.76))
+      VStack(spacing: 16) {
+        Image(systemName: canRequestAccess ? "bolt.horizontal.circle" : "lock.circle")
+          .font(.system(size: 32))
+          .foregroundColor(TaktColor.accent)
+
+        Text("Tagesbericht freischalten")
+          .font(TaktFont.ui(15, .semibold))
+          .foregroundColor(TaktColor.textPrimary)
+
+        Text(
+          "Der Tagesbericht wird nach 5 Stunden analysierter Timeline-Daten freigeschaltet. \(progressText)"
+        )
+        .font(TaktFont.ui(13))
+        .foregroundColor(TaktColor.textSecondary)
         .multilineTextAlignment(.center)
-        .frame(maxWidth: 460)
-        .padding(.horizontal, 24)
+        .frame(maxWidth: 390)
 
-      DailyAnimatedRequestAccessButton(
-        requestState: requestState,
-        showsSuccessRing: showsSuccessRing,
-        isEnabled: canRequestAccess,
-        stateChangeAnimation: stateChangeAnimation,
-        successRingAnimation: successRingAnimation,
-        onTap: animateRequestGranted
-      )
+        DailyAnimatedRequestAccessButton(
+          requestState: requestState,
+          showsSuccessRing: showsSuccessRing,
+          isEnabled: canRequestAccess,
+          stateChangeAnimation: stateChangeAnimation,
+          successRingAnimation: successRingAnimation,
+          onTap: animateRequestGranted
+        )
+      }
+      .padding(20)
+      .frame(maxWidth: 420)
+      .background(TaktColor.surface)
+      .overlay(Rectangle().stroke(TaktColor.borderGrid, lineWidth: TaktMetrics.hairline))
     }
     .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
     .onDisappear {
@@ -244,9 +258,9 @@ struct DailyProviderOnboardingView: View {
 private struct DailyAccessHeaderView: View {
   var body: some View {
     HStack(alignment: .top, spacing: 4) {
-      Text("TAKT Daily")
-        .font(.custom("InstrumentSerif-Italic", size: 38))
-        .foregroundColor(Color(red: 0.35, green: 0.22, blue: 0.12))
+      Text("Takt Daily")
+        .font(.custom("Figtree-SemiBold", size: 30))
+        .foregroundColor(TaktColor.textPrimary)
 
       Text("BETA")
         .font(.custom("Figtree-Bold", size: 11))
@@ -254,8 +268,8 @@ private struct DailyAccessHeaderView: View {
         .padding(.horizontal, 8)
         .padding(.vertical, 4)
         .background(
-          RoundedRectangle(cornerRadius: 6)
-            .fill(Color(red: 0.98, green: 0.55, blue: 0.20))
+          RoundedRectangle(cornerRadius: 4)
+            .fill(TaktColor.accent)
         )
         .rotationEffect(.degrees(-12))
         .offset(x: -4, y: -4)
@@ -295,48 +309,28 @@ private struct DailyAnimatedRequestAccessButton: View {
 
   var body: some View {
     Button(action: onTap) {
-      ZStack {
-        Capsule()
-          .stroke(Color.white.opacity(0.24), lineWidth: 1.5)
-          .scaleEffect(showsSuccessRing ? 1.08 : 0.96)
-          .opacity(showsSuccessRing ? 0 : 0.65)
-
-        RoundedRectangle(cornerRadius: 10)
-          .fill(backgroundColor)
-          .overlay(
-            RoundedRectangle(cornerRadius: 10)
-              .stroke(Color.white.opacity(0.16), lineWidth: 1.5)
-          )
-          .shadow(color: .black.opacity(0.08), radius: 4, x: 0, y: 2)
-          .shadow(color: .black.opacity(0.12), radius: 8, x: 0, y: 4)
-
-        ZStack {
-          Text("Unlock Daily")
-            .font(.custom("Figtree", size: 15))
-            .fontWeight(.semibold)
-            .foregroundColor(.white)
-            .opacity(requestState == .idle ? 1 : 0)
-            .offset(y: requestState == .idle ? 0 : -5)
-
-          HStack(spacing: 8) {
-            Image(systemName: "checkmark.circle.fill")
-              .font(.system(size: 14, weight: .semibold))
-            Text("Tagesbericht freigeschaltet")
-              .font(.custom("Figtree", size: 15))
-              .fontWeight(.semibold)
-          }
-          .foregroundColor(.white)
-          .opacity(requestState == .granted ? 1 : 0)
-          .offset(y: requestState == .granted ? 0 : 5)
+      HStack(spacing: 8) {
+        if requestState == .granted {
+          Image(systemName: "checkmark.circle.fill")
+            .font(.system(size: 14, weight: .semibold))
+          Text("Tagesbericht freigeschaltet")
+        } else {
+          Text("Tagesbericht freischalten")
         }
-        .padding(.horizontal, 26)
-        .padding(.vertical, 13)
       }
-      .compositingGroup()
-      .fixedSize()
+      .font(TaktFont.ui(15, .semibold))
+      .foregroundColor(isEnabled ? TaktColor.textPrimary : TaktColor.textMuted)
+      .padding(.horizontal, 28)
+      .padding(.vertical, 12)
+      .background(isEnabled ? TaktColor.accentSoft : TaktColor.surfaceSunken)
+      .overlay(
+        Rectangle().stroke(
+          isEnabled ? TaktColor.accent.opacity(0.4) : TaktColor.borderGrid,
+          lineWidth: TaktMetrics.hairline
+        )
+      )
       .scaleEffect(buttonScale)
       .animation(stateChangeAnimation, value: requestState)
-      .animation(successRingAnimation, value: showsSuccessRing)
     }
     .buttonStyle(.plain)
     .disabled(requestState == .granted || !isEnabled)

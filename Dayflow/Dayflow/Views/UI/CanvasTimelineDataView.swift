@@ -87,6 +87,7 @@ struct CanvasTimelineDataView: View {
   // Staggered entrance animation state (Emil Kowalski principle: sequential reveal)
   @State private var cardEntranceProgress: [String: Bool] = [:]
   @ObservedObject private var pauseManager = PauseManager.shared
+  @Environment(\.accessibilityReduceMotion) private var reduceMotion
   @EnvironmentObject private var categoryStore: CategoryStore
   @EnvironmentObject private var appState: AppState
   @EnvironmentObject private var retryCoordinator: RetryCoordinator
@@ -554,12 +555,17 @@ struct CanvasTimelineDataView: View {
         .scaleEffect(x: doodleFlipped ? -1 : 1, y: 1)
         .offset(y: doodlePhase % 2 == 0 ? 0 : -2)
         .onAppear {
+          guard !reduceMotion else { return }
           withAnimation(.easeInOut(duration: 0.55).repeatForever(autoreverses: true)) {
             doodlePhase = 1
           }
           withAnimation(.easeInOut(duration: 3.2).repeatForever(autoreverses: true)) {
             doodleFlipped = true
           }
+        }
+        .onDisappear {
+          doodlePhase = 0
+          doodleFlipped = false
         }
         .allowsHitTesting(false)
 

@@ -46,6 +46,12 @@ struct ToolCallBubble: View {
           appearScale = 1.0
         }
       }
+      if !message.isRunning {
+        stopAnimations()
+      }
+    }
+    .onDisappear {
+      stopAnimations()
     }
   }
 
@@ -201,6 +207,11 @@ struct ToolCallBubble: View {
     withAnimation(.easeInOut(duration: 1.5).repeatForever(autoreverses: false)) {
       shimmerOffset = 1.0
     }
+  }
+
+  private func stopAnimations() {
+    spinnerRotation = 0
+    shimmerOffset = -0.5
   }
 }
 

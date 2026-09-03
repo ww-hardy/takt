@@ -21,7 +21,6 @@ struct ClientsView: View {
   @State private var taggingError: String?
 
   @State private var showAddClient = false
-  @State private var showEditClient = false
   @State private var editingClient: Client?
   @State private var showAddProject = false
   @State private var exportStatus: String?
@@ -63,10 +62,8 @@ struct ClientsView: View {
     .sheet(isPresented: $showAddClient) {
       ClientEditorSheet { reload() }
     }
-    .sheet(isPresented: $showEditClient) {
-      if let editingClient {
-        ClientEditorSheet(client: editingClient) { reload() }
-      }
+    .sheet(item: $editingClient) { client in
+      ClientEditorSheet(client: client) { reload() }
     }
     .sheet(isPresented: $showAddProject) {
       if let selectedClientId {
@@ -148,7 +145,6 @@ struct ClientsView: View {
             showAddProject = true
           } onEdit: {
             editingClient = client
-            showEditClient = true
           } onDelete: {
             if let id = client.id {
               StorageManager.shared.deleteClient(id: id)
@@ -525,8 +521,10 @@ private struct ClientEditorSheet: View {
         .fontWeight(.semibold)
       TextField("Name (z. B. ICF Switzerland)", text: $name)
         .textFieldStyle(.roundedBorder)
+        .foregroundColor(TaktColor.ink)
       TextField("Kurzbeschreibung (was machst du für diesen Kunden?)", text: $detail, axis: .vertical)
         .textFieldStyle(.roundedBorder)
+        .foregroundColor(TaktColor.ink)
         .lineLimit(2...4)
       HStack {
         Text("Farbe")
@@ -587,8 +585,10 @@ private struct AddProjectSheet: View {
         .fontWeight(.semibold)
       TextField("Name (z. B. Strategiewerkstatt)", text: $name)
         .textFieldStyle(.roundedBorder)
+        .foregroundColor(TaktColor.ink)
       TextField("Kurzbeschreibung (optional)", text: $detail, axis: .vertical)
         .textFieldStyle(.roundedBorder)
+        .foregroundColor(TaktColor.ink)
         .lineLimit(2...4)
       HStack {
         Spacer()

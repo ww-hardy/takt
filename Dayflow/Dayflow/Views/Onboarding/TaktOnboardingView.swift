@@ -3,7 +3,7 @@
 //  Dayflow
 //
 //  TAKT: minimal 5-step onboarding (de-CH) — welcome (Wertwandler) → LLM
-//  provider (Nous / OpenAI-compatible) → first client → screen permission →
+//  provider (OpenAI-compatible) → first client → screen permission →
 //  done. Square, token-based, no marketing videos, no analytics gates.
 //  Replaces the Dayflow wizard.
 //
@@ -267,11 +267,28 @@ struct TaktOnboardingView: View {
     }
   }
 
-  // MARK: - Step 2: LLM provider (Nous / OpenAI-compatible)
+  // MARK: - Step 2: LLM provider
 
-  @State private var baseURL = "https://inference-api.nousresearch.com/v1"
-  @State private var modelID = "deepseek/deepseek-v4-flash"
+  private enum ProviderMode: String, CaseIterable {
+    case openAICompatible
+    case local
+
+    var label: String {
+      switch self {
+      case .openAICompatible: return "OpenAI-kompatibler Dienst"
+      case .local: return "Lokale Installation"
+      }
+    }
+  }
+
+  @State private var providerMode: ProviderMode = .openAICompatible
+  @State private var baseURL = ""
+  @State private var modelID = ""
   @State private var apiKey = ""
+  @State private var localEngine: LocalEngine = .lmstudio
+  @State private var localBaseURL = LocalEngine.lmstudio.defaultBaseURL
+  @State private var localModelID = LocalModelPreferences.defaultModelId(for: .lmstudio)
+  @State private var localAPIKey = ""
   @State private var testState: TestState = .idle
 
   private enum TestState {
@@ -282,61 +299,92 @@ struct TaktOnboardingView: View {
     VStack(alignment: .leading, spacing: 20) {
       titleBlock(
         "LLM-Anbieter",
-        "Die KI erkennt später automatisch, für welchen Kunden du arbeitest. "
-          + "Standard ist Nous Portal (OpenAI-kompatibel) — passe Base-URL, Modell "
-          + "und API-Schlüssel an, falls du etwas anderes nutzt."
+        "TAKT braucht einen LLM-Dienst, um deine Arbeiten, Kunden und Kategorien "
+          + "später automatisch zuzuordnen."
       )
 
-      VStack(alignment: .leading, spacing: 6) {
-        label("Base-URL")
-        TextField("https://…/v1", text: $baseURL)
-          .textFieldStyle(.plain)
-          .font(TaktFont.ui(14))
-          .padding(10)
-          .background(TaktColor.surface)
-          .overlay(Rectangle().stroke(TaktColor.borderStrong, lineWidth: 1))
+      HStack(spacing: 8) {
+        providerCTA(
+          title: "OpenAI-kompatibler Dienst",
+          selected: providerMode == .openAICompatible
+        ) {
+          providerMode = .openAICompatible
+          testState = .idle
+        }
+        providerCTA(
+          title: "Lokale Installation",
+          selected: providerMode == .local
+        ) {
+          providerMode = .local
+          testState = .idle
+        }
       }
+      .frame(maxWidth: .infinity, alignment: .leading)
 
-      VStack(alignment: .leading, spacing: 6) {
-        label("Modell")
-        TextField("z. B. deepseek/deepseek-v4-flash", text: $modelID)
-          .textFieldStyle(.plain)
-          .font(TaktFont.ui(14))
-          .padding(10)
-          .background(TaktColor.surface)
-          .overlay(Rectangle().stroke(TaktColor.borderStrong, lineWidth: 1))
-      }
+      if providerMode == .local {
+        HStack(spacing: 8) {
+          localEngineCTA(.lmstudio)
+          localEngineCTA(.ollama)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
 
-      VStack(alignment: .leading, spacing: 6) {
-        label("API-Schlüssel")
-        SecureField("sk-…", text: $apiKey)
-          .textFieldStyle(.plain)
-          .font(TaktFont.ui(14))
-          .padding(10)
-          .background(TaktColor.surface)
-          .overlay(Rectangle().stroke(TaktColor.borderStrong, lineWidth: 1))
-      }
-
-      HStack(spacing: 12) {
-        TaktButton(
-          title: "Verbindung testen",
-          variant: .secondary,
-          action: testConnection
+        LocalLLMTestView(
+          baseURL: $localBaseURL,
+          modelId: $localModelID,
+          apiKey: $localAPIKey,
+          engine: localEngine,
+          showInputs: true,
+          buttonLabel: "Lokale Verbindung testen",
+          basePlaceholder: localEngine.defaultBaseURL,
+          modelPlaceholder: "z. B. dein lokales Modell",
+          credentialStorageDescription: "Der optionale Schlüssel bleibt auf diesem Mac.",
+          onTestComplete: { success in
+            testState = success ? .ok : .failed("Lokale Verbindung konnte nicht geprüft werden.")
+          }
         )
+      } else {
+        VStack(alignment: .leading, spacing: 6) {
+          label("Base-URL")
+          TextField("https://…/v1", text: $baseURL)
+            .textFieldStyle(.plain)
+            .font(TaktFont.ui(14))
+            .foregroundColor(TaktColor.ink)
+            .padding(10)
+            .background(TaktColor.surface)
+            .overlay(Rectangle().stroke(TaktColor.borderStrong, lineWidth: 1))
+        }
 
-        if case .testing = testState {
-          ProgressView().controlSize(.small)
+        VStack(alignment: .leading, spacing: 6) {
+          label("Modell")
+          TextField("z. B. dein Modell", text: $modelID)
+            .textFieldStyle(.plain)
+            .font(TaktFont.ui(14))
+            .foregroundColor(TaktColor.ink)
+            .padding(10)
+            .background(TaktColor.surface)
+            .overlay(Rectangle().stroke(TaktColor.borderStrong, lineWidth: 1))
         }
-        if case .ok = testState {
-          Text("Verbindung OK")
-            .font(TaktFont.caption)
-            .foregroundColor(TaktColor.positive)
+
+        VStack(alignment: .leading, spacing: 6) {
+          label("API-Schlüssel")
+          SecureField("sk-…", text: $apiKey)
+            .textFieldStyle(.plain)
+            .font(TaktFont.ui(14))
+            .foregroundColor(TaktColor.ink)
+            .padding(10)
+            .background(TaktColor.surface)
+            .overlay(Rectangle().stroke(TaktColor.borderStrong, lineWidth: 1))
         }
-        if case .failed(let msg) = testState {
-          Text(msg)
-            .font(TaktFont.caption)
-            .foregroundColor(TaktColor.negative)
-            .lineLimit(2)
+
+        HStack(spacing: 12) {
+          TaktButton(title: "Verbindung testen", variant: .secondary, action: testConnection)
+          if case .testing = testState { ProgressView().controlSize(.small) }
+          if case .ok = testState {
+            Text("Verbindung OK").font(TaktFont.caption).foregroundColor(TaktColor.positive)
+          }
+          if case .failed(let msg) = testState {
+            Text(msg).font(TaktFont.caption).foregroundColor(TaktColor.negative).lineLimit(2)
+          }
         }
       }
 
@@ -350,10 +398,48 @@ struct TaktOnboardingView: View {
             advance()
           }
         )
-        .disabled(baseURL.trimmingCharacters(in: .whitespaces).isEmpty
-          || modelID.trimmingCharacters(in: .whitespaces).isEmpty
-          || apiKey.trimmingCharacters(in: .whitespaces).isEmpty)
+        .disabled(providerMode == .local
+          ? localBaseURL.trimmingCharacters(in: .whitespaces).isEmpty
+            || localModelID.trimmingCharacters(in: .whitespaces).isEmpty
+          : baseURL.trimmingCharacters(in: .whitespaces).isEmpty
+            || modelID.trimmingCharacters(in: .whitespaces).isEmpty
+            || apiKey.trimmingCharacters(in: .whitespaces).isEmpty)
       }
+    }
+  }
+
+  private func providerCTA(
+    title: String,
+    selected: Bool,
+    action: @escaping () -> Void
+  ) -> some View {
+    Button(action: action) {
+      HStack {
+        Text(title)
+          .font(TaktFont.ui(14, .medium))
+        Spacer(minLength: 0)
+      }
+      .foregroundColor(selected ? TaktColor.surface : TaktColor.ink)
+      .padding(.horizontal, 12)
+      .frame(maxWidth: .infinity, minHeight: 36, alignment: .leading)
+      .background(selected ? TaktColor.ink : TaktColor.surfaceSunken)
+      .overlay(
+        Rectangle().stroke(
+          selected ? TaktColor.ink : TaktColor.borderStrong,
+          lineWidth: 1
+        )
+      )
+    }
+    .buttonStyle(.plain)
+    .pointingHandCursor()
+  }
+
+  private func localEngineCTA(_ engine: LocalEngine) -> some View {
+    providerCTA(title: engine.displayName, selected: localEngine == engine) {
+      localEngine = engine
+      localBaseURL = engine.defaultBaseURL
+      localModelID = LocalModelPreferences.defaultModelId(for: engine)
+      testState = .idle
     }
   }
 
@@ -390,6 +476,23 @@ struct TaktOnboardingView: View {
   }
 
   private func saveProvider() {
+    if providerMode == .local {
+      let endpoint = localBaseURL.trimmingCharacters(in: .whitespacesAndNewlines)
+      let model = localModelID.trimmingCharacters(in: .whitespacesAndNewlines)
+      UserDefaults.standard.set(localEngine.rawValue, forKey: "llmLocalEngine")
+      UserDefaults.standard.set(endpoint, forKey: "llmLocalBaseURL")
+      UserDefaults.standard.set(model, forKey: "llmLocalModelId")
+      let localKey = localAPIKey.trimmingCharacters(in: .whitespacesAndNewlines)
+      if localKey.isEmpty {
+        UserDefaults.standard.removeObject(forKey: "llmLocalAPIKey")
+      } else {
+        UserDefaults.standard.set(localKey, forKey: "llmLocalAPIKey")
+      }
+      LocalModelPreferences.syncPreset(for: localEngine, modelId: model)
+      try? LLMProviderRoutingStore.save(LLMProviderRouting(primary: .local))
+      return
+    }
+
     let config = OpenAICompatibleConfiguration(
       preset: .custom,
       baseURL: baseURL.trimmingCharacters(in: .whitespacesAndNewlines),
@@ -428,6 +531,7 @@ struct TaktOnboardingView: View {
         TextField("z. B. Healthcare-Klinik Zürich", text: $clientName)
           .textFieldStyle(.plain)
           .font(TaktFont.ui(14))
+          .foregroundColor(TaktColor.ink)
           .padding(10)
           .background(TaktColor.surface)
           .overlay(Rectangle().stroke(TaktColor.borderStrong, lineWidth: 1))
@@ -438,6 +542,7 @@ struct TaktOnboardingView: View {
         TextField("z. B. Team-Coaching, Vertraulichkeit", text: $clientDetail)
           .textFieldStyle(.plain)
           .font(TaktFont.ui(14))
+          .foregroundColor(TaktColor.ink)
           .padding(10)
           .background(TaktColor.surface)
           .overlay(Rectangle().stroke(TaktColor.borderStrong, lineWidth: 1))

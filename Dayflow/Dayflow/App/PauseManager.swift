@@ -180,11 +180,12 @@ final class PauseManager: ObservableObject {
   }
 
   private func timerTick() {
-    // Trigger UI update by notifying observers
-    objectWillChange.send()
-
-    // Check if pause has expired
+    // Check if pause has expired first
     checkAndResumeIfExpired()
+
+    // Only notify observers if we still have an active timed pause (avoid idle wakeups)
+    guard pauseEndTime != nil, !isPausedIndefinitely else { return }
+    objectWillChange.send()
   }
 
   private func checkAndResumeIfExpired() {

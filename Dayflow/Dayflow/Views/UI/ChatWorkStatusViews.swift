@@ -150,14 +150,9 @@ struct WorkStatusCard: View {
 }
 
 struct AnimatedEllipsis: View {
-  let interval: TimeInterval = 0.45
-
   var body: some View {
-    TimelineView(.periodic(from: .now, by: interval)) { context in
-      let step = Int(context.date.timeIntervalSinceReferenceDate / interval) % 3 + 1
-      Text(String(repeating: ".", count: step))
-        .accessibilityHidden(true)
-    }
+    Text("…")
+      .accessibilityHidden(true)
   }
 }
 

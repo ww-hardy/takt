@@ -207,6 +207,9 @@ struct ThinkingIndicator: View {
     .onAppear {
       startAnimation()
     }
+    .onDisappear {
+      stopAnimation()
+    }
   }
 
   func startAnimation() {
@@ -219,6 +222,12 @@ struct ThinkingIndicator: View {
       ) {
         dotScale[i] = 1.4
       }
+    }
+  }
+
+  func stopAnimation() {
+    for i in 0..<3 {
+      dotScale[i] = 1.0
     }
   }
 }
