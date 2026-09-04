@@ -42,7 +42,7 @@ Konfiguriert wird: Base URL, Modell-ID und API-Key (nur bei Cloud). Der Chat nut
 
 ## Architektur
 
-TAKT ist ein Fork von [Dayflow](https://github.com/dayflow) mit eigener Wertwandler-Designsprache, deutscher UI und erweiterter Kunden-/Projektlogik.
+TAKT ist ein Fork von [Dayflow](https://github.com/JerryZLiu/Dayflow) mit eigener Wertwandler-Designsprache, deutscher UI und erweiterter Kunden-/Projektlogik.
 
 | Schicht | Technologie |
 |---------|------------|
@@ -89,7 +89,9 @@ xcrun stapler staple TAKT.dmg
 
 ## Lizenz
 
-Proprietär — © Wertwandler. Alle Rechte vorbehalten.
+TAKT steht unter der MIT-Lizenz. Siehe [LICENSE](LICENSE) für den vollständigen Lizenztext.
+
+Copyright (c) 2026 Wertwandler
 
 ## Kontakt
 

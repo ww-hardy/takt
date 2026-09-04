@@ -84,21 +84,65 @@ enum WhatsNewWeeklyFeedback: String, CaseIterable, Identifiable {
 
 // MARK: - What's New Configuration
 
+private struct GitHubReleasePayload: Codable {
+  let tagName: String
+  let name: String
+  let body: String
+
+  enum CodingKeys: String, CodingKey {
+    case tagName = "tag_name"
+    case name
+    case body
+  }
+}
+
+enum GitHubReleaseNotesParser {
+  static func version(from tag: String) -> String {
+    tag.hasPrefix("v") ? String(tag.dropFirst()) : tag
+  }
+
+  static func highlights(from body: String) -> [String] {
+    body.split(separator: "\n", omittingEmptySubsequences: false)
+      .compactMap { rawLine in
+        let line = rawLine.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard line.hasPrefix("- ") || line.hasPrefix("* ") else { return nil }
+        return cleanMarkdown(String(line.dropFirst(2)))
+      }
+      .filter { !$0.isEmpty }
+  }
+
+  private static func cleanMarkdown(_ text: String) -> String {
+    var cleaned = text
+      .replacingOccurrences(of: "**", with: "")
+      .replacingOccurrences(of: "__", with: "")
+      .replacingOccurrences(of: "`", with: "")
+
+    let pattern = #"\[([^\]]+)\]\([^\)]+\)"#
+    if let expression = try? NSRegularExpression(pattern: pattern) {
+      let range = NSRange(cleaned.startIndex..., in: cleaned)
+      cleaned = expression.stringByReplacingMatches(
+        in: cleaned,
+        range: range,
+        withTemplate: "$1"
+      )
+    }
+    return cleaned.trimmingCharacters(in: .whitespacesAndNewlines)
+  }
+}
+
 enum WhatsNewConfiguration {
   private static let seenKey = "lastSeenWhatsNewVersion"
+  private static let cacheKey = "latestGitHubReleaseNotes"
+  private static let repository = "ww-hardy/takt"
 
-  /// Override with the specific release number you want to show.
-  private static let versionOverride: String? = "2.1.0"
-
-  /// Update this content before shipping each release. Return nil to disable the modal entirely.
+  /// Local safety net used only when GitHub cannot be reached.
   static var configuredRelease: ReleaseNote? {
     ReleaseNote(
-      version: targetVersion,
-      title: "MCP and CLI support is finally here",
+      version: currentAppVersion,
+      title: "TAKT wird kontinuierlich weiterentwickelt",
       highlights: [
-        "Connect Claude, Cursor, or any MCP client to Dayflow and ask about your day in plain English: what you worked on, where your time went, and more. Set it up in Settings → MCP / CLI with one click.",
-        "New `dayflow` terminal command lets you check your timeline from any terminal. It links to the CLI bundled inside the app and stays in sync automatically whenever Dayflow updates.",
-        "AI tools get read-only access unless you turn on edits in Settings. Everything runs locally against your own data, so nothing new leaves your Mac.",
+        "Verbesserungen an Stabilität, Performance und Bildschirmaufzeichnung.",
+        "Aktuelle Release Notes werden direkt aus GitHub geladen.",
       ],
       socialPreview: nil,
       previewIntro: nil,
@@ -109,33 +153,75 @@ enum WhatsNewConfiguration {
     )
   }
 
-  /// Returns the configured release when it matches the app version and hasn't been shown yet.
-  static func pendingReleaseForCurrentBuild() -> ReleaseNote? {
-    guard let release = configuredRelease else { return nil }
-    guard isVersion(release.version, lessThanOrEqualTo: currentAppVersion) else { return nil }
-    let defaults = UserDefaults.standard
-    let lastSeen = defaults.string(forKey: seenKey)
+  /// Loads the latest published GitHub release and caches it for offline use.
+  static func loadLatestRelease() async -> ReleaseNote? {
+    do {
+      let payload = try await fetchLatestRelease()
+      UserDefaults.standard.set(try? JSONEncoder().encode(payload), forKey: cacheKey)
+      return makeRelease(from: payload)
+    } catch {
+      return cachedRelease() ?? configuredRelease
+    }
+  }
 
-    // First run: seed seen version so new installs skip the modal until next upgrade.
+  /// Returns the latest release when it is newer than the last one seen by the user.
+  static func pendingReleaseForCurrentBuild() async -> ReleaseNote? {
+    guard let release = await loadLatestRelease() else { return nil }
+    guard isVersion(release.version, lessThanOrEqualTo: currentAppVersion) else { return nil }
+    let lastSeen = UserDefaults.standard.string(forKey: seenKey)
+
     if lastSeen == nil || lastSeen?.isEmpty == true {
-      defaults.set(release.version, forKey: seenKey)
+      UserDefaults.standard.set(release.version, forKey: seenKey)
       return nil
     }
 
     return lastSeen == release.version ? nil : release
   }
 
-  /// Returns the latest configured release, regardless of the running app version.
-  static func latestRelease() -> ReleaseNote? {
-    configuredRelease
+  /// Returns the latest GitHub release for the manual Versionshinweise action.
+  static func latestRelease() async -> ReleaseNote? {
+    await loadLatestRelease()
   }
 
   static func markReleaseAsSeen(version: String) {
     UserDefaults.standard.set(version, forKey: seenKey)
   }
 
-  private static var targetVersion: String {
-    versionOverride ?? currentAppVersion
+  private static func fetchLatestRelease() async throws -> GitHubReleasePayload {
+    let url = URL(string: "https://api.github.com/repos/\(repository)/releases/latest")!
+    var request = URLRequest(url: url)
+    request.httpMethod = "GET"
+    request.timeoutInterval = 15
+    request.setValue("application/vnd.github+json", forHTTPHeaderField: "Accept")
+    request.setValue("TAKT/\(currentAppVersion)", forHTTPHeaderField: "User-Agent")
+
+    let (data, response) = try await URLSession.shared.data(for: request)
+    guard let http = response as? HTTPURLResponse, (200..<300).contains(http.statusCode) else {
+      throw URLError(.badServerResponse)
+    }
+    return try JSONDecoder().decode(GitHubReleasePayload.self, from: data)
+  }
+
+  private static func cachedRelease() -> ReleaseNote? {
+    guard let data = UserDefaults.standard.data(forKey: cacheKey),
+      let payload = try? JSONDecoder().decode(GitHubReleasePayload.self, from: data)
+    else { return nil }
+    return makeRelease(from: payload)
+  }
+
+  private static func makeRelease(from payload: GitHubReleasePayload) -> ReleaseNote {
+    let highlights = GitHubReleaseNotesParser.highlights(from: payload.body)
+    return ReleaseNote(
+      version: GitHubReleaseNotesParser.version(from: payload.tagName),
+      title: payload.name.isEmpty ? "Neu in TAKT" : payload.name,
+      highlights: highlights.isEmpty ? ["Weitere Verbesserungen und Fehlerbehebungen in TAKT."] : highlights,
+      socialPreview: nil,
+      previewIntro: nil,
+      previewImageNames: [],
+      betaSignup: nil,
+      cta: nil,
+      showsWeeklyFeedbackSurvey: false
+    )
   }
 
   private static var currentAppVersion: String {
@@ -153,7 +239,7 @@ enum WhatsNewConfiguration {
       if lhsVal < rhsVal { return true }
       if lhsVal > rhsVal { return false }
     }
-    return true  // equal
+    return true
   }
 }
 

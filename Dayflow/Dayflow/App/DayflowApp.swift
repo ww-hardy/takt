@@ -22,28 +22,28 @@ struct AppRootView: View {
       goalFlowOverlay
     }
     .frame(maxWidth: .infinity, maxHeight: .infinity)
-    .onAppear {
+    .task {
       guard whatsNewNote == nil else { return }
-      DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-        if let note = WhatsNewConfiguration.pendingReleaseForCurrentBuild() {
-          whatsNewNote = note
-          activeWhatsNewVersion = note.version
-          shouldMarkWhatsNewSeen = true
-        }
-      }
+      try? await Task.sleep(for: .milliseconds(500))
+      guard let note = await WhatsNewConfiguration.pendingReleaseForCurrentBuild() else { return }
+      whatsNewNote = note
+      activeWhatsNewVersion = note.version
+      shouldMarkWhatsNewSeen = true
     }
     .onReceive(NotificationCenter.default.publisher(for: .showWhatsNew)) { _ in
-      guard let release = WhatsNewConfiguration.latestRelease() else { return }
-      whatsNewNote = release
-      activeWhatsNewVersion = release.version
-      shouldMarkWhatsNewSeen = release.version == currentAppVersion
+      Task { @MainActor in
+        guard let release = await WhatsNewConfiguration.latestRelease() else { return }
+        whatsNewNote = release
+        activeWhatsNewVersion = release.version
+        shouldMarkWhatsNewSeen = release.version == currentAppVersion
 
-      // Analytics: track manual view
-      AnalyticsService.shared.capture(
-        "whats_new_viewed_manual",
-        [
-          "version": release.version
-        ])
+        // Analytics: track manual view
+        AnalyticsService.shared.capture(
+          "whats_new_viewed_manual",
+          [
+            "version": release.version
+          ])
+      }
     }
     .sheet(item: $whatsNewNote, onDismiss: handleWhatsNewDismissed) { note in
       ZStack {
