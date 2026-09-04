@@ -1,11 +1,20 @@
-<?xml version="1.0" standalone="yes"?>
+<?xml version="1.0" encoding="utf-8"?>
 <rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle">
   <channel>
-    <title>TAKT</title>
-    <link>https://github.com/ww-hardy/takt/releases</link>
-    <description>Wertwandler Zeit-Tracking — automatische Tätigkeits- und Kundenerkennung</description>
-    <language>de</language>
-
+    <title>TAKT Updates</title>
+    <language>en</language>
+    <item>
+      <title>Version 2.1.2</title>
+      <pubDate>Fri, 04 Sep 2026 17:49:12 +0000</pubDate>
+      <enclosure url="https://github.com/ww-hardy/takt/releases/download/v2.1.2/TAKT-2.1.2-llama-cpp.dmg"
+                 sparkle:version="121"
+                 sparkle:shortVersionString="2.1.2"
+                 length="45191539"
+                 type="application/octet-stream"
+                 sparkle:edSignature="e0biE8TRmT8RcmpWZt4P8FpePiJhjCqQThe6vGULnXaT01yTTpqBIIh/xpzWM80p6CB7VwzckJj9DU24mE6jCw=="/>
+      <sparkle:minimumSystemVersion>13.0</sparkle:minimumSystemVersion>
+      <releaseNotesLink>https://github.com/ww-hardy/takt/releases/tag/v2.1.2</releaseNotesLink>
+    </item>
     <item>
       <title>Version 2.1.1</title>
       <pubDate>Wed, 03 Sep 2026 18:00:00 +0200</pubDate>
@@ -18,6 +27,5 @@
         type="application/octet-stream" />
       <sparkle:minimumSystemVersion>13.0</sparkle:minimumSystemVersion>
     </item>
-
   </channel>
-</rss>
+  </rss>
