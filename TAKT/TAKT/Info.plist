@@ -5,7 +5,7 @@
 	<key>ATSApplicationFontsPath</key>
 	<string>.</string>
 	<key>CFBundleShortVersionString</key>
-	<string>2.1.1</string>
+	<string>2.1.2</string>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
@@ -18,13 +18,23 @@
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>120</string>
+	<string>121</string>
 	<key>DayflowBackendURL</key>
 	<string>$(DAYFLOW_BACKEND_URL)</string>
 	<key>NSAppleEventsUsageDescription</key>
 	<string>Dayflow uses Automation to focus or reopen your agent sessions in the terminal.</string>
 	<key>NSScreenCaptureUsageDescription</key>
 	<string>Dayflow uses screen access to create your timeline. Recordings stay on your Mac and you can pause or delete them anytime.</string>
+	<key>SUAllowsAutomaticUpdates</key>
+	<true/>
+	<key>SUEnableAutomaticChecks</key>
+	<true/>
+	<key>SUFeedURL</key>
+	<string>https://raw.githubusercontent.com/ww-hardy/takt/main/appcast.xml</string>
+	<key>SUPublicEDKey</key>
+	<string>lYoqGzXsasfzfuVLvUheB7U2Bsf1W4U9kyK2dKAsozM=</string>
+	<key>SUScheduledCheckInterval</key>
+	<integer>86400</integer>
 	<key>UIAppFonts</key>
 	<array>
 		<string>InstrumentSerif-Regular.ttf</string>
@@ -34,15 +44,5 @@
 		<string>Nunito-VariableFont_wght.ttf</string>
 		<string>Nunito-Italic-VariableFont_wght.ttf</string>
 	</array>
-	<key>SUFeedURL</key>
-	<string>https://raw.githubusercontent.com/ww-hardy/takt/main/appcast.xml</string>
-	<key>SUPublicEDKey</key>
-	<string>lYoqGzXsasfzfuVLvUheB7U2Bsf1W4U9kyK2dKAsozM=</string>
-	<key>SUAllowsAutomaticUpdates</key>
-	<true/>
-	<key>SUEnableAutomaticChecks</key>
-	<true/>
-	<key>SUScheduledCheckInterval</key>
-	<integer>86400</integer>
 </dict>
 </plist>
