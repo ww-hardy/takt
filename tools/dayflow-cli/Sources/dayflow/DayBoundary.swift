@@ -2,7 +2,7 @@
 //  DayBoundary.swift
 //  dayflow-cli
 //
-//  Dayflow's day runs 4 AM to 4 AM, and its week runs Monday 4 AM to Monday
+//  TAKT's day runs 4 AM to 4 AM, and its week runs Monday 4 AM to Monday
 //  4 AM. This mirrors StorageDateHelpers.swift and WeeklyDateRange.swift in
 //  the app; when the CLI becomes an Xcode target these files should be
 //  replaced by the app's own, compiled into both.
@@ -24,7 +24,7 @@ struct DayWindow {
   let end: Date  // 4 AM the next day
 }
 
-/// The Dayflow day containing `date`. Before 4 AM this resolves to the
+/// The TAKT day containing `date`. Before 4 AM this resolves to the
 /// previous calendar day, matching Date.getDayInfoFor4AMBoundary() in the app.
 func dayWindow(containing date: Date) -> DayWindow {
   let calendar = Calendar.current
@@ -34,7 +34,7 @@ func dayWindow(containing date: Date) -> DayWindow {
   return DayWindow(dayKey: dayKeyFormatter.string(from: start), start: start, end: end)
 }
 
-/// The Dayflow day for an explicit "YYYY-MM-DD" label. Returns nil for
+/// The TAKT day for an explicit "YYYY-MM-DD" label. Returns nil for
 /// unparseable input. Matches fetchTimelineCards(forDay:) in the app: 4 AM on
 /// the named day through 4 AM the next day.
 func dayWindow(forKey key: String) -> DayWindow? {
@@ -53,7 +53,7 @@ struct WeekWindow {
   let end: Date  // next Monday 4 AM
 }
 
-/// The Dayflow week containing `date`. Mirrors WeeklyDateRange.containing().
+/// The TAKT week containing `date`. Mirrors WeeklyDateRange.containing().
 func weekWindow(containing date: Date) -> WeekWindow {
   var calendar = Calendar.current
   calendar.firstWeekday = 2  // Monday

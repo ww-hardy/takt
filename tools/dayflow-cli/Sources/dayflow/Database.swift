@@ -2,7 +2,7 @@
 //  Database.swift
 //  dayflow-cli
 //
-//  Read-only access to Dayflow's SQLite database. Read-only is enforced at the
+//  Read-only access to TAKT's SQLite database. Read-only is enforced at the
 //  connection level (SQLITE_OPEN_READONLY + PRAGMA query_only), not by command
 //  naming, so a bug in this tool cannot corrupt the app's data.
 //
@@ -49,14 +49,14 @@ enum SQLValue {
 final class Database {
   private let handle: OpaquePointer
 
-  /// Dayflow's database location. Overridable via DAYFLOW_DB for tests.
+  /// TAKT's database location. Overridable via DAYFLOW_DB for tests.
   static func defaultPath() -> String {
     if let override = ProcessInfo.processInfo.environment["DAYFLOW_DB"] {
       return override
     }
     let appSupport = FileManager.default.urls(
       for: .applicationSupportDirectory, in: .userDomainMask)[0]
-    return appSupport.appendingPathComponent("Dayflow/chunks.sqlite").path
+    return appSupport.appendingPathComponent("TAKT/chunks.sqlite").path
   }
 
   init(path: String) throws {

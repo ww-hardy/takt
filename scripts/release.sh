@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# One-button release script for Dayflow.
+# One-button release script for TAKT.
 # - Bumps version (minor by default; --major to bump major)
 #   - Updates Xcode target MARKETING_VERSION and CURRENT_PROJECT_VERSION
 #   - Keeps Info.plist values in sync
 # - Builds, signs, notarizes DMG
 # - Signs update (Sparkle) using Keychain-stored PEM
 # - Creates GitHub Release and uploads DMG (draft)
-# - Prepends new item to docs/appcast.xml and pushes
+# - Prepends new item to appcast.xml and pushes
 # - Publishes the release (undrafts)
 #
 # Requirements:
@@ -23,9 +23,9 @@ set -euo pipefail
 SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 REPO_ROOT=$(cd "$SCRIPT_DIR/.." && pwd)
 
-PLIST=${PLIST:-"$REPO_ROOT/Dayflow/Dayflow/Info.plist"}
-APP_NAME=${APP_NAME:-Dayflow}
-SCHEME=${SCHEME:-Dayflow}
+PLIST=${PLIST:-"$REPO_ROOT/TAKT/TAKT/Info.plist"}
+APP_NAME=${APP_NAME:-TAKT}
+SCHEME=${SCHEME:-TAKT}
 CONFIG=${CONFIG:-Release}
 # Optional: override Keychain account name for sign_update; defaults to "ed25519"
 SIGN_ACCOUNT=${SIGN_ACCOUNT:-}
@@ -56,13 +56,21 @@ require() { command -v "$1" >/dev/null 2>&1 || err "Missing required command: $1
 require "/usr/libexec/PlistBuddy"
 require git
 require gh
+
+# Resolve Sparkle's bundled CLI without requiring it to be globally installed.
+SIGN_UPDATE=${SIGN_UPDATE:-}
+if [[ -z "$SIGN_UPDATE" ]]; then
+  SIGN_UPDATE=$(find "$HOME/Library/Developer/Xcode/DerivedData" \
+    -type f -path '*/SourcePackages/artifacts/sparkle/Sparkle/bin/sign_update' \
+    -perm -111 -print -quit 2>/dev/null || true)
+fi
 if [[ ${DRY_RUN:-0} -eq 0 ]]; then
-  require sign_update
+  [[ -x "$SIGN_UPDATE" ]] || err "Sparkle sign_update not found; set SIGN_UPDATE to its path"
 fi
 
 if [[ ! -f "$PLIST" ]]; then err "Info.plist not found at $PLIST"; fi
 
-PBP="$REPO_ROOT/Dayflow/Dayflow.xcodeproj/project.pbxproj"
+PBP="$REPO_ROOT/TAKT/TAKT.xcodeproj/project.pbxproj"
 
 get_plist() { /usr/libexec/PlistBuddy -c "Print :$1" "$PLIST" 2>/dev/null || true; }
 set_plist() {
@@ -92,7 +100,7 @@ if [[ -z "$CURRENT_BUILD" ]]; then CURRENT_BUILD=0; fi
 
 # Ensure build number monotonically increases across releases by considering
 # the highest sparkle:version present in the existing appcast.
-APPCAST_PATH="$REPO_ROOT/docs/appcast.xml"
+APPCAST_PATH="$REPO_ROOT/appcast.xml"
 if [[ -f "$APPCAST_PATH" ]]; then
   APPCAST_MAX_BUILD=$(grep -Eo 'sparkle:version="[0-9]+"' "$APPCAST_PATH" | sed -E 's/[^0-9]//g' | sort -n | tail -1 || true)
   if [[ -n "$APPCAST_MAX_BUILD" ]]; then
@@ -125,7 +133,7 @@ echo "[1/8] Bumping versions in project and Info.plist…"
 # First, update the Xcode project so UI reflects the correct version.
 if [[ -f "$PBP" ]]; then
   if xcrun -f agvtool >/dev/null 2>&1; then
-    ( cd "$REPO_ROOT/Dayflow" && \
+    ( cd "$REPO_ROOT/TAKT" && \
       xcrun agvtool new-marketing-version "$NEW_SHORT" >/dev/null || true; \
       xcrun agvtool new-version -all "$NEW_BUILD" >/dev/null || true )
   fi
@@ -154,11 +162,11 @@ fi
 
 echo "[3/8] Signing update with Sparkle…"
 if [[ -n "${SPARKLE_PRIVATE_KEY:-}" ]]; then
-  ED_SIG=$(printf "%s\n" "$SPARKLE_PRIVATE_KEY" | sign_update --ed-key-file - -p "$REPO_ROOT/$DMG_NAME")
+  ED_SIG=$(printf "%s\n" "$SPARKLE_PRIVATE_KEY" | "$SIGN_UPDATE" --ed-key-file - -p "$REPO_ROOT/$DMG_NAME")
 elif [[ -n "$SIGN_ACCOUNT" ]]; then
-  ED_SIG=$(sign_update --account "$SIGN_ACCOUNT" -p "$REPO_ROOT/$DMG_NAME")
+  ED_SIG=$("$SIGN_UPDATE" --account "$SIGN_ACCOUNT" -p "$REPO_ROOT/$DMG_NAME")
 else
-  ED_SIG=$(sign_update -p "$REPO_ROOT/$DMG_NAME")
+  ED_SIG=$("$SIGN_UPDATE" -p "$REPO_ROOT/$DMG_NAME")
 fi
 [[ -n "$ED_SIG" ]] || err "Could not obtain edSignature from sign_update"
 
@@ -185,7 +193,7 @@ echo "[6/8] Resolving canonical asset + release URLs…"
 ASSET_URL=""
 for i in {1..10}; do
   ASSET_URL=$(gh release view "$TAG" --json assets --jq \
-    ".assets[] | select(.name==\"$DMG_NAME\").url" 2>/dev/null || true)
+    ".assets[] | select(.name==\"$DMG_NAME\").browserDownloadUrl" 2>/dev/null || true)
   [[ -n "$ASSET_URL" ]] && break
   sleep 2
 done
@@ -193,7 +201,7 @@ RELEASE_URL=$(gh release view "$TAG" --json url --jq .url)
 
 [[ -n "$ASSET_URL" ]] || err "Failed to obtain canonical browser_download_url for $DMG_NAME"
 
-echo "[7/8] Updating appcast (docs/appcast.xml)…"
+echo "[7/8] Updating appcast (appcast.xml)…"
 "$SCRIPT_DIR/update_appcast.sh" \
   --dmg "$REPO_ROOT/$DMG_NAME" \
   --url "$ASSET_URL" \
@@ -202,15 +210,15 @@ echo "[7/8] Updating appcast (docs/appcast.xml)…"
   --signature "$ED_SIG" \
   --msv "$MSV" \
   --notes "$RELEASE_URL" \
-  --out "$REPO_ROOT/docs/appcast.xml"
+  --out "$REPO_ROOT/appcast.xml"
 
-git add "$REPO_ROOT/docs/appcast.xml" "$REPO_ROOT/docs/.nojekyll" 2>/dev/null || true
+git add "$REPO_ROOT/appcast.xml"
 git commit -m "release: update appcast for v$NEW_SHORT" || true
 git tag -f "$TAG" || true
 git push origin HEAD
 git push origin "$TAG" --force
 
 echo "[8/8] Post-release sanity check…"
-echo "Feed URL should be reachable at: https://dayflow.so/appcast.xml"
+echo "Feed URL should be reachable at: https://raw.githubusercontent.com/ww-hardy/takt/main/appcast.xml"
 
 echo "[8/8] Done. Version $NEW_SHORT ($NEW_BUILD) released."

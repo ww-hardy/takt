@@ -2,11 +2,11 @@
 //  main.swift
 //  dayflow-cli
 //
-//  Command dispatch. Reads work with Dayflow closed; they go straight to the
+//  Command dispatch. Reads work with TAKT closed; they go straight to the
 //  database. Write commands arrive in a later phase and will require the app.
 //
 //  Exit codes: 0 success · 1 unexpected · 2 bad arguments · 3 not found ·
-//  5 no Dayflow data. (4 and 6 are reserved for the write phase.)
+//  5 no TAKT data. (4 and 6 are reserved for the write phase.)
 //
 
 import Foundation
@@ -48,15 +48,15 @@ func openDatabase() -> (Database, String) {
   do {
     return (try Database(path: path), path)
   } catch DatabaseError.notFound {
-    let message = "No Dayflow data found. Open Dayflow and let it record for a bit."
+    let message = "No TAKT data found. Open TAKT and let it record for a bit."
     wantsJSON ? failJSON("no_data", message, exitCode: 5) : fail(message, code: 5)
   } catch {
-    let message = "Could not open Dayflow's database: \(error)"
+    let message = "Could not open TAKT's database: \(error)"
     wantsJSON ? failJSON("database_error", message, exitCode: 1) : fail(message, code: 1)
   }
 }
 
-/// Resolve an optional YYYY-MM-DD argument to a Dayflow day, defaulting to now.
+/// Resolve an optional YYYY-MM-DD argument to a TAKT day, defaulting to now.
 func resolveDay(_ key: String?) -> DayWindow {
   guard let key else { return dayWindow(containing: Date()) }
   guard let window = dayWindow(forKey: key) else {
@@ -231,7 +231,7 @@ func runDaily(dayKey: String?) {
   let (db, _) = openDatabase()
   do {
     guard let standup = try fetchStandup(db: db, day: key) else {
-      let message = "No Daily for \(key). Dayflow generates one after a day with enough activity."
+      let message = "No Daily for \(key). TAKT generates one after a day with enough activity."
       wantsJSON ? failJSON("not_found", message, exitCode: 3) : fail(message, code: 3)
     }
     if wantsJSON {
@@ -381,7 +381,7 @@ func runStatus() {
           minutes < 2
           ? "last capture just now" : "last capture \(formatDuration(minutes: minutes)) ago"
       }
-      print("  Dayflow · \(captureLine)")
+      print("  TAKT · \(captureLine)")
       print("  Today: \(status.today) (day starts 4:00 AM, \(TimeZone.current.identifier))")
       if status.pendingBatches > 0 {
         print(

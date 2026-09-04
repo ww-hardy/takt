@@ -1,0 +1,336 @@
+//
+//  TAKTApp.swift
+//  TAKT
+//
+
+import Sparkle
+import SwiftUI
+
+struct AppRootView: View {
+  @EnvironmentObject private var categoryStore: CategoryStore
+  @State private var whatsNewNote: ReleaseNote? = nil
+  @State private var activeWhatsNewVersion: String? = nil
+  @State private var shouldMarkWhatsNewSeen = false
+  @State private var goalFlowPresentation: DayGoalFlowPresentation? = nil
+
+  var body: some View {
+    ZStack {
+      MainView(goalFlowPresentation: $goalFlowPresentation)
+        .environmentObject(AppState.shared)
+        .environmentObject(categoryStore)
+
+      goalFlowOverlay
+    }
+    .frame(maxWidth: .infinity, maxHeight: .infinity)
+    .task {
+      guard whatsNewNote == nil else { return }
+      try? await Task.sleep(for: .milliseconds(500))
+      guard let note = await WhatsNewConfiguration.pendingReleaseForCurrentBuild() else { return }
+      whatsNewNote = note
+      activeWhatsNewVersion = note.version
+      shouldMarkWhatsNewSeen = true
+    }
+    .onReceive(NotificationCenter.default.publisher(for: .showWhatsNew)) { _ in
+      Task { @MainActor in
+        guard let release = await WhatsNewConfiguration.latestRelease() else { return }
+        whatsNewNote = release
+        activeWhatsNewVersion = release.version
+        shouldMarkWhatsNewSeen = release.version == currentAppVersion
+
+        // Analytics: track manual view
+        AnalyticsService.shared.capture(
+          "whats_new_viewed_manual",
+          [
+            "version": release.version
+          ])
+      }
+    }
+    .sheet(item: $whatsNewNote, onDismiss: handleWhatsNewDismissed) { note in
+      ZStack {
+        // Backdrop
+        Color.black.opacity(0.4)
+          .ignoresSafeArea()
+
+        WhatsNewView(releaseNote: note) {
+          closeWhatsNew()
+        }
+      }
+      .environment(\.colorScheme, .light)
+      .preferredColorScheme(.light)
+    }
+  }
+
+  @ViewBuilder
+  private var goalFlowOverlay: some View {
+    if let goalFlowPresentation {
+      DayGoalFlowOverlay(
+        presentation: goalFlowPresentation,
+        onDismiss: {
+          withAnimation(.spring(response: 0.28, dampingFraction: 0.9)) {
+            self.goalFlowPresentation = nil
+          }
+        }
+      )
+      .frame(maxWidth: .infinity, maxHeight: .infinity)
+      .ignoresSafeArea()
+      .transition(.opacity.combined(with: .scale(scale: 0.985)))
+      .zIndex(3)
+    }
+  }
+
+  private func closeWhatsNew() {
+    whatsNewNote = nil
+  }
+
+  private func handleWhatsNewDismissed() {
+    guard let version = activeWhatsNewVersion else { return }
+    if shouldMarkWhatsNewSeen {
+      WhatsNewConfiguration.markReleaseAsSeen(version: version)
+      AnalyticsService.shared.capture(
+        "whats_new_viewed",
+        [
+          "version": version,
+          "source": "auto",
+        ])
+    }
+    AnalyticsService.shared.capture(
+      "whats_new_viewed",
+      [
+        "version": version,
+        "source": "manual",
+      ])
+    activeWhatsNewVersion = nil
+    shouldMarkWhatsNewSeen = false
+  }
+
+  private var currentAppVersion: String {
+    Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? ""
+  }
+}
+
+@main
+struct TaktApp: App {
+  @NSApplicationDelegateAdaptor(AppDelegate.self) var delegate
+  @AppStorage("didOnboard") private var didOnboard = false
+  @AppStorage("useBlankUI") private var useBlankUI = false
+  @AppStorage("hasCompletedJournalOnboarding") private var hasCompletedJournalOnboarding = false
+  @State private var contentOpacity = 0.0
+  @State private var contentScale = 0.98
+  @StateObject private var categoryStore = CategoryStore()
+  @StateObject private var journalCoordinator = JournalCoordinator()
+
+  init() {
+    // Comment out for production - only use for testing onboarding
+    // UserDefaults.standard.set(false, forKey: "didOnboard")
+  }
+
+  // Sparkle updater manager
+  private let updaterManager = UpdaterManager.shared
+
+  var body: some Scene {
+    Window("TAKT", id: "main") {
+      ZStack {
+        // Main app UI or onboarding (TAKT: minimal 5-step wizard)
+        Group {
+          if didOnboard {
+            // Show UI after onboarding
+            AppRootView()
+              .environmentObject(categoryStore)
+              .environmentObject(updaterManager)
+              .environmentObject(journalCoordinator)
+          } else {
+            TaktOnboardingView()
+              .environmentObject(AppState.shared)
+              .environmentObject(categoryStore)
+              .environmentObject(updaterManager)
+          }
+        }
+        .opacity(contentOpacity)
+        .scaleEffect(contentScale)
+        .animation(.easeOut(duration: 0.3).delay(0.15), value: contentOpacity)
+        .animation(.easeOut(duration: 0.3).delay(0.15), value: contentScale)
+        .onAppear {
+          withAnimation(.easeOut(duration: 0.3)) {
+            contentOpacity = 1.0
+            contentScale = 1.0
+          }
+          if didOnboard {
+            dispatchPendingNotificationNavigation(after: 0.1)
+          }
+        }
+        .onReceive(
+          NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)
+        ) { _ in
+          if didOnboard {
+            dispatchPendingNotificationNavigation(after: 0.1)
+          }
+        }
+
+        // Journal onboarding video (full window coverage, above sidebar)
+        if journalCoordinator.showOnboardingVideo {
+          JournalOnboardingVideoView(onComplete: {
+            withAnimation(.easeOut(duration: 0.3)) {
+              journalCoordinator.showOnboardingVideo = false
+              hasCompletedJournalOnboarding = true
+            }
+          })
+          .ignoresSafeArea()
+          .transition(.opacity)
+        }
+      }
+      // Inline background behind the main app UI only
+      .background {
+        MainWindowRegistrationView()
+
+        if didOnboard {
+          ZStack {
+            Image("MainUIBackground")
+              .resizable()
+              .scaledToFill()
+
+            Color(red: 0.98, green: 0.96, blue: 0.93)
+              .opacity(0.4)
+          }
+          .ignoresSafeArea()
+          .allowsHitTesting(false)
+          .accessibilityHidden(true)
+        }
+      }
+      .frame(minWidth: 900, maxWidth: .infinity, minHeight: 508, maxHeight: .infinity)
+    }
+    .windowStyle(.hiddenTitleBar)
+    .windowResizability(.contentMinSize)
+    .defaultSize(width: 1195, height: 675)
+
+    .commands {
+      // Remove the "New Window" command if you want a single window app
+      CommandGroup(replacing: .newItem) {}
+
+      // Add custom menu items after the app info section
+      CommandGroup(after: .appInfo) {
+        Divider()
+        Button("Reset Onboarding") {
+          // Reset the onboarding flag
+          UserDefaults.standard.set(false, forKey: "didOnboard")
+          // Reset the saved onboarding step to start from beginning
+          UserDefaults.standard.set(0, forKey: "onboardingStep")
+          UserDefaults.standard.removeObject(forKey: "onboardingHasPaidAI")
+          UserDefaults.standard.removeObject(forKey: CategoryStore.StoreKeys.onboardingSelectedRole)
+          UserDefaults.standard.removeObject(
+            forKey: CategoryStore.StoreKeys.onboardingAppliedCategoryPreset)
+          UserDefaults.standard.removeObject(
+            forKey: CategoryStore.StoreKeys.onboardingCategoriesCustomized)
+          UserDefaults.standard.removeObject(forKey: "onboardingSelectedProviderID")
+          // Force quit and restart the app to show onboarding
+          Task { @MainActor in
+            AppDelegate.allowTermination = true
+            NSApp.terminate(nil)
+          }
+        }
+        .keyboardShortcut("R", modifiers: [.command, .shift])
+      }
+
+      // TAKT: Kein Sparkle-Update-Menü mehr — es gibt keinen eigenen Appcast.
+      CommandGroup(after: .appInfo) {
+        Button("View Release Notes") {
+          // Activate the app and bring to foreground
+          NSApp.activate(ignoringOtherApps: true)
+
+          // Post notification to show What's New modal
+          NotificationCenter.default.post(name: .showWhatsNew, object: nil)
+        }
+        .keyboardShortcut("N", modifiers: [.command, .shift])
+      }
+
+      #if DEBUG
+        CommandGroup(after: .appInfo) {
+          Divider()
+        }
+      #endif
+    }
+    .defaultSize(width: 1200, height: 800)
+
+  }
+
+  private var hasPendingNotificationNavigation: Bool {
+    AppDelegate.pendingNotificationNavigationDestination != nil
+  }
+
+  private func dispatchPendingNotificationNavigation(after delay: TimeInterval) {
+    guard hasPendingNotificationNavigation else { return }
+
+    DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+      guard let destination = AppDelegate.pendingNotificationNavigationDestination else { return }
+      AppDelegate.pendingNotificationNavigationDestination = nil
+
+      switch destination {
+      case .daily(let day) where day?.isEmpty == false:
+        NotificationCenter.default.post(
+          name: .navigateToDaily,
+          object: nil,
+          userInfo: ["day": day]
+        )
+      case .daily:
+        NotificationCenter.default.post(name: .navigateToDaily, object: nil)
+      case .weekly:
+        NotificationCenter.default.post(name: .navigateToWeekly, object: nil)
+      case .journal:
+        NotificationCenter.default.post(name: .navigateToJournal, object: nil)
+      }
+    }
+  }
+}
+
+// MARK: - Notification Names
+
+extension Notification.Name {
+  static let analyticsPreferenceChanged = Notification.Name("analyticsPreferenceChanged")
+  static let showWhatsNew = Notification.Name("showWhatsNew")
+  static let navigateToJournal = Notification.Name("navigateToJournal")
+  static let navigateToDaily = Notification.Name("navigateToDaily")
+  static let navigateToWeekly = Notification.Name("navigateToWeekly")
+  static let timelineDataUpdated = Notification.Name("timelineDataUpdated")
+  static let showTimelineFailureToast = Notification.Name("showTimelineFailureToast")
+  static let showScreenRecordingPermissionNotice = Notification.Name(
+    "showScreenRecordingPermissionNotice")
+  static let openProvidersSettings = Notification.Name("openProvidersSettings")
+  static let openAccountSettings = Notification.Name("openAccountSettings")
+}
+
+@MainActor
+final class MainWindowController {
+  static let shared = MainWindowController()
+
+  private var openWindowAction: OpenWindowAction?
+  private var hasPendingOpenRequest = false
+
+  func register(_ openWindowAction: OpenWindowAction) {
+    self.openWindowAction = openWindowAction
+
+    if hasPendingOpenRequest {
+      hasPendingOpenRequest = false
+      openWindowAction(id: "main")
+    }
+  }
+
+  func showMainWindow() {
+    guard let openWindowAction else {
+      hasPendingOpenRequest = true
+      return
+    }
+
+    openWindowAction(id: "main")
+  }
+}
+
+private struct MainWindowRegistrationView: View {
+  @Environment(\.openWindow) private var openWindow
+
+  var body: some View {
+    Color.clear
+      .frame(width: 0, height: 0)
+      .onAppear {
+        MainWindowController.shared.register(openWindow)
+      }
+  }
+}

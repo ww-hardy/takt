@@ -6,14 +6,14 @@ set -euo pipefail
 #
 # Usage:
 #   scripts/update_appcast.sh \
-#     --dmg Dayflow.dmg \
-#     --url https://github.com/you/repo/releases/download/v1.2.3/Dayflow.dmg \
+#     --dmg TAKT.dmg \
+#     --url https://github.com/you/repo/releases/download/v1.2.3/TAKT.dmg \
 #     --short 1.2.3 \
 #     --build 123 \
 #     --signature <BASE64_EDDSA_SIG> \
 #     [--msv 13.0] \
 #     [--notes https://github.com/you/repo/releases/tag/v1.2.3] \
-#     [--out docs/appcast.xml]
+#     [--out appcast.xml]
 
 DMG=""
 URL=""
@@ -22,7 +22,7 @@ BUILD_VER=""
 SIG=""
 MSV=""
 NOTES_LINK=""
-OUT="docs/appcast.xml"
+OUT="appcast.xml"
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -51,7 +51,7 @@ fi
 LEN=$(stat -f%z "$DMG" 2>/dev/null || wc -c <"$DMG")
 DATE_RFC=$(LC_ALL=C date -u "+%a, %d %b %Y %H:%M:%S %z")
 
-TITLE="Dayflow Updates"
+TITLE="TAKT Updates"
 LANG="en"
 
 mkdir -p "$(dirname "$OUT")"

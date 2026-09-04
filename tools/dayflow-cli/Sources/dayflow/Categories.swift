@@ -3,7 +3,7 @@
 //  dayflow-cli
 //
 //  Categories live in the app's preferences (the `colorCategories` key in
-//  teleportlabs.com.Dayflow), not in SQLite. We read that domain directly —
+//  teleportlabs.com.TAKT), not in SQLite. We read that domain directly —
 //  reads across processes are what CFPreferences is for — and fall back to
 //  the app's own default set when the key is absent, which is exactly what
 //  CategoryStore does on load.

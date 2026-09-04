@@ -2,7 +2,7 @@
 //  Queries.swift
 //  dayflow-cli
 //
-//  Typed reads over Dayflow's schema. SQL semantics deliberately mirror
+//  Typed reads over TAKT's schema. SQL semantics deliberately mirror
 //  StorageManager: day queries select cards *starting* inside the 4 AM window,
 //  range queries select cards overlapping the window, both skip soft-deleted
 //  rows, both order by start_ts.

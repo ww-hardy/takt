@@ -1,18 +1,18 @@
 *.dmg
 *.DS_Store
 .DS_Store
-Dayflow/build*
+TAKT/build*
 *.xcuserstate
 xcuserdata/
 LLMEvalScript.swift
-Dayflow/eval/
+TAKT/eval/
 evals/
 build/
 build_tmp/
 build_universal/
 .claude/
 scripts/release.env
-Dayflow/Config/LocalSecrets.xcconfig
+TAKT/Config/LocalSecrets.xcconfig
 signed/
 
 # Ignore Claude prompt notes

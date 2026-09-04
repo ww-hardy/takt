@@ -7,7 +7,7 @@
 //  nothing else — all diagnostics go to stderr.
 //
 //  Read tools are always available. Write tools appear in tools/list only
-//  when the user has enabled edits in Dayflow's settings, so a model can't
+//  when the user has enabled edits in TAKT's settings, so a model can't
 //  see or attempt them otherwise.
 //
 
@@ -93,7 +93,7 @@ private func schema(_ properties: [String: Any], required: [String] = []) -> [St
 
 private let dateProperty: [String: Any] = [
   "type": "string",
-  "description": "Day as YYYY-MM-DD. Omit for the current Dayflow day (days start at 4 AM).",
+  "description": "Day as YYYY-MM-DD. Omit for the current TAKT day (days start at 4 AM).",
 ]
 
 private func toolDefinitions() -> [[String: Any]] {
@@ -112,7 +112,7 @@ private func toolDefinitions() -> [[String: Any]] {
     [
       "name": "get_timeline",
       "description":
-        "Activities for one Dayflow day: times, titles, one-line summaries, categories, and record IDs. Each activity has a longer detailed write-up NOT included here — call get_activity_detail for specific activities that need depth. \(untrustedNote)",
+        "Activities for one TAKT day: times, titles, one-line summaries, categories, and record IDs. Each activity has a longer detailed write-up NOT included here — call get_activity_detail for specific activities that need depth. \(untrustedNote)",
       "inputSchema": schema(["date": dateProperty]),
       "annotations": ["readOnlyHint": true, "idempotentHint": true],
     ],
@@ -136,7 +136,7 @@ private func toolDefinitions() -> [[String: Any]] {
     [
       "name": "get_daily",
       "description":
-        "The Daily standup document Dayflow generated: highlights, tasks, blockers. Use for standups and status updates.",
+        "The Daily standup document TAKT generated: highlights, tasks, blockers. Use for standups and status updates.",
       "inputSchema": schema(["date": dateProperty]),
       "annotations": ["readOnlyHint": true, "idempotentHint": true],
     ],
@@ -156,7 +156,7 @@ private func toolDefinitions() -> [[String: Any]] {
     [
       "name": "get_status",
       "description":
-        "Dayflow's state: current day, capture freshness, analysis backlog, whether edits are enabled.",
+        "TAKT's state: current day, capture freshness, analysis backlog, whether edits are enabled.",
       "inputSchema": schema([:]),
       "annotations": ["readOnlyHint": true, "idempotentHint": true],
     ],
@@ -291,7 +291,7 @@ private func callTool(name: String, arguments: [String: Any]) -> [String: Any] {
       return toolError("Unknown tool: \(name)")
     }
   } catch DatabaseError.notFound {
-    return toolError("No Dayflow data found. The user needs to open Dayflow and record first.")
+    return toolError("No TAKT data found. The user needs to open TAKT and record first.")
   } catch {
     return toolError("Query failed: \(error)")
   }
@@ -377,7 +377,7 @@ private func runDailyTool(_ arguments: [String: Any]) throws -> [String: Any] {
   }
   guard let standup = try fetchStandup(db: openDB(), day: key) else {
     return toolError(
-      "No Daily for \(key). Dayflow generates one after a day with enough activity.")
+      "No Daily for \(key). TAKT generates one after a day with enough activity.")
   }
   return toolResult([
     "date": standup.day,
@@ -439,7 +439,7 @@ private func runStatusTool() throws -> [String: Any] {
 private func runWriteTool(name: String, arguments: [String: Any]) -> [String: Any] {
   guard AgentBridge.editsEnabled else {
     return toolError(
-      "Edits are turned off. The user can enable them in Dayflow → Settings → AI Tools.")
+      "Edits are turned off. The user can enable them in TAKT → Settings → AI Tools.")
   }
   // Tool names map 1:1 onto bridge operations.
   let operation: String

@@ -20,7 +20,7 @@ enum AgentBridge {
   static var socketPath: String {
     let appSupport = FileManager.default.urls(
       for: .applicationSupportDirectory, in: .userDomainMask)[0]
-    return appSupport.appendingPathComponent("Dayflow/agent.sock").path
+    return appSupport.appendingPathComponent("TAKT/agent.sock").path
   }
 
   static var editsEnabled: Bool {
@@ -65,7 +65,7 @@ enum AgentBridge {
     guard connectResult == 0 else {
       throw BridgeError(
         code: "app_not_running",
-        message: "Dayflow isn't running. Reads work offline; edits need the app open.")
+        message: "TAKT isn't running. Reads work offline; edits need the app open.")
     }
 
     let request: [String: Any] = [
@@ -93,7 +93,7 @@ enum AgentBridge {
     guard
       let object = try? JSONSerialization.jsonObject(with: response) as? [String: Any]
     else {
-      throw BridgeError(code: "protocol_error", message: "Unreadable response from Dayflow.")
+      throw BridgeError(code: "protocol_error", message: "Unreadable response from TAKT.")
     }
 
     if object["ok"] as? Bool == true {
@@ -102,7 +102,7 @@ enum AgentBridge {
     let errorInfo = object["error"] as? [String: Any]
     throw BridgeError(
       code: errorInfo?["code"] as? String ?? "unknown",
-      message: errorInfo?["message"] as? String ?? "Dayflow reported an error."
+      message: errorInfo?["message"] as? String ?? "TAKT reported an error."
     )
   }
 }

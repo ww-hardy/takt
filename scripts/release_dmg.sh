@@ -1,17 +1,17 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Release helper for Dayflow: builds, signs, notarizes, and packages a DMG for distribution.
+# Release helper for TAKT: builds, signs, notarizes, and packages a DMG for distribution.
 #
 # Usage:
 #   ./scripts/release_dmg.sh
 #
 # Optional env vars:
-#   SCHEME           - Xcode scheme (default: Dayflow)
+#   SCHEME           - Xcode scheme (default: TAKT)
 #   CONFIG           - Xcode configuration (default: Release)
 #   DERIVED_DATA     - Derived data path (default: build)
-#   APP_NAME         - App name (default: Dayflow)
-#   ENTITLEMENTS     - Entitlements plist path (default: Dayflow/Dayflow/Dayflow.entitlements)
+#   APP_NAME         - App name (default: TAKT)
+#   ENTITLEMENTS     - Entitlements plist path (default: TAKT/TAKT/Dayflow.entitlements)
 #   SIGN_ID          - Codesign identity (e.g. "Developer ID Application: Your Name (TEAMID)")
 #   VOL_NAME         - DMG volume name (defaults to APP_NAME)
 #   DMG_NAME         - Output DMG name (defaults to "${APP_NAME}.dmg")
@@ -30,22 +30,22 @@ if [[ -f "${SCRIPT_DIR}/release.env" ]]; then
   source "${SCRIPT_DIR}/release.env"
 fi
 
-SCHEME=${SCHEME:-Dayflow}
+SCHEME=${SCHEME:-TAKT}
 CONFIG=${CONFIG:-Release}
 DERIVED_DATA=${DERIVED_DATA:-build}
-APP_NAME=${APP_NAME:-Dayflow}
-ENTITLEMENTS=${ENTITLEMENTS:-Dayflow/Dayflow/Dayflow.entitlements}
+APP_NAME=${APP_NAME:-TAKT}
+ENTITLEMENTS=${ENTITLEMENTS:-TAKT/TAKT/Dayflow.entitlements}
+PROJECT_PATH=${PROJECT_PATH:-TAKT/TAKT.xcodeproj}
 VOL_NAME=${VOL_NAME:-$APP_NAME}
 DMG_NAME=${DMG_NAME:-"${APP_NAME}.dmg"}
 
 APP_PATH="${DERIVED_DATA}/Build/Products/${CONFIG}/${APP_NAME}.app"
 # Work in a non-iCloud temporary directory to avoid fileprovider xattrs
-SANITIZED_DIR=${SANITIZED_DIR:-$(mktemp -d -t dayflow_sign)}
+SANITIZED_DIR=${SANITIZED_DIR:-$(mktemp -d -t takt_sign)}
 trap 'rm -rf "${SANITIZED_DIR}"' EXIT
 SANITIZED_APP="${SANITIZED_DIR}/${APP_NAME}.app"
 
 # Fixed project location inside repo
-PROJECT_PATH=${PROJECT_PATH:-Dayflow/Dayflow.xcodeproj}
 if [[ ! -d "$PROJECT_PATH" ]]; then
   echo "ERROR: Xcode project not found at $PROJECT_PATH" >&2
   exit 1
@@ -179,13 +179,12 @@ if [[ -n "${SENTRY_ENV:-}" ]]; then
   /usr/libexec/PlistBuddy -c "Set :SentryEnvironment ${SENTRY_ENV}" "${SANITIZED_APP}/Contents/Info.plist" \
     >/dev/null 2>&1 || /usr/libexec/PlistBuddy -c "Add :SentryEnvironment string ${SENTRY_ENV}" "${SANITIZED_APP}/Contents/Info.plist"
 fi
-if [[ -z "${DAYFLOW_BACKEND_URL:-}" ]]; then
-  echo "ERROR: DAYFLOW_BACKEND_URL must be set before building a release DMG." >&2
-  exit 1
+# The backend is optional for this release. Only inject it when explicitly configured;
+# never block a local-first build on an unavailable backend secret or endpoint.
+if [[ -n "${DAYFLOW_BACKEND_URL:-}" ]]; then
+  /usr/libexec/PlistBuddy -c "Set :DayflowBackendURL ${DAYFLOW_BACKEND_URL}" "${SANITIZED_APP}/Contents/Info.plist" \
+    >/dev/null 2>&1 || /usr/libexec/PlistBuddy -c "Add :DayflowBackendURL string ${DAYFLOW_BACKEND_URL}" "${SANITIZED_APP}/Contents/Info.plist"
 fi
-RESOLVED_DAYFLOW_BACKEND_URL="${DAYFLOW_BACKEND_URL}"
-/usr/libexec/PlistBuddy -c "Set :DayflowBackendURL ${RESOLVED_DAYFLOW_BACKEND_URL}" "${SANITIZED_APP}/Contents/Info.plist" \
-  >/dev/null 2>&1 || /usr/libexec/PlistBuddy -c "Add :DayflowBackendURL string ${RESOLVED_DAYFLOW_BACKEND_URL}" "${SANITIZED_APP}/Contents/Info.plist"
 
 # Resolve $(PRODUCT_BUNDLE_IDENTIFIER) in entitlements before codesigning
 BUNDLE_ID=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "${SANITIZED_APP}/Contents/Info.plist" 2>/dev/null || true)
@@ -258,7 +257,7 @@ fi
 rm -f "${DMG_NAME}"
 
 # Window size and positions tuned for docs/assets/dmg-background.png (1550×960 @2x, displays as 775×480)
-# Dayflow app on left, Applications folder on right (swapped from typical layout)
+# TAKT app on left, Applications folder on right (swapped from typical layout)
 create-dmg \
   --volname "${VOL_NAME}" \
   --background "${DMG_BG}" \
