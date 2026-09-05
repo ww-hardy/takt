@@ -5,6 +5,18 @@
     <language>en</language>
     <item>
       <title>Version 2.1.2</title>
+      <pubDate>Sat, 05 Sep 2026 09:39:15 +0000</pubDate>
+      <enclosure url="https://github.com/ww-hardy/takt/releases/download/v2.1.2/TAKT-2.1.2-llama-cpp.dmg"
+                 sparkle:version="121"
+                 sparkle:shortVersionString="2.1.2"
+                 length="45191539"
+                 type="application/octet-stream"
+                 sparkle:edSignature="Cj2TiEEQ3xYeGxuGvewbOfIOTGgnyLM+lSa2KcB6bE0BCtvucVabKnLr7HPXLh2r+oz/b94JEQ6v+1fmL1MMAg=="/>
+      <sparkle:minimumSystemVersion>13.0</sparkle:minimumSystemVersion>
+      <releaseNotesLink>https://github.com/ww-hardy/takt/releases/tag/v2.1.2</releaseNotesLink>
+    </item>
+    <item>
+      <title>Version 2.1.2</title>
       <pubDate>Fri, 04 Sep 2026 17:49:12 +0000</pubDate>
       <enclosure url="https://github.com/ww-hardy/takt/releases/download/v2.1.2/TAKT-2.1.2-llama-cpp.dmg"
                  sparkle:version="121"
