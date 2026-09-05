@@ -158,8 +158,9 @@ extension DailyView {
       return
     }
 
+    // Daily follows the canonical app-wide routing. Do not persist this picker
+    // selection into the global routing store; Settings owns that decision.
     dailyRecapProvider = provider
-    DailyRecapGenerator.shared.persistSelectedProvider(provider)
     isShowingProviderPicker = false
     standupRegenerateResetTask?.cancel()
     standupRegenerateResetTask = nil

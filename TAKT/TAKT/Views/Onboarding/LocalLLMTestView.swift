@@ -172,13 +172,6 @@ struct LocalLLMTestView: View {
     success = false
     resultMessage = nil
 
-    guard let url = LocalEndpointUtilities.chatCompletionsURL(baseURL: baseURL) else {
-      resultMessage = "Invalid base URL"
-      isTesting = false
-      onTestComplete(false)
-      return
-    }
-
     let payload = LocalLLMChatRequest(
       model: modelId,
       messages: [
@@ -193,19 +186,18 @@ struct LocalLLMTestView: View {
       maxTokens: 10
     )
 
-    var request = URLRequest(url: url)
-    request.httpMethod = "POST"
-    request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-    if engine == .lmstudio {
-      request.setValue("Bearer lm-studio", forHTTPHeaderField: "Authorization")
+    guard let request = LocalLLMTestRequestBuilder.makeRequest(
+      baseURL: baseURL,
+      modelId: modelId,
+      apiKey: trimmedAPIKey,
+      engine: engine,
+      body: payload
+    ) else {
+      resultMessage = "Invalid base URL"
+      isTesting = false
+      onTestComplete(false)
+      return
     }
-    if engine == .custom && !trimmedAPIKey.isEmpty {
-      request.setValue("Bearer \(trimmedAPIKey)", forHTTPHeaderField: "Authorization")
-    }
-    let encoder = JSONEncoder()
-    encoder.keyEncodingStrategy = .convertToSnakeCase
-    request.httpBody = try? encoder.encode(payload)
-    request.timeoutInterval = 35
 
     let startedAt = Date()
 
@@ -256,6 +248,37 @@ struct LocalLLMTestView: View {
         }
       }
     }.resume()
+  }
+}
+
+enum LocalLLMTestRequestBuilder {
+  static func makeRequest(
+    baseURL: String,
+    modelId: String,
+    apiKey: String,
+    engine: LocalEngine,
+    body: LocalLLMChatRequest
+  ) -> URLRequest? {
+    guard let url = LocalEndpointUtilities.chatCompletionsURL(baseURL: baseURL) else {
+      return nil
+    }
+
+    var request = URLRequest(url: url)
+    request.httpMethod = "POST"
+    request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+    if engine == .lmstudio {
+      request.setValue("Bearer lm-studio", forHTTPHeaderField: "Authorization")
+    } else if engine == .custom && !apiKey.isEmpty {
+      request.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
+    }
+
+    let encoder = JSONEncoder()
+    encoder.keyEncodingStrategy = .convertToSnakeCase
+    request.httpBody = try? encoder.encode(
+      LocalLLMChatRequest(model: modelId, messages: body.messages, maxTokens: body.maxTokens)
+    )
+    request.timeoutInterval = 35
+    return request
   }
 }
 

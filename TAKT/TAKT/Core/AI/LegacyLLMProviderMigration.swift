@@ -87,11 +87,14 @@ enum LegacyLLMProviderMigration {
       )
     }
 
+    // Do not silently resurrect Gemini when no legacy provider was selected.
+    // The onboarding flow starts with the OpenAI-compatible path, and a missing
+    // legacy value must not turn into a different provider after a restart.
     let providerID =
       providerID(
         from: defaults.string(forKey: Key.selectedProvider),
         combinedChatCLITool: preferredChatCLITool(from: defaults)
-      ) ?? .gemini
+      ) ?? .openAICompatible
     return PrimarySelection(
       providerID: providerID,
       dayflowEndpointOverride: nil,

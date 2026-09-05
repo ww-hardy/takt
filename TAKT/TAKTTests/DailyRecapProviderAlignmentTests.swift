@@ -65,10 +65,13 @@ final class DailyRecapProviderAlignmentTests: XCTestCase {
 
   func testDailyProviderFollowsCanonicalDefaultWhenNoRoutingStored() throws {
     let defaults = try makeDefaults()
-    // No routing value and no legacy provider values: the canonical store migrates
-    // to its built-in default primary (gemini). Daily must follow that same default.
-    XCTAssertEqual(DailyRecapProvider.load(from: defaults), .gemini)
-    XCTAssertEqual(try LLMProviderRoutingStore.load(from: defaults).primary, .gemini)
+    // No routing value and no legacy provider values: migration must use the
+    // neutral OpenAI-compatible path rather than silently selecting Gemini.
+    XCTAssertEqual(DailyRecapProvider.load(from: defaults), .openAICompatible)
+    XCTAssertEqual(
+      try LLMProviderRoutingStore.load(from: defaults).primary,
+      .openAICompatible
+    )
   }
 
   func testDailyProviderDoesNotReadOrWriteLegacyStorageKey() throws {
@@ -84,29 +87,22 @@ final class DailyRecapProviderAlignmentTests: XCTestCase {
     XCTAssertEqual(defaults.string(forKey: "dailyRecapProvider_v1"), "gemini")
   }
 
-  // MARK: - Persisting a Daily selection writes the canonical routing
+  // MARK: - Daily selection must not overwrite global routing
 
-  func testPersistSelectedProviderWritesCanonicalRouting() throws {
+  func testDailySelectionDoesNotOverwriteCanonicalRouting() throws {
     let defaults = try makeDefaults()
-    let generator = DailyRecapGenerator.shared
+    try saveRouting(LLMProviderRouting(primary: .openAICompatible), to: defaults)
 
-    generator.persistSelectedProvider(.openAICompatible, to: defaults)
+    // The Daily picker is local UI state. The Settings provider is the canonical
+    // app-wide decision and must survive a later app restart.
     XCTAssertEqual(
-      try LLMProviderRoutingStore.load(from: defaults).primary, .openAICompatible)
-    XCTAssertNil(
-      defaults.object(forKey: "dailyRecapProvider_v1"),
-      "Daily selection must persist through the routing store, not a separate key")
-  }
-
-  func testPersistNoProviderIsNoOp() throws {
-    let defaults = try makeDefaults()
-    try saveRouting(LLMProviderRouting(primary: .local), to: defaults)
-    let generator = DailyRecapGenerator.shared
-
-    generator.persistSelectedProvider(.none, to: defaults)
+      try LLMProviderRoutingStore.load(from: defaults).primary,
+      .openAICompatible
+    )
     XCTAssertEqual(
-      try LLMProviderRoutingStore.load(from: defaults).primary, .local,
-      ".none has no canonical routing equivalent; it must not clobber the routing")
+      DailyRecapProvider.load(from: defaults),
+      .openAICompatible
+    )
   }
 
   // MARK: - Mapping
@@ -127,18 +123,4 @@ final class DailyRecapProviderAlignmentTests: XCTestCase {
     XCTAssertTrue(DailyRecapProvider.allCases.contains(.openAICompatible))
   }
 
-  // MARK: - Round-trip: selecting in the picker is visible to the whole app
-
-  func testDailySelectionIsVisibleToRestOfApplication() throws {
-    let defaults = try makeDefaults()
-    try saveRouting(LLMProviderRouting(primary: .openAICompatible), to: defaults)
-    let generator = DailyRecapGenerator.shared
-
-    generator.persistSelectedProvider(.local, to: defaults)
-
-    // The rest of the app reads the same canonical routing store.
-    XCTAssertEqual(try LLMProviderRoutingStore.load(from: defaults).primary, .local)
-    // And Daily re-loads the same value.
-    XCTAssertEqual(DailyRecapProvider.load(from: defaults), .local)
-  }
 }

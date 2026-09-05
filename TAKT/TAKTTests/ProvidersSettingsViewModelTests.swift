@@ -65,6 +65,61 @@ final class ProvidersSettingsViewModelTests: XCTestCase {
     )
   }
 
+  func testEverySupportedLocalEngineHasAnInstallationPath() {
+    XCTAssertEqual(LocalEngine.ollama.installURL?.absoluteString, "https://ollama.com/download/mac")
+    XCTAssertEqual(LocalEngine.lmstudio.installURL?.absoluteString, "https://lmstudio.ai/")
+    XCTAssertEqual(
+      LocalEngine.llamaCpp.installCommand,
+      "brew install llama.cpp"
+    )
+  }
+
+  func testLocalConnectionRequestUsesTheSelectedEngineConfiguration() throws {
+    let body = LocalLLMChatRequest(
+      model: "qwen3-vl-4b",
+      messages: [],
+      maxTokens: 10
+    )
+
+    let llamaRequest = try XCTUnwrap(
+      LocalLLMTestRequestBuilder.makeRequest(
+        baseURL: "http://127.0.0.1:8080",
+        modelId: "qwen3-vl-4b",
+        apiKey: "",
+        engine: .llamaCpp,
+        body: body
+      )
+    )
+    XCTAssertEqual(llamaRequest.url?.absoluteString, "http://127.0.0.1:8080/v1/chat/completions")
+    XCTAssertNil(llamaRequest.value(forHTTPHeaderField: "Authorization"))
+
+    let ollamaRequest = try XCTUnwrap(
+      LocalLLMTestRequestBuilder.makeRequest(
+        baseURL: "http://127.0.0.1:11434",
+        modelId: "qwen3-vl:4b",
+        apiKey: "",
+        engine: .ollama,
+        body: body
+      )
+    )
+    XCTAssertEqual(ollamaRequest.url?.absoluteString, "http://127.0.0.1:11434/v1/chat/completions")
+    XCTAssertNil(ollamaRequest.value(forHTTPHeaderField: "Authorization"))
+
+    let lmStudioRequest = try XCTUnwrap(
+      LocalLLMTestRequestBuilder.makeRequest(
+        baseURL: "http://127.0.0.1:1234",
+        modelId: "qwen3-vl-4b",
+        apiKey: "",
+        engine: .lmstudio,
+        body: body
+      )
+    )
+    XCTAssertEqual(
+      lmStudioRequest.value(forHTTPHeaderField: "Authorization"),
+      "Bearer lm-studio"
+    )
+  }
+
   func testLlamaCppConfigurationPersistsAndBuildsAUsableServerCommand() {
     let configuration = LlamaCppConfiguration(
       modelDirectory: "~/Models/llama.cpp",

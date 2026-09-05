@@ -39,11 +39,13 @@ enum DashboardChatProvider: String, Codable, CaseIterable {
       return .claude
     case .openAICompatible:
       return .openAICompatible
-    case .local, .dayflow, nil:
-      // OpenAI-kompatibel (z. B. Nous Portal) laeuft ueber die
-      // OpenAI-kompatible Chat-Route; fuer den Chat-Provider ist Gemini
-      // der Fallback, wenn kein anderer Anbieter aktiv ist.
-      return .gemini
+    case .local:
+      // Local engines use the same OpenAI-compatible chat transport.
+      return .openAICompatible
+    case .dayflow, nil:
+      // TAKT has no hosted backend fallback. Keep the mapping explicit rather
+      // than silently presenting Gemini as the active provider.
+      return .openAICompatible
     }
   }
 

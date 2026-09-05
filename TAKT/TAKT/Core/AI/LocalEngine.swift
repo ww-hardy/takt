@@ -25,4 +25,28 @@ enum LocalEngine: String, CaseIterable, Identifiable, Codable {
     case .custom: return "http://localhost:11434"
     }
   }
+
+  var installURL: URL? {
+    switch self {
+    case .ollama:
+      return URL(string: "https://ollama.com/download/mac")
+    case .lmstudio:
+      return URL(string: "https://lmstudio.ai/")
+    case .llamaCpp:
+      return URL(string: "https://formulae.brew.sh/formula/llama.cpp")
+    case .custom:
+      return nil
+    }
+  }
+
+  var installCommand: String? {
+    switch self {
+    case .ollama, .lmstudio:
+      return nil
+    case .llamaCpp:
+      return "brew install llama.cpp"
+    case .custom:
+      return nil
+    }
+  }
 }

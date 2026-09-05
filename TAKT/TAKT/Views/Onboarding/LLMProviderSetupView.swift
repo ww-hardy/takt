@@ -127,6 +127,45 @@ struct LLMProviderSetupView: View {
     }
   }
 
+  @ViewBuilder
+  private func localEngineInstallButton(_ engine: LocalEngine) -> some View {
+    DayflowSurfaceButton(
+      action: {
+        setupState.selectEngine(engine)
+        if let url = engine.installURL {
+          NSWorkspace.shared.open(url)
+        }
+      },
+      content: {
+        VStack(alignment: .leading, spacing: 6) {
+          HStack(spacing: 7) {
+            Image(systemName: engine == .llamaCpp ? "terminal" : "arrow.down.circle")
+              .font(.system(size: 13, weight: .semibold))
+            Text(engine == .llamaCpp ? "Install llama.cpp" : "Install \(engine.displayName)")
+              .font(.custom("Figtree", size: 13))
+              .fontWeight(.semibold)
+          }
+          if let command = engine.installCommand {
+            Text(command)
+              .font(.system(size: 10, design: .monospaced))
+              .opacity(0.75)
+          } else {
+            Text("Open download page")
+              .font(.custom("Figtree", size: 10))
+              .opacity(0.75)
+          }
+        }
+      },
+      background: Color(red: 0.25, green: 0.17, blue: 0),
+      foreground: .white,
+      borderColor: .clear,
+      cornerRadius: 8,
+      horizontalPadding: 12,
+      verticalPadding: 10,
+      showOverlayStroke: true
+    )
+  }
+
   var nextButtonText: String {
     if let title = setupState.currentStep.contentType.informationTitle {
       if (title == "Testing" || title == "Test Connection") && !setupState.testSuccessful {
@@ -192,47 +231,30 @@ struct LLMProviderSetupView: View {
             .fontWeight(.semibold)
             .foregroundColor(.black.opacity(0.9))
           Text(
-            "For local use, LM Studio is the most reliable; Ollama has a known thinking bug in onboarding (can't turn thinking off) and performance is unreliable."
+            "Choose the local engine you already use or install one below. Each engine has its own endpoint and model setup."
           )
           .font(.custom("Figtree", size: 14))
           .foregroundColor(.black.opacity(0.6))
         }
-        HStack(alignment: .center, spacing: 12) {
-          DayflowSurfaceButton(
-            action: {
-              setupState.selectEngine(.lmstudio)
-              openLMStudioDownload()
-            },
-            content: {
-              AsyncImage(
-                url: URL(
-                  string:
-                    "https://lmstudio.ai/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Flmstudio-app-logo.11b4d746.webp&w=96&q=75"
-                )
-              ) { phase in
-                switch phase {
-                case .success(let image): image.resizable().scaledToFit()
-                case .failure(_):
-                  Image(systemName: "desktopcomputer").resizable().scaledToFit().foregroundColor(
-                    .white.opacity(0.6))
-                case .empty: ProgressView().scaleEffect(0.7)
-                @unknown default: EmptyView()
-                }
-              }
-              .frame(width: 18, height: 18)
-              Text("Download LM Studio")
-                .font(.custom("Figtree", size: 14))
-                .fontWeight(.semibold)
-            },
-            background: Color(red: 0.25, green: 0.17, blue: 0),
-            foreground: .white,
-            borderColor: .clear,
-            cornerRadius: 8,
-            showOverlayStroke: true
-          )
+        VStack(alignment: .leading, spacing: 12) {
+          Text("Install or choose an engine")
+            .font(.custom("Figtree", size: 14))
+            .fontWeight(.semibold)
+            .foregroundColor(.black.opacity(0.75))
+
+          HStack(alignment: .top, spacing: 10) {
+            ForEach([LocalEngine.lmstudio, .ollama, .llamaCpp], id: \.self) { engine in
+              localEngineInstallButton(engine)
+            }
+          }
         }
         Text(
-          "Already have a local server? Make sure it’s OpenAI-compatible. You can set a custom base URL in the next step."
+          "Choose the engine you want to use. The next step shows the matching model setup and server command."
+        )
+        .font(.custom("Figtree", size: 13))
+        .foregroundColor(.black.opacity(0.6))
+        Text(
+          "Already have a local server? Choose the matching engine and verify its endpoint in the next step."
         )
         .font(.custom("Figtree", size: 13))
         .foregroundColor(.black.opacity(0.6))

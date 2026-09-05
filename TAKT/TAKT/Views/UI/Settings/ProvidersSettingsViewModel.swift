@@ -3,7 +3,7 @@ import SwiftUI
 
 @MainActor
 final class ProvidersSettingsViewModel: ObservableObject {
-  @Published private(set) var routing = LLMProviderRouting(primary: .gemini)
+  @Published private(set) var routing: LLMProviderRouting
   @Published private(set) var hasLoadedRouting = false
   @Published var setupModalProvider: LLMProviderID? {
     didSet {
@@ -141,6 +141,13 @@ final class ProvidersSettingsViewModel: ObservableObject {
   private var pendingSetupRole: ProviderRoutingRole?
 
   init() {
+    // Never publish Gemini as a transient startup value. Hydrate the canonical
+    // route synchronously; if it is unavailable, use the neutral route until
+    // the error can be shown by handleOnAppear().
+    let storedRouting: LLMProviderRouting? = try? LLMProviderRoutingStore.load()
+    routing = storedRouting ?? LLMProviderRouting(primary: .openAICompatible)
+    hasLoadedRouting = storedRouting != nil
+
     let preference = GeminiModelPreference.load()
     selectedGeminiModel = preference.primary
     savedGeminiModel = preference.primary

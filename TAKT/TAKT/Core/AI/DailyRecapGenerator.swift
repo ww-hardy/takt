@@ -140,18 +140,13 @@ final class DailyRecapGenerator {
     DailyRecapProvider.load(from: defaults)
   }
 
-  /// Daily follows the canonical app-wide provider (timeline/chat). Selecting a Daily
-  /// provider persists through to the shared `LLMProviderRoutingStore` so Daily and the
-  /// rest of the application always use the same provider. `.none` has no routing
-  /// equivalent (the routing store always has a primary), so it is a no-op.
+  /// The global provider is owned by Settings. Keep this compatibility entry point
+  /// as a no-op so Daily cannot overwrite the app-wide routing on restart.
   func persistSelectedProvider(
     _ provider: DailyRecapProvider, to defaults: UserDefaults = .standard
   ) {
-    guard let providerID = provider.canonicalProviderID else { return }
-    try? LLMProviderRoutingStore.save(
-      LLMProviderRouting(primary: providerID),
-      to: defaults
-    )
+    _ = provider
+    _ = defaults
   }
 
   func availabilitySnapshot() -> [DailyRecapProvider: DailyRecapProviderAvailability] {

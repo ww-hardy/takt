@@ -24,12 +24,12 @@ final class LLMProviderRoutingTests: XCTestCase {
     super.tearDown()
   }
 
-  func testMissingLegacyValuesDefaultToGeminiWithoutMutatingLegacyState() throws {
+  func testMissingLegacyValuesDefaultToOpenAICompatibleWithoutMutatingLegacyState() throws {
     let defaults = try makeDefaults()
 
     let migration = LegacyLLMProviderMigration.migrate(from: defaults)
 
-    XCTAssertEqual(migration.routing, LLMProviderRouting(primary: .gemini))
+    XCTAssertEqual(migration.routing, LLMProviderRouting(primary: .openAICompatible))
     XCTAssertTrue(migration.sharedPromptOverrides.isEmpty)
     XCTAssertNil(migration.dayflowEndpointOverride)
     XCTAssertNil(migration.localEndpointOverride)
