@@ -4,6 +4,18 @@
     <title>TAKT Updates</title>
     <language>en</language>
     <item>
+      <title>Version 2.1.4</title>
+      <pubDate>Sat, 05 Sep 2026 17:43:02 +0000</pubDate>
+      <enclosure url="https://github.com/ww-hardy/takt/releases/download/v2.1.4/TAKT-2.1.4-routing-fix.dmg"
+                 sparkle:version="123"
+                 sparkle:shortVersionString="2.1.4"
+                 length="45210635"
+                 type="application/octet-stream"
+                 sparkle:edSignature="K37x8Mm99DyhTGFLo0M9kSpuUhuL0VKObLY07sfO7lh8Yv1y6SWVNzEzsx/zp91fkOUYtaTH8iSbux4YpcgkCA=="/>
+      <sparkle:minimumSystemVersion>13.0</sparkle:minimumSystemVersion>
+      <releaseNotesLink>https://github.com/ww-hardy/takt/releases/tag/v2.1.4</releaseNotesLink>
+    </item>
+    <item>
       <title>Version 2.1.3</title>
       <pubDate>Sat, 05 Sep 2026 12:37:02 +0000</pubDate>
       <enclosure url="https://github.com/ww-hardy/takt/releases/download/v2.1.3/TAKT-2.1.3-provider-fix.dmg"
