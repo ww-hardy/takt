@@ -102,6 +102,18 @@ final class ProvidersSettingsViewModelTests: XCTestCase {
     XCTAssertEqual(configuration.contextSize, LlamaCppConfiguration.defaultContextSize)
   }
 
+  func testInitialRoutingUsesPersistedProviderBeforeSettingsAppears() throws {
+    try LLMProviderRoutingStore.save(
+      LLMProviderRouting(primary: .openAICompatible),
+      to: UserDefaults.standard
+    )
+
+    let viewModel = ProvidersSettingsViewModel()
+
+    XCTAssertTrue(viewModel.hasLoadedRouting)
+    XCTAssertEqual(viewModel.primaryRoutingProviderId, .openAICompatible)
+  }
+
   func testProviderSetupCompletionRefreshesLocalModelSettingsFromDefaults() {
     UserDefaults.standard.set(LocalEngine.ollama.rawValue, forKey: "llmLocalEngine")
     UserDefaults.standard.set("http://localhost:11434", forKey: "llmLocalBaseURL")

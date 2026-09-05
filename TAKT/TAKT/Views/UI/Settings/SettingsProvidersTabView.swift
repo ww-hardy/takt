@@ -5,6 +5,32 @@ struct SettingsProvidersTabView: View {
   @ObservedObject var viewModel: ProvidersSettingsViewModel
 
   var body: some View {
+    Group {
+      if viewModel.hasLoadedRouting {
+        loadedContent
+      } else {
+        VStack(alignment: .leading, spacing: 12) {
+          Text("Provider-Einstellungen werden geladen …")
+            .font(.custom("Figtree", size: 15))
+            .fontWeight(.semibold)
+            .foregroundColor(SettingsStyle.text)
+
+          Text(
+            viewModel.providerRoutingErrorMessage
+              ?? "Der aktive Provider wird aus den gespeicherten Einstellungen gelesen."
+          )
+          .font(.custom("Figtree", size: 13))
+          .foregroundColor(
+            viewModel.providerRoutingErrorMessage == nil
+              ? SettingsStyle.secondary : .red.opacity(0.8)
+          )
+          .fixedSize(horizontal: false, vertical: true)
+        }
+      }
+    }
+  }
+
+  private var loadedContent: some View {
     VStack(alignment: .leading, spacing: SettingsStyle.sectionSpacing) {
       if viewModel.currentProvider == .local, viewModel.showLocalModelUpgradeBanner {
         LocalModelUpgradeBanner(

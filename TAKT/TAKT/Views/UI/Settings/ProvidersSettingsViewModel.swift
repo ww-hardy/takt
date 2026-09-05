@@ -170,8 +170,14 @@ final class ProvidersSettingsViewModel: ObservableObject {
       openAICompatibleBaseURL = configuration.baseURL
       openAICompatibleModelID = configuration.modelID
     }
-    openAICompatibleAPIKey =
-      KeychainManager.shared.retrieve(for: OpenAICompatiblePreferences.keychainProvider) ?? ""
+    // Hydrate the canonical routing before the settings view can render.
+    // Avoid provider/keychain side effects here; those belong to onAppear.
+    // The published Gemini value is only a fallback for initialization and
+    // must never appear while persisted routing is available.
+    if let storedRouting = try? LLMProviderRoutingStore.load() {
+      routing = storedRouting
+      hasLoadedRouting = true
+    }
   }
 
   func handleOnAppear() {
