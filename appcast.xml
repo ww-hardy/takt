@@ -4,6 +4,18 @@
     <title>TAKT Updates</title>
     <language>en</language>
     <item>
+      <title>Version 2.1.5</title>
+      <pubDate>Mon, 07 Sep 2026 08:39:40 +0000</pubDate>
+      <enclosure url="https://github.com/ww-hardy/takt/releases/download/v2.1.5/TAKT-2.1.5-cpu-fix.dmg"
+                 sparkle:version="124"
+                 sparkle:shortVersionString="2.1.5"
+                 length="45209953"
+                 type="application/octet-stream"
+                 sparkle:edSignature="9Js2yw4jqhuyS9FTXHjzXdpneYNyteE6cPgofugvV5DY9V/yLJR0N7X/YdwVsrioT6NqWiU4vt/MwYPIu84HCg=="/>
+      <sparkle:minimumSystemVersion>13.0</sparkle:minimumSystemVersion>
+      <releaseNotesLink>https://github.com/ww-hardy/takt/releases/tag/v2.1.5</releaseNotesLink>
+    </item>
+    <item>
       <title>Version 2.1.4</title>
       <pubDate>Sat, 05 Sep 2026 17:43:02 +0000</pubDate>
       <enclosure url="https://github.com/ww-hardy/takt/releases/download/v2.1.4/TAKT-2.1.4-routing-fix.dmg"
