@@ -312,6 +312,8 @@ final class ProvidersSettingsViewModel: ObservableObject {
     LocalModelPreferences.syncPreset(for: engine, modelId: modelId)
     LocalModelPreferences.markUpgradeDismissed(true)
     refreshUpgradeBannerState()
+    // Keep the BaseRT background agent in sync with the newly applied engine.
+    BaseRTLaunchAgentManager.syncWithPersistedLocalConfiguration()
     upgradeStatusMessage = "Upgraded to \(LocalModelPreset.recommended.displayName)"
     AnalyticsService.shared.capture(
       "local_model_upgraded",

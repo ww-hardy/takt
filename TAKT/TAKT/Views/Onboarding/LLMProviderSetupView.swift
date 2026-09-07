@@ -315,6 +315,22 @@ struct LLMProviderSetupView: View {
             )
             .font(.custom("Figtree", size: 13))
             .foregroundColor(.black.opacity(0.65))
+
+            Toggle(
+              "BaseRT automatisch im Hintergrund starten",
+              isOn: $setupState.baseRTAutoStart
+            )
+            .font(.custom("Figtree", size: 13))
+            .fontWeight(.medium)
+            .toggleStyle(.checkbox)
+            .foregroundColor(.black.opacity(0.8))
+
+            Text(
+              "TAKT richtet einen Login-Agenten ein, der `basert serve` nach dem Anmelden automatisch startet — du musst den Server nicht mehr manuell im Terminal betreiben."
+            )
+            .font(.custom("Figtree", size: 12))
+            .foregroundColor(.black.opacity(0.6))
+            .fixedSize(horizontal: false, vertical: true)
           }
         } else if setupState.localEngine == .lmstudio {
           VStack(alignment: .leading, spacing: 16) {
@@ -857,6 +873,9 @@ struct LLMProviderSetupView: View {
     // Also store the endpoint explicitly for other parts of the app if needed
     UserDefaults.standard.set(endpoint, forKey: "llmLocalBaseURL")
     persistLocalAPIKey(setupState.localAPIKey)
+    // Install/remove the BaseRT background agent to match the saved engine
+    // and the user's auto-start choice.
+    BaseRTLaunchAgentManager.syncWithPersistedLocalConfiguration()
   }
 
   func persistOpenAICompatibleSettings() -> Bool {

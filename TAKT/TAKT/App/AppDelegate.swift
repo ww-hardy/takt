@@ -71,6 +71,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     screenshotShortcutTracker.start()
     updateCPUMonitoring(analyticsEnabled: AnalyticsService.shared.isOptedIn)
 
+    // Keep the BaseRT background agent in sync with the persisted local
+    // engine configuration (covers engine switches made outside the setup
+    // flow). Runs off the main thread; launchctl calls can take a moment.
+    DispatchQueue.global(qos: .utility).async {
+      BaseRTLaunchAgentManager.syncWithPersistedLocalConfiguration()
+    }
+
     // App updated check
     let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? ""
     let lastBuild = UserDefaults.standard.string(forKey: "lastRunBuild")

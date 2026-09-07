@@ -710,6 +710,7 @@ struct LocalModelUpgradeSheet: View {
   @State private var candidateAPIKey: String
   @State private var llamaCppConfiguration: LlamaCppConfiguration
   @State private var didApplyUpgrade = false
+  @AppStorage(BaseRTLaunchAgentManager.autoStartKey) private var baseRTAutoStart = false
 
   init(
     preset: LocalModelPreset,
@@ -803,6 +804,26 @@ struct LocalModelUpgradeSheet: View {
             candidateModelId = "qwen3-vl-4b"
             didApplyUpgrade = false
           }
+        }
+
+        if selectedEngine == .baseRT {
+          VStack(alignment: .leading, spacing: 8) {
+            Toggle(
+              "BaseRT automatisch im Hintergrund starten",
+              isOn: $baseRTAutoStart
+            )
+            .font(.custom("Figtree", size: 13))
+            .fontWeight(.medium)
+            .toggleStyle(.checkbox)
+
+            Text(
+              "TAKT richtet einen Login-Agenten ein, der `basert serve` nach dem Anmelden automatisch startet."
+            )
+            .font(.custom("Figtree", size: 12))
+            .foregroundColor(SettingsStyle.secondary)
+            .fixedSize(horizontal: false, vertical: true)
+          }
+          .padding(.top, 4)
         }
 
         LocalLLMTestView(

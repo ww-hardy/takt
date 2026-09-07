@@ -17,6 +17,12 @@ class ProviderSetupState: ObservableObject {
   @Published var localBaseURL: String
   @Published var localModelId: String
   @Published var localAPIKey: String
+  @Published var baseRTAutoStart: Bool {
+    didSet {
+      guard oldValue != baseRTAutoStart else { return }
+      UserDefaults.standard.set(baseRTAutoStart, forKey: BaseRTLaunchAgentManager.autoStartKey)
+    }
+  }
   @Published var llamaCppConfiguration: LlamaCppConfiguration
   @Published var openAICompatiblePreset: OpenAICompatiblePreset = .openRouter
   @Published var openAICompatibleBaseURL: String = OpenAICompatibleConfiguration.openRouterBaseURL
@@ -55,6 +61,7 @@ class ProviderSetupState: ObservableObject {
       savedLocalModelID.isEmpty
       ? LocalModelPreferences.defaultModelId(for: savedLocalEngine) : savedLocalModelID
     self.localAPIKey = defaults.string(forKey: "llmLocalAPIKey") ?? ""
+    self.baseRTAutoStart = defaults.bool(forKey: BaseRTLaunchAgentManager.autoStartKey)
     self.llamaCppConfiguration = LlamaCppConfiguration.load(from: defaults)
 
     let preference = GeminiModelPreference.load()
@@ -498,6 +505,10 @@ extension ProviderSetupState {
       localModelId = LocalModelPreferences.defaultModelId(for: engine)
     } else {
       localModelId = LocalModelPreferences.defaultModelId(for: .ollama)
+    }
+    // A BaseRT background agent only makes sense while BaseRT is the engine.
+    if engine != .baseRT, BaseRTLaunchAgentManager.isInstalled {
+      BaseRTLaunchAgentManager.uninstall()
     }
     let defaultModel = localModelId
 
