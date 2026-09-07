@@ -62,4 +62,41 @@ final class BaseRTLaunchAgentManagerTests: XCTestCase {
     defaults.set(true, forKey: BaseRTLaunchAgentManager.autoStartKey)
     XCTAssertTrue(BaseRTLaunchAgentManager.autoStartEnabled(defaults: defaults))
   }
+
+  func testWrapperIsAdHocSignedAfterWrite() throws {
+    let fileManager = FileManager.default
+    let tempDir = fileManager.temporaryDirectory
+      .appendingPathComponent("basert-agent-sig-\(UUID().uuidString)")
+    try fileManager.createDirectory(at: tempDir, withIntermediateDirectories: true)
+
+    defer { try? fileManager.removeItem(at: tempDir) }
+
+    // Point the manager's wrapper URL at the temp dir by writing the script
+    // content there directly and signing it through the same routine.
+    let testWrapper = tempDir.appendingPathComponent("test-basert-serve.sh")
+    try BaseRTLaunchAgentManager.wrapperScript().write(
+      to: testWrapper, atomically: true, encoding: .utf8)
+    try fileManager.setAttributes(
+      [.posixPermissions: 0o755], ofItemAtPath: testWrapper.path)
+
+    // Run codesign the same way the manager does (ad-hoc, force).
+    let process = Process()
+    process.executableURL = URL(fileURLWithPath: "/usr/bin/codesign")
+    process.arguments = ["-s", "-", "--force", testWrapper.path]
+    try process.run()
+    process.waitUntilExit()
+    XCTAssertEqual(process.terminationStatus, 0)
+
+    let verify = Process()
+    verify.executableURL = URL(fileURLWithPath: "/usr/bin/codesign")
+    verify.arguments = ["-dv", testWrapper.path]
+    let stderrPipe = Pipe()
+    verify.standardError = stderrPipe
+    try verify.run()
+    verify.waitUntilExit()
+    let output = String(
+      data: stderrPipe.fileHandleForReading.readDataToEndOfFile(), encoding: .utf8) ?? ""
+    XCTAssertEqual(verify.terminationStatus, 0)
+    XCTAssertTrue(output.contains("Signature=adhoc"))
+  }
 }

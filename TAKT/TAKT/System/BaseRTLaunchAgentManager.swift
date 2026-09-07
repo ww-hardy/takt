@@ -149,6 +149,27 @@ enum BaseRTLaunchAgentManager {
     try script.write(to: wrapperURL, atomically: true, encoding: .utf8)
     try FileManager.default.setAttributes(
       [.posixPermissions: 0o755], ofItemAtPath: wrapperURL.path)
+    try adHocSignWrapper()
+  }
+
+  /// Ad-hoc signs the generated wrapper so launchd/macOS Gatekeeper accepts
+  /// it as an identified executable instead of showing the "unidentified
+  /// developer" block for `/bin/bash <wrapper>`.
+  static func adHocSignWrapper() throws {
+    let process = Process()
+    process.executableURL = URL(fileURLWithPath: "/usr/bin/codesign")
+    process.arguments = ["-s", "-", "--force", wrapperURL.path]
+
+    let stderrPipe = Pipe()
+    process.standardError = stderrPipe
+    try process.run()
+    process.waitUntilExit()
+
+    guard process.terminationStatus == 0 else {
+      let detail = String(
+        data: stderrPipe.fileHandleForReading.readDataToEndOfFile(), encoding: .utf8) ?? ""
+      throw BaseRTLaunchAgentError.signFailed(detail)
+    }
   }
 
   static func writePlist() throws {
@@ -269,11 +290,14 @@ enum BaseRTLaunchAgentManager {
 
 enum BaseRTLaunchAgentError: LocalizedError {
   case installFailed(String)
+  case signFailed(String)
 
   var errorDescription: String? {
     switch self {
     case .installFailed(let detail):
       return "BaseRT background agent could not be installed: \(detail)"
+    case .signFailed(let detail):
+      return "BaseRT background wrapper could not be signed: \(detail)"
     }
   }
 }
