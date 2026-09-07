@@ -717,7 +717,7 @@ extension DailyView {
     )
   }
   func standupSectionHeading(for date: Date) -> String {
-    "Tagesbericht für \\(dailyDateTitle(for: date))"
+    "Tagesbericht für \(dailyDateTitle(for: date))"
   }
   func standupHighlightsTitle(for sourceDay: DailyStandupDayInfo?) -> String {
     guard let sourceDay else { return "Letzte Highlights" }

@@ -143,7 +143,7 @@ struct LLMProviderSetupView: View {
               .font(.system(size: 13, weight: .semibold))
             Text(
               engine == .llamaCpp ? "Install llama.cpp"
-                : engine == .baseRT ? "Install BaseRT" : "Install \\(engine.displayName)"
+                : engine == .baseRT ? "Install BaseRT" : "Install \(engine.displayName)"
             )
               .font(.custom("Figtree", size: 13))
               .fontWeight(.semibold)

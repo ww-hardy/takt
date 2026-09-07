@@ -81,7 +81,7 @@ enum LocalModelPreset: String, CaseIterable, Codable {
         buttonTitle: nil,
         buttonURL: nil,
         note:
-          "llama.cpp runs locally. TAKT sends screenshots to the local server at \\(LocalEngine.llamaCpp.defaultBaseURL); no native llama.cpp library is embedded in the app."
+          "llama.cpp runs locally. TAKT sends screenshots to the local server at \(LocalEngine.llamaCpp.defaultBaseURL); no native llama.cpp library is embedded in the app."
       )
     case .baseRT:
       return LocalModelInstructionSet(

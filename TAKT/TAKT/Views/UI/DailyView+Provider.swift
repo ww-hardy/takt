@@ -62,7 +62,7 @@ extension DailyView {
       reassertOnPressEnd: true
     )
     .accessibilityLabel(Text("Tagesbericht-Provider wählen"))
-    .help("Tagesbericht-Provider: \\(dailyRecapProvider.selectionLabel)")
+    .help("Tagesbericht-Provider: \(dailyRecapProvider.selectionLabel)")
     .popover(isPresented: $isShowingProviderPicker, arrowEdge: .bottom) {
       dailyProviderPicker(scale: scale)
         .padding(16)
