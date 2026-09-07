@@ -4,6 +4,18 @@
     <title>TAKT Updates</title>
     <language>en</language>
     <item>
+      <title>Version 2.1.8</title>
+      <pubDate>Mon, 07 Sep 2026 17:43:00 +0000</pubDate>
+      <enclosure url="https://github.com/ww-hardy/takt/releases/download/v2.1.8/TAKT-2.1.8-basert-agent.dmg"
+                 sparkle:version="127"
+                 sparkle:shortVersionString="2.1.8"
+                 length="45252480"
+                 type="application/octet-stream"
+                 sparkle:edSignature="LFwXf69G6ESGFTj4T3i01S4Ywelmqrl8c5v9F2PI88CA7U4O0+Hm1nymR7yOmQW3PoSNbV2qQxvKYoijcCciAg=="/>
+      <sparkle:minimumSystemVersion>13.0</sparkle:minimumSystemVersion>
+      <releaseNotesLink>https://github.com/ww-hardy/takt/releases/tag/v2.1.8</releaseNotesLink>
+    </item>
+    <item>
       <title>Version 2.1.7</title>
       <pubDate>Mon, 07 Sep 2026 15:19:18 +0000</pubDate>
       <enclosure url="https://github.com/ww-hardy/takt/releases/download/v2.1.7/TAKT-2.1.7-basert-catalog.dmg"
