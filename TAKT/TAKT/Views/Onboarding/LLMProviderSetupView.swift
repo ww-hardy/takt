@@ -306,12 +306,12 @@ struct LLMProviderSetupView: View {
             TerminalCommandView(
               title: "Start the server:",
               subtitle:
-                "Pulls Qwen3-VL 4B on first start and serves an OpenAI-compatible API on port 8080",
+                "Pulls a pre-converted Gemma vision model on first start and serves an OpenAI-compatible API on port 8080",
               command: "basert serve --model \(LocalModelPreferences.defaultModelId(for: .baseRT)) --port 8080"
             )
 
             Text(
-              "BaseRT caches models in ~/.cache/baseRT/models. Use `basert list` to see installed models."
+              "BaseRT serves vision-capable catalog models (default: Gemma 4 E2B). Models are cached in ~/.cache/baseRT/models; use `basert list` to see installed models."
             )
             .font(.custom("Figtree", size: 13))
             .foregroundColor(.black.opacity(0.65))

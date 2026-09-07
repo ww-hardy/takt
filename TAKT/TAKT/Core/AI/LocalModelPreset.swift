@@ -52,9 +52,9 @@ enum LocalModelPreset: String, CaseIterable, Codable {
     case (.qwen25VL3B, .llamaCpp):
       return "qwen2.5-vl-3b"
     case (.qwen3VL4B, .baseRT):
-      return "Qwen/Qwen3-VL-4B-Instruct"
+      return "basecompute/gemma-4-E2B-it"
     case (.qwen25VL3B, .baseRT):
-      return "Qwen/Qwen2.5-VL-3B-Instruct"
+      return "basecompute/gemma-3-1b-it"
     case (.qwen3VL4B, _):
       return "qwen3-vl:4b"
     case (.qwen25VL3B, _):
@@ -99,7 +99,7 @@ enum LocalModelPreset: String, CaseIterable, Codable {
         buttonTitle: nil,
         buttonURL: nil,
         note:
-          "BaseRT runs locally. TAKT sends screenshots to the local server at \\(LocalEngine.baseRT.defaultBaseURL); no BaseRT library is embedded in the app."
+          "BaseRT serves pre-converted catalog models (vision-capable Gemma 3/4 `it` variants). TAKT sends screenshots to the local server at \(LocalEngine.baseRT.defaultBaseURL); no BaseRT library is embedded in the app."
       )
     case .ollama, .custom:
       return LocalModelInstructionSet(

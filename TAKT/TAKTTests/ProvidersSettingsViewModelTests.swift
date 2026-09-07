@@ -89,11 +89,11 @@ final class ProvidersSettingsViewModelTests: XCTestCase {
     XCTAssertEqual(LocalEngine(rawValue: "base_rt"), .baseRT)
     XCTAssertEqual(
       LocalModelPreferences.defaultModelId(for: .baseRT),
-      "Qwen/Qwen3-VL-4B-Instruct"
+      "basecompute/gemma-4-E2B-it"
     )
     XCTAssertTrue(
       LocalModelPreset.recommended.instructions(for: .baseRT).command?
-        .contains("basert serve --model Qwen/Qwen3-VL-4B-Instruct --port 8080") == true
+        .contains("basert serve --model basecompute/gemma-4-E2B-it --port 8080") == true
     )
   }
 
