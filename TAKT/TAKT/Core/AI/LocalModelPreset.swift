@@ -51,6 +51,10 @@ enum LocalModelPreset: String, CaseIterable, Codable {
       return "qwen3-vl-4b"
     case (.qwen25VL3B, .llamaCpp):
       return "qwen2.5-vl-3b"
+    case (.qwen3VL4B, .baseRT):
+      return "Qwen/Qwen3-VL-4B-Instruct"
+    case (.qwen25VL3B, .baseRT):
+      return "Qwen/Qwen2.5-VL-3B-Instruct"
     case (.qwen3VL4B, _):
       return "qwen3-vl:4b"
     case (.qwen25VL3B, _):
@@ -77,7 +81,25 @@ enum LocalModelPreset: String, CaseIterable, Codable {
         buttonTitle: nil,
         buttonURL: nil,
         note:
-          "llama.cpp runs locally. TAKT sends screenshots to the local server at \(LocalEngine.llamaCpp.defaultBaseURL); no native llama.cpp library is embedded in the app."
+          "llama.cpp runs locally. TAKT sends screenshots to the local server at \\(LocalEngine.llamaCpp.defaultBaseURL); no native llama.cpp library is embedded in the app."
+      )
+    case .baseRT:
+      return LocalModelInstructionSet(
+        title: "Install with BaseRT",
+        subtitle:
+          "BaseRT is the fastest LLM inference runtime for Apple Silicon. Its `basert serve` command exposes an OpenAI-compatible API on port 8080.",
+        bullets: [
+          "Install BaseRT with the one-shot installer",
+          "Pull the vision model with `basert pull`",
+          "Start `basert serve` on port 8080, then test the endpoint",
+        ],
+        commandTitle: "Example server command:",
+        commandSubtitle: "Pulls the model on first serve if it is not cached yet",
+        command: "basert serve --model \(modelId(for: .baseRT)) --port 8080",
+        buttonTitle: nil,
+        buttonURL: nil,
+        note:
+          "BaseRT runs locally. TAKT sends screenshots to the local server at \\(LocalEngine.baseRT.defaultBaseURL); no BaseRT library is embedded in the app."
       )
     case .ollama, .custom:
       return LocalModelInstructionSet(

@@ -72,6 +72,29 @@ final class ProvidersSettingsViewModelTests: XCTestCase {
       LocalEngine.llamaCpp.installCommand,
       "brew install llama.cpp"
     )
+    XCTAssertEqual(
+      LocalEngine.baseRT.installCommand,
+      "curl -LsSf https://basecompute.co/install.sh | sh"
+    )
+    XCTAssertEqual(
+      LocalEngine.baseRT.installURL?.absoluteString,
+      "https://docs.basecompute.co/installation"
+    )
+  }
+
+  func testBaseRTEngineUsesOpenAICompatibleServerDefaults() {
+    XCTAssertEqual(LocalEngine.baseRT.rawValue, "base_rt")
+    XCTAssertEqual(LocalEngine.baseRT.defaultBaseURL, "http://localhost:8080")
+    XCTAssertEqual(LocalEngine.baseRT.displayName, "BaseRT")
+    XCTAssertEqual(LocalEngine(rawValue: "base_rt"), .baseRT)
+    XCTAssertEqual(
+      LocalModelPreferences.defaultModelId(for: .baseRT),
+      "Qwen/Qwen3-VL-4B-Instruct"
+    )
+    XCTAssertTrue(
+      LocalModelPreset.recommended.instructions(for: .baseRT).command?
+        .contains("basert serve --model Qwen/Qwen3-VL-4B-Instruct --port 8080") == true
+    )
   }
 
   func testLocalConnectionRequestUsesTheSelectedEngineConfiguration() throws {
@@ -117,6 +140,34 @@ final class ProvidersSettingsViewModelTests: XCTestCase {
     XCTAssertEqual(
       lmStudioRequest.value(forHTTPHeaderField: "Authorization"),
       "Bearer lm-studio"
+    )
+
+    // BaseRT without a key sends no auth header
+    let baseRTRequest = try XCTUnwrap(
+      LocalLLMTestRequestBuilder.makeRequest(
+        baseURL: "http://127.0.0.1:8080",
+        modelId: "Qwen/Qwen3-VL-4B-Instruct",
+        apiKey: "",
+        engine: .baseRT,
+        body: body
+      )
+    )
+    XCTAssertEqual(baseRTRequest.url?.absoluteString, "http://127.0.0.1:8080/v1/chat/completions")
+    XCTAssertNil(baseRTRequest.value(forHTTPHeaderField: "Authorization"))
+
+    // BaseRT with a key sends it as a Bearer token
+    let baseRTKeyedRequest = try XCTUnwrap(
+      LocalLLMTestRequestBuilder.makeRequest(
+        baseURL: "http://127.0.0.1:8080",
+        modelId: "Qwen/Qwen3-VL-4B-Instruct",
+        apiKey: "local-secret",
+        engine: .baseRT,
+        body: body
+      )
+    )
+    XCTAssertEqual(
+      baseRTKeyedRequest.value(forHTTPHeaderField: "Authorization"),
+      "Bearer local-secret"
     )
   }
 

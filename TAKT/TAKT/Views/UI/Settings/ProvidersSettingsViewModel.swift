@@ -723,6 +723,7 @@ final class ProvidersSettingsViewModel: ObservableObject {
       case .ollama: engineName = "Ollama"
       case .lmstudio: engineName = "LM Studio"
       case .llamaCpp: engineName = "llama.cpp"
+      case .baseRT: engineName = "BaseRT"
       case .custom: engineName = "Custom"
       }
       let displayModel = localModelId.isEmpty

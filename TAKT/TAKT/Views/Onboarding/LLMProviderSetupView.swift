@@ -139,9 +139,12 @@ struct LLMProviderSetupView: View {
       content: {
         VStack(alignment: .leading, spacing: 6) {
           HStack(spacing: 7) {
-            Image(systemName: engine == .llamaCpp ? "terminal" : "arrow.down.circle")
+            Image(systemName: engine == .llamaCpp || engine == .baseRT ? "terminal" : "arrow.down.circle")
               .font(.system(size: 13, weight: .semibold))
-            Text(engine == .llamaCpp ? "Install llama.cpp" : "Install \(engine.displayName)")
+            Text(
+              engine == .llamaCpp ? "Install llama.cpp"
+                : engine == .baseRT ? "Install BaseRT" : "Install \\(engine.displayName)"
+            )
               .font(.custom("Figtree", size: 13))
               .fontWeight(.semibold)
           }
@@ -243,7 +246,7 @@ struct LLMProviderSetupView: View {
             .foregroundColor(.black.opacity(0.75))
 
           HStack(alignment: .top, spacing: 10) {
-            ForEach([LocalEngine.lmstudio, .ollama, .llamaCpp], id: \.self) { engine in
+            ForEach([LocalEngine.lmstudio, .ollama, .llamaCpp, .baseRT], id: \.self) { engine in
               localEngineInstallButton(engine)
             }
           }
@@ -288,12 +291,36 @@ struct LLMProviderSetupView: View {
               .font(.custom("Figtree", size: 13))
               .foregroundColor(.black.opacity(0.65))
           }
+        } else if setupState.localEngine == .baseRT {
+          VStack(alignment: .leading, spacing: 16) {
+            Text("Install BaseRT and start the OpenAI-compatible server:")
+              .font(.custom("Figtree", size: 14))
+              .foregroundColor(.black.opacity(0.6))
+
+            TerminalCommandView(
+              title: "Install BaseRT:",
+              subtitle: "One-shot installer for Apple Silicon (macOS 14+)",
+              command: "curl -LsSf https://basecompute.co/install.sh | sh"
+            )
+
+            TerminalCommandView(
+              title: "Start the server:",
+              subtitle:
+                "Pulls Qwen3-VL 4B on first start and serves an OpenAI-compatible API on port 8080",
+              command: "basert serve --model \(LocalModelPreferences.defaultModelId(for: .baseRT)) --port 8080"
+            )
+
+            Text(
+              "BaseRT caches models in ~/.cache/baseRT/models. Use `basert list` to see installed models."
+            )
+            .font(.custom("Figtree", size: 13))
+            .foregroundColor(.black.opacity(0.65))
+          }
         } else if setupState.localEngine == .lmstudio {
           VStack(alignment: .leading, spacing: 16) {
             Text("After installing LM Studio, download the recommended model:")
               .font(.custom("Figtree", size: 14))
               .foregroundColor(.black.opacity(0.6))
-
             DayflowSurfaceButton(
               action: openLMStudioModelDownload,
               content: {
@@ -583,6 +610,7 @@ struct LLMProviderSetupView: View {
                     Text("Ollama").tag(LocalEngine.ollama)
                     Text("LM Studio").tag(LocalEngine.lmstudio)
                     Text("llama.cpp").tag(LocalEngine.llamaCpp)
+                    Text("BaseRT").tag(LocalEngine.baseRT)
                     Text("Custom model").tag(LocalEngine.custom)
                   }
                   .pickerStyle(.segmented)

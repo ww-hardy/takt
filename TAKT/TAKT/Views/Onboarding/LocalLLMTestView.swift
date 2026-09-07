@@ -268,7 +268,7 @@ enum LocalLLMTestRequestBuilder {
     request.setValue("application/json", forHTTPHeaderField: "Content-Type")
     if engine == .lmstudio {
       request.setValue("Bearer lm-studio", forHTTPHeaderField: "Authorization")
-    } else if engine == .custom && !apiKey.isEmpty {
+    } else if (engine == .custom || engine == .baseRT) && !apiKey.isEmpty {
       request.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
     }
 

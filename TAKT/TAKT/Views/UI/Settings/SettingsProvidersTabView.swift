@@ -783,6 +783,7 @@ struct LocalModelUpgradeSheet: View {
             Text("Ollama").tag(LocalEngine.ollama)
             Text("LM Studio").tag(LocalEngine.lmstudio)
             Text("llama.cpp").tag(LocalEngine.llamaCpp)
+            Text("BaseRT").tag(LocalEngine.baseRT)
             Text("Custom").tag(LocalEngine.custom)
           }
           .pickerStyle(.segmented)
