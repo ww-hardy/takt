@@ -2,7 +2,9 @@ import AppKit
 import Foundation
 
 enum RecordingPrivacyPlaceholder {
-  @MainActor
+  // Pure local image work (drawing into a private NSImage + JPEG encode);
+  // intentionally NOT MainActor so it runs on the recorder's background
+  // queue instead of blocking the UI thread during encoding.
   static func jpegData(
     size: CGSize,
     quality: CGFloat,

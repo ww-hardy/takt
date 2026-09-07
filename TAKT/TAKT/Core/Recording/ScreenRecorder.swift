@@ -329,7 +329,9 @@ final class ScreenRecorder: NSObject, @unchecked Sendable {
     let timer = DispatchSource.makeTimerSource(queue: q)
     timer.schedule(deadline: .now() + interval, repeating: interval)
     timer.setEventHandler { [weak self] in
-      Task { await self?.captureScreenshot() }
+      // Screenshots are background timeline data; utility QoS keeps CPU/energy
+      // impact low while still completing well within the 10s interval.
+      Task(priority: .utility) { await self?.captureScreenshot() }
     }
     timer.resume()
     captureTimer = timer
@@ -366,14 +368,13 @@ final class ScreenRecorder: NSObject, @unchecked Sendable {
       if let blockedApplication = await MainActor.run(body: {
         RecordingPrivacyPreferences.frontmostBlockedApplication()
       }) {
+        // Encode off the main actor: the placeholder is local image work.
         guard
-          let jpegData = await MainActor.run(body: {
-            RecordingPrivacyPlaceholder.jpegData(
-              size: CGSize(width: captureSize.width, height: captureSize.height),
-              quality: Config.jpegQuality,
-              applicationName: blockedApplication.name
-            )
-          })
+          let jpegData = RecordingPrivacyPlaceholder.jpegData(
+            size: CGSize(width: captureSize.width, height: captureSize.height),
+            quality: Config.jpegQuality,
+            applicationName: blockedApplication.name
+          )
         else {
           throw ScreenRecorderError.imageConversionFailed
         }

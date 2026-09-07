@@ -116,6 +116,7 @@ struct TaktApp: App {
   @AppStorage("hasCompletedJournalOnboarding") private var hasCompletedJournalOnboarding = false
   @State private var contentOpacity = 0.0
   @State private var contentScale = 0.98
+  @State private var entranceAnimationComplete = false
   @StateObject private var categoryStore = CategoryStore()
   @StateObject private var journalCoordinator = JournalCoordinator()
 
@@ -145,14 +146,21 @@ struct TaktApp: App {
               .environmentObject(updaterManager)
           }
         }
-        .opacity(contentOpacity)
-        .scaleEffect(contentScale)
-        .animation(.easeOut(duration: 0.3).delay(0.15), value: contentOpacity)
-        .animation(.easeOut(duration: 0.3).delay(0.15), value: contentScale)
+        .modifier(RootEntranceEffect(
+          isActive: !entranceAnimationComplete,
+          opacity: contentOpacity,
+          scale: contentScale
+        ))
         .onAppear {
-          withAnimation(.easeOut(duration: 0.3)) {
+          withAnimation(.easeOut(duration: 0.3).delay(0.15)) {
             contentOpacity = 1.0
             contentScale = 1.0
+          }
+          // Drop the entrance effects from the view graph once the animation
+          // is done so the root hierarchy is not re-evaluated every frame.
+          Task { @MainActor in
+            try? await Task.sleep(nanoseconds: 600_000_000)
+            entranceAnimationComplete = true
           }
           if didOnboard {
             dispatchPendingNotificationNavigation(after: 0.1)
@@ -332,5 +340,26 @@ private struct MainWindowRegistrationView: View {
       .onAppear {
         MainWindowController.shared.register(openWindow)
       }
+  }
+}
+
+/// Applies the launch fade/scale entrance only while it is animating, then
+/// removes itself from the view graph. Keeping `.opacity`/`.scaleEffect`
+/// permanently on the root hierarchy forces GeometryEffect + RendererEffect
+/// evaluation on every layout pass; dropping them avoids that constant cost.
+private struct RootEntranceEffect: ViewModifier {
+  let isActive: Bool
+  let opacity: Double
+  let scale: Double
+
+  @ViewBuilder
+  func body(content: Content) -> some View {
+    if isActive {
+      content
+        .opacity(opacity)
+        .scaleEffect(scale)
+    } else {
+      content
+    }
   }
 }
